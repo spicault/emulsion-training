@@ -5,3 +5,4 @@ dependencies:
   - python=3.8
   - r-base=3.6
   - r-tidyverse
+  - rpy2
