@@ -1,3 +1,1 @@
-numpy
-pandas
-matplotlib
+emulsion==1.2b1
