@@ -1,0 +1,446 @@
+---
+#  __  __           _      _
+# |  \/  |         | |    | |
+# | \  / | ___   __| | ___| |
+# | |\/| |/ _ \ / _` |/ _ \ |
+# | |  | | (_) | (_| |  __/ |
+# |_|  |_|\___/ \__,_|\___|_|
+#
+#  _____        __                           _   _
+# |_   _|      / _|                         | | (_)
+#   | |  _ __ | |_ ___  _ __ _ __ ___   __ _| |_ _  ___  _ __
+#   | | | '_ \|  _/ _ \| '__| '_ ` _ \ / _` | __| |/ _ \| '_ \
+#  _| |_| | | | || (_) | |  | | | | | | (_| | |_| | (_) | | | |
+# |_____|_| |_|_| \___/|_|  |_| |_| |_|\__,_|\__|_|\___/|_| |_|
+
+
+# NAME OF THE MODEL
+model_name: Bat_Cattle_Rabies
+
+
+# DESCRIPTION OF THE MODEL
+model_info:
+  abstract: 'This model is a simple discrete-time, stochastic,
+  hybrid model of bat-borne cattle rabies'
+  author: 'Sebastien Picault (sebastien.picault@inra.fr)'
+  source: 'Massad et al. 2001 (DOI: 10.1006/tpbi.2000.1494)'
+
+#  _______ _
+# |__   __(_)
+#    | |   _ _ __ ___   ___
+#    | |  | | '_ ` _ \ / _ \
+#    | |  | | | | | | |  __/
+#    |_|  |_|_| |_| |_|\___|
+
+# TIME INFORMATION
+# This section defines the time unit (used e.g. for expressing
+# durations, rates, etc.), the duration of the time step, the origin
+# date and total duration of the simulation.
+time_info:
+  time_unit: 'days'
+  delta_t: 1
+  origin: 'January 1, 2019'
+  total_duration: '2 * 365'
+  calendars:
+    vaccination:
+      events:
+        first_year: {begin: 'January 1, 2019', end: 'December 31, 2019'}
+        second_year: {begin: 'January 1, 2020', end: 'December 31, 2020'}
+
+
+
+#  _                    _
+# | |                  | |
+# | |     _____   _____| |___
+# | |    / _ \ \ / / _ \ / __|
+# | |___|  __/\ V /  __/ \__ \
+# |______\___| \_/ \___|_|___/
+
+# ORGANIZATION LEVELS USED IN THE SIMULATION
+# A hybrid model considers two levels: the population and
+# its components (individuals)
+levels:
+  group:
+    desc: 'level of the population'
+    aggregation_type: 'hybrid'   # the keyword for designing hybrid models
+    default_prototype: default_group
+    contains:
+      - animals
+  animals:
+    desc: 'level of the individuals'
+
+
+
+#  _____
+# |  __ \
+# | |__) | __ ___   ___ ___  ___ ___  ___  ___
+# |  ___/ '__/ _ \ / __/ _ \/ __/ __|/ _ \/ __|
+# | |   | | | (_) | (_|  __/\__ \__ \  __/\__ \
+# |_|   |_|  \___/ \___\___||___/___/\___||___/
+
+# LIST OF PROCESSES (IN ORDER) TO BE EXECUTED DURING EACH TIME STEP
+# In a hybrid model, processes take place at the population level
+# (here, herd) and are managed by groupings
+processes:
+  group:
+    - group_by_species
+    - infection                 # name of a grouping
+
+
+#   _____                       _
+#  / ____|                     (_)
+# | |  __ _ __ ___  _   _ _ __  _ _ __   __ _
+# | | |_ | '__/ _ \| | | | '_ \| | '_ \ / _` |
+# | |__| | | | (_) | |_| | |_) | | | | | (_| |
+#  \_____|_|  \___/ \__,_| .__/|_|_| |_|\__, |
+#                        | |             __/ |
+#                        |_|            |___/
+
+# DESCRIPTION OF GROUPINGS, ASSOCIATED WITH PROCESSES WHICH ARE NOT
+# DIRECTLY BASED ON STATE MACHINES
+# A grouping is based on one or more variables. For instance, the
+# grouping for managing the 'infection' process is based on the
+# variable 'health_state' (coming from the state machine with the same
+# name): hence, one group will be defined for all possible values of
+# the health_state variable.
+
+grouping:
+  group:
+    infection:
+      machine_name: health_state
+      key_variables: [health_state, species]
+    group_by_species:
+      machine_name: species
+      key_variables: [species]
+
+
+#   _____ _        _         __  __            _     _
+#  / ____| |      | |       |  \/  |          | |   (_)
+# | (___ | |_ __ _| |_ ___  | \  / | __ _  ___| |__  _ _ __   ___  ___
+#  \___ \| __/ _` | __/ _ \ | |\/| |/ _` |/ __| '_ \| | '_ \ / _ \/ __|
+#  ____) | || (_| | ||  __/ | |  | | (_| | (__| | | | | | | |  __/\__ \
+# |_____/ \__\__,_|\__\___| |_|  |_|\__,_|\___|_| |_|_|_| |_|\___||___/
+
+# DESCRIPTION OF THE STATE MACHINES INVOLVED IN THE MODEL
+# Each state machine is composed at least of several states.
+# The name of a state machine defines an individual variable which
+# contains the value of the current state in the individual.
+# Transitions define how each change can change to another one.
+# Productions define how individuals in one state can produce
+# new individuals in another state.
+state_machines:
+  species:
+    desc: 'The state machine used to differentiate bats from cattle'
+    states:
+      - Bat:
+          name: 'Bat'
+          desc: 'Vampire bats'
+          fillcolor: 'red'
+      - Cattle:
+          name: 'Cattle'
+          desc: 'Bovine animals'
+          fillcolor: 'green'
+      - Dead:
+          name: 'Dead'
+          desc: 'Animals that died from natural causes or ecological interactions'
+          fillcolor: 'white'
+          autoremove: yes
+    transitions:
+      # mortality
+      - from: Bat
+        to: Dead
+        rate: 'bat_mortality_rate'
+        desc: 'mortality of bats'
+      - from: Cattle
+        to: Dead
+        rate: 'cattle_mortality_rate'
+        desc: 'mortality of cattle'
+
+    ## birth
+    productions:
+      - from: Bat
+        to: Bat
+        rate: 'bat_birth'
+        prototype: 'newborn_bat'
+      - from: Cattle
+        to: Cattle
+        rate: 'cattle_birth'
+        prototype: 'newborn_cattle'
+  health_state:
+    desc: 'The state machine which defines the evolution of health states'
+    # Below, the list of states with their attributes.
+    states:
+      - X:
+          name: 'Susceptible'
+          desc: 'suceptible of becoming infected'
+          fillcolor: 'wheat'
+      - H:
+          name: 'Infected'
+          desc: 'Infected without noticeable disease (latent)'
+          fillcolor: 'magenta'
+      - Y:
+          name: 'Ill'
+          desc: 'Clinically ill'
+          fillcolor: 'maroon'
+      - Z:
+          name: 'Vaccinated'
+          desc: 'protected against infection'
+          fillcolor: 'deepskyblue'
+      - D:
+          name: 'Dead'
+          desc: 'dead animals'
+          fillcolor: 'white'
+          autoremove: yes
+    transitions:
+      # infectious process
+      - from: X
+        to: H
+        rate: 'is_Bat * bat_force_of_infection'
+        desc: 'infection experienced by bats, leading to latent state'
+      - from: H
+        to: Y
+        rate: 'tau'
+        desc: 'transference from latent to rabid bats'
+      - from: X
+        to: Y
+        rate: 'is_Cattle * cattle_force_of_infection'
+        desc: 'infection experienced by cattle, leading directly to clinically ill state'
+      - from: X
+        to: Z
+        rate: 'is_Cattle * cattle_vaccination_rate'
+      - from: Z
+        to: X
+        rate: 'gamma'
+      # mortality induced by infectious process
+      - from: Y
+        to: D
+        rate: 'is_Bat * alpha_b'
+        desc: 'mortality of rabid bats'
+      - from: Y
+        to: D
+        rate: 'is_Cattle * alpha_c'
+        desc: 'mortality of rabid cattle'
+        on_cross:
+          - record_change: rabies_losses
+
+#  _____                               _
+# |  __ \                             | |
+# | |__) |_ _ _ __ __ _ _ __ ___   ___| |_ ___ _ __ ___
+# |  ___/ _` | '__/ _` | '_ ` _ \ / _ \ __/ _ \ '__/ __|
+# | |  | (_| | | | (_| | | | | | |  __/ ||  __/ |  \__ \
+# |_|   \__,_|_|  \__,_|_| |_| |_|\___|\__\___|_|  |___/
+
+# PARAMETERS/FUNCTIONS/EXPRESSIONS USED IN THE MODEL
+parameters:
+  ## INITIAL CONDITIONS
+  initial_bat_prevalence:
+    desc: 'initial prevalence of rabies in bats (Y)'
+    value: 0.01
+  ## INFECTION
+  bat_force_of_infection:
+    desc: 'force of infection experienced by bats, resulting from 1) infection by latent bats, 2) infection by rabid bats, and 3) a small fraction of infection by bitten rabid cattle'
+    value: 'beta_1 * total_H_Bat / total_Bat + beta_2 * total_Y_Bat / total_Bat + delta * a_X * total_Y_Cattle / total_Cattle'
+  cattle_force_of_infection:
+    desc: 'force of infection experienced by cattle, resulting from bites by latend and rabid bats'
+    value: 'kappa_1 * a_Y * total_Y_Bat / total_Cattle + kappa_2 * a_H * total_H_Bat / total_Cattle'
+  tau:
+    desc: 'rate of transference from latent to rabid bats (per day)'
+    value: '1 / 21'
+  beta_1:
+    desc: 'contact rate between susceptible and latent bats (per day)'
+    value: '4 / 365'
+  beta_2:
+    desc: 'contact rate between susceptible and rabid bats (per day)'
+    value: '8 / 365'
+  delta:
+    desc: 'probability of bats acquiring rabies from rabid cattle'
+    value: 0.0001
+  gamma:
+    desc: 'rate of immunity loss (per day)'
+    value: '1 / 362'
+  kappa_1:
+    desc: 'fraction of rabid bats bites that result in an infection'
+    value: 0.7
+  kappa_2:
+    desc: 'fraction of latent bats bites that result in an infection'
+    value: 0.4
+  epsilon:
+    desc: 'fraction of bitten cattle that die from bleeding'
+    value: 0.001
+  a_X:
+    desc: 'susceptible bats biting rate (per day)'
+    value: '200 / 365'
+  a_H:
+    desc: 'latent bats biting rate (per day)'
+    value: '200 / 365'
+  a_Y:
+    desc: 'rabit bats biting rate (per day)'
+    value: '300 / 365'
+
+  ## DEMOGRAPHY
+  bat_mortality_rate:
+    desc: 'bat mortality rate not caused by rabies'
+    value: 'mu_b * (1 + bat_additional_mortality)'
+  cattle_mortality_rate:
+    desc: 'cattle mortality rate not caused by rabies (natural mortality + bleeding)'
+    value: 'mu_c + epsilon * (a_X * total_X_Bat + a_H * total_H_Bat + a_Y * total_Y_Bat) / total_Cattle'
+  bat_birth:
+    desc: 'environment-dependent birth rate in bats (Phi in paper)'
+    value: 'r_b * (1 - total_Bat / (K_b + sigma_1 * total_Cattle))'
+  cattle_birth:
+    desc: 'environment-dependent birth rate in cattle bats (Gamma in paper)'
+    value: 'r_c / (1 + sigma_2 * total_Bat) * (1 - total_Cattle / K_c)'
+  mu_b:
+    desc: 'bats natural mortality rate (per day)'
+    value: '0.083 / 365'
+  mu_c:
+    desc: 'cattle harvesting + natural mortality rate (per day)'
+    value: '0.067 / 365'
+  r_b:
+    desc: 'birth rate of bats (per day)'
+    value: '2 / 365'
+  r_c:
+    desc: 'cattle birth rate (per day)'
+    value: '10 / 365'
+  K_b:
+    desc: 'bats carrying capacity'
+    value: 200
+  K_c:
+    desc: 'carrying capacity of cattle'
+    value: 500
+  sigma_1:
+    desc: 'influence of cattle on bats carrying capacity'
+    value: 0.01
+  sigma_2:
+    desc: 'influence of bats on cattle population growth rate'
+    value: 0.001
+  alpha_b:
+    desc: 'bats addition mortality rate due to rabies (per day)'
+    value: '12 / 365'
+  alpha_c:
+    desc: 'total mortality rate of rabid cattle (per day)'
+    value: '60 / 365'
+
+  ## CONTROL
+  cattle_vaccination_rate:
+    desc: 'cattle vaccination rate (per day)'
+    value: '1 / 365'
+  bat_additional_mortality:
+    desc: 'additional factor to bat mortality (vampiricide gel)'
+    value: '0.2'
+  prop_vaccinated:
+    desc: 'actual proportion of vaccinated cattle'
+    value: 'total_Z / total_Cattle'
+  bat_latent_prevalence:
+    desc: 'prevalence of latent state in bat population'
+    value: 'total_H_Bat / total_Bat'
+  bat_rabid_prevalence:
+    desc: 'prevalence of rabid state in bat population'
+    value: 'total_Y_Bat / total_Bat'
+  cattle_rabid_prevalence:
+    desc: 'prevalence of rabid state in cattle population'
+    value: 'total_Y_Cattle / total_Cattle'
+  disease_impact:
+    desc: 'relative losses in cattle due to rabies compared to carrying capacity'
+    value: 'rabies_losses / K_c'
+
+#   _____ _        _
+#  / ____| |      | |
+# | (___ | |_ __ _| |_ _____   ____ _ _ __ ___
+#  \___ \| __/ _` | __/ _ \ \ / / _` | '__/ __|
+#  ____) | || (_| | ||  __/\ V / (_| | |  \__ \
+# |_____/ \__\__,_|\__\___| \_/ \__,_|_|  |___/
+statevars:
+  rabies_losses:
+    desc: 'total amount of cattle that died from rabies'
+
+#  _____           _        _
+# |  __ \         | |      | |
+# | |__) | __ ___ | |_ ___ | |_ _   _ _ __   ___  ___
+# |  ___/ '__/ _ \| __/ _ \| __| | | | '_ \ / _ \/ __|
+# | |   | | | (_) | || (_) | |_| |_| | |_) |  __/\__ \
+# |_|   |_|  \___/ \__\___/ \__|\__, | .__/ \___||___/
+#                                __/ | |
+#                               |___/|_|
+
+# PROTOTYPES describe typical individuals, characterized by specific
+# values of their variables
+prototypes:
+  group:
+    - default_group:
+        rabies_losses: 0
+  animals:
+    - susceptible_cattle:
+        desc: 'suceptible cattle animals'
+        species: Cattle
+        health_state: X
+    - susceptible_bat:
+        desc: 'suceptible vampire bats'
+        species: Bat
+        health_state: X
+    - infected_bat:
+        desc: 'infected vampire bats'
+        health_state: H
+        species: Bat
+    - newborn_bat:
+        desc: 'newborn susceptible bat'
+        species: Bat
+        health_state: X
+    - newborn_cattle:
+        desc: 'newborn susceptible cattle'
+        species: Cattle
+        health_state: X
+
+#  _____       _ _   _       _
+# |_   _|     (_) | (_)     | |
+#   | |  _ __  _| |_ _  __ _| |
+#   | | | '_ \| | __| |/ _` | |
+#  _| |_| | | | | |_| | (_| | |
+# |_____|_| |_|_|\__|_|\__,_|_|
+
+#   _____                _ _ _   _
+#  / ____|              | (_) | (_)
+# | |     ___  _ __   __| |_| |_ _  ___  _ __  ___
+# | |    / _ \| '_ \ / _` | | __| |/ _ \| '_ \/ __|
+# | |___| (_) | | | | (_| | | |_| | (_) | | | \__ \
+#  \_____\___/|_| |_|\__,_|_|\__|_|\___/|_| |_|___/
+
+# INITIAL CONDITIONS FOR THE SIMULATION
+# In IBM or hybrid models, initial conditions describe the prototypes
+# involved with the amount of individuals in each of those prototypes
+initial_conditions:
+  group:
+    - prototype: susceptible_bat
+      amount: 'K_b * (1 - initial_bat_prevalence)'
+    - prototype: infected_bat
+      amount: 'K_b * initial_bat_prevalence'
+    - prototype: susceptible_cattle
+      amount: 'K_c'
+
+
+#   ____        _               _
+#  / __ \      | |             | |
+# | |  | |_   _| |_ _ __  _   _| |_ ___
+# | |  | | | | | __| '_ \| | | | __/ __|
+# | |__| | |_| | |_| |_) | |_| | |_\__ \
+#  \____/ \__,_|\__| .__/ \__,_|\__|___/
+#                  | |
+#                  |_|
+
+# TYPE AND PERIODICITY OF OUTPUTS
+# The amount of individuals in each state is automatically recorded
+# for all state machines each time step during the simulation.
+# Additional variables (e.g. expressions defined in the 'parameters'
+# section) can be specified below (as 'extra_vars').
+outputs:
+  type: csv
+  group:
+    period: 1
+    extra_vars:
+      - bat_latent_prevalence
+      - bat_rabid_prevalence
+      - cattle_rabid_prevalence
+      - disease_impact
+      - cattle_vaccination_rate
+      - prop_vaccinated
+...
