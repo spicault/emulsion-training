@@ -141,6 +141,7 @@ state_machines:
           name: 'Juveniles'
           desc: 'juvenile individuals'
           fillcolor: 'purple'
+          default: yes
       - A:
           name: 'Adults'
           desc: 'adult individuals'
@@ -228,9 +229,11 @@ prototypes:
     - healthy:
         desc: 'healthy animals'
         health_state: S
+        age_group: default
     - infectious:
         desc: 'infectious animals'
         health_state: I
+        age_group: default
     - newborn:
         desc: 'newborn animals'
         health_state: S
