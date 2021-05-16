@@ -1,0 +1,26 @@
+digraph {
+          charset="utf-8"
+        	rankdir=LR;
+        
+        	node[fontsize=16, fontname=Arial, shape=box, style="filled,rounded"];
+        	edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip="", headtooltip=""];
+
+        	"J" [shape="Mrecord", label="J", tooltip="J (Juveniles):
+	juvenile individuals", fillcolor="purple", style="filled,rounded"] ;
+	"A" [shape="Mrecord", label="A", tooltip="A (Adults):
+	adult individuals", fillcolor="maroon", style="filled,rounded"] ;
+	"D" [shape="Mrecord", label="D", tooltip="D (Deceased):
+	decesased individuals (individuals in this state are removed automatically)", fillcolor="white", style="filled,rounded,dotted"] ;
+	"A" -> "D" [label="rate: mortality", labeltooltip="mortality [parameter]:
+	mortality rate, assumed density-dependent                               
+	mu * total_herd / K", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"A" -> "J" [label="rate: b", labeltooltip="b [parameter]:
+	birth rate                                                              
+	2 * mu", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="dashed"];
+	"J" -> "A" [label="rate: maturation", labeltooltip="maturation [parameter]:
+	maturation rate, i.e. speed at which juveniles become adults            
+	0.05", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"J" -> "D" [label="rate: mortality", labeltooltip="mortality [parameter]:
+	mortality rate, assumed density-dependent                               
+	mu * total_herd / K", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+}

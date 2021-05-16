@@ -123,8 +123,15 @@ state_machines:
     # assuming a classical exponential distribution of durations in
     # the states.
     transitions:
-      - {from: S, to: I, rate: 'force_of_infection'}
-      - {from: I, to: R, rate: 'recovery'}
+      - from: S
+        to: I
+        rate: 'force_of_infection'
+        desc: 'infection of susceptibles by infectious, according to the force of infection'
+      - from: I
+        to: R
+        rate: 'recovery'
+        desc: 'recovery of infectious individuals, which become resistant at the specified recovery rate'
+      
 
 
 #  _____                               _
@@ -149,11 +156,10 @@ parameters:
     desc: 'recovery rate (/day)'
     value: 0.1
   force_of_infection:
-    desc: 'infection function'
+    desc: 'infection function assuming frequency dependence'
     value: 'transmission_I * total_I / total_herd'
-    source: 'classical function assuming frequency dependence'
   percentage_prevalence:
-    desc: 'proportion of infected+infectious animals'
+    desc: 'proportion of infected animals'
     value: '100 * total_I / total_herd'
 
 
@@ -192,8 +198,7 @@ prototypes:
 #  \_____\___/|_| |_|\__,_|_|\__|_|\___/|_| |_|___/
 
 # INITIAL CONDITIONS FOR THE SIMULATION
-# In compartment-based models, initial conditions describe the amount
-# of population in each state
+# Initial conditions describe the amount of sub-populations, identified by prototypes
 initial_conditions:
   herd:
     - prototype: infectious

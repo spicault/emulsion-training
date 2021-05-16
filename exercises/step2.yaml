@@ -15,7 +15,7 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_compart_SIR
+model_name: stoch_compart_SIR_JA
 
 
 # DESCRIPTION OF THE MODEL
@@ -124,8 +124,15 @@ state_machines:
     # assuming a classical exponential distribution of durations in
     # the states.
     transitions:
-      - {from: S, to: I, rate: 'force_of_infection'}
-      - {from: I, to: R, rate: 'recovery'}
+      - from: S
+        to: I
+        rate: 'force_of_infection'
+        desc: 'infection of susceptibles by infectious, according to the force of infection'
+      - from: I
+        to: R
+        rate: 'recovery'
+        desc: 'recovery of infectious individuals, which become resistant at the specified recovery rate'
+      
    ## below, the new state machine
   age_group:
     desc: 'the state machine representing the demographic process'
@@ -138,9 +145,28 @@ state_machines:
           name: 'Adults'
           desc: 'adult individuals'
           fillcolor: 'maroon'
+      - D:
+          name: 'Deceased'
+          desc: 'decesased individuals (individuals in this state are removed automatically)'
+          fillcolor: 'white'
+          autoremove: yes
     transitions:
-      - {from: J, to: A, rate: 'maturation'}
-
+      - from: J
+        to: A
+        rate: 'maturation'
+        desc: 'maturation of juvenile individuals into adults'
+      - from: J
+        to: D
+        rate: 'mortality'
+      - from: A
+        to: D
+        rate: 'mortality'
+    productions:
+      - from: A
+        to: J
+        rate: 'b'
+        prototype: 'newborn'
+        desc: 'production of juvenile individuals from adults'
 
 #  _____                               _
 # |  __ \                             | |
@@ -164,15 +190,26 @@ parameters:
     desc: 'recovery rate (/day)'
     value: 0.1
   force_of_infection:
-    desc: 'infection function'
+    desc: 'infection function assuming frequency dependence'
     value: 'transmission_I * total_I / total_herd'
-    source: 'classical function assuming frequency dependence'
   percentage_prevalence:
     desc: 'proportion of infected+infectious animals'
     value: '100 * total_I / total_herd'
   maturation:
     desc: 'maturation rate, i.e. speed at which juveniles become adults'
     value: 0.05
+  mortality:
+    desc: 'mortality rate, assumed density-dependent'
+    value: 'mu * total_herd / K'
+  mu:
+    desc: 'base mortality rate'
+    value: 0.05
+  K:
+    desc: 'carrying capacity of the environment'
+    value: 150
+  b:
+    desc: 'birth rate'
+    value: '2 * mu'
 
 
 
@@ -194,6 +231,10 @@ prototypes:
     - infectious:
         desc: 'infectious animals'
         health_state: I
+    - newborn:
+        desc: 'newborn animals'
+        health_state: S
+        age_group: J
 
 
 #  _____       _ _   _       _
@@ -211,8 +252,7 @@ prototypes:
 #  \_____\___/|_| |_|\__,_|_|\__|_|\___/|_| |_|___/
 
 # INITIAL CONDITIONS FOR THE SIMULATION
-# In compartment-based models, initial conditions describe the amount
-# of population in each state
+# Initial conditions describe the amount of sub-populations, identified by prototypes
 initial_conditions:
   herd:
     - prototype: infectious
