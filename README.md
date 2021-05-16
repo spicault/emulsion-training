@@ -2,7 +2,7 @@
 
 | Author: **Sébastien Picault, INRAE** | June 2-4, 2021 |
 |---|---|
-| License: [CC-BY-NC-SA](https://en.wikipedia.org/wiki/Creative_Commons_license) | ![CC-BY-NC-SA](https://upload.wikimedia.org/wikipedia/commons/1/12/Cc-by-nc-sa_icon.svg \"License CC-BY-NC-SA\") |
+| License: [CC-BY-NC-SA](https://en.wikipedia.org/wiki/Creative_Commons_license) | ![CC-BY-NC-SA](https://upload.wikimedia.org/wikipedia/commons/1/12/Cc-by-nc-sa_icon.svg "License CC-BY-NC-SA") |
 
 This training is part of the doctoral formation proposed at the EGAAL doctoral school.
 
