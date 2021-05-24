@@ -1,2 +1,2 @@
-pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ emulsion==1.2b2
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ emulsion==1.2b3
 init_emulsion
