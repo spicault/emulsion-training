@@ -15,18 +15,14 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_hybrid_SIR_JA
+model_name: stoch_compart_SEIR_JA_dur_struct
 
 
 # DESCRIPTION OF THE MODEL
 model_info:
   abstract: 'This model is a simple discrete-time, stochastic,
-  hybrid SIR model. In EMULSION, a model is characterized
-  by several sections (time_info, processes, state_machines, etc.)
-  which are detailed below.
-
-  The organization of this document mainly relies upon correct
-  indentation (2 white spaces) to move from section to sub-section.'
+  compartment-based SIR model with demography and age structure,
+  and a contact structure between age group.'
   author: 'Sebastien Picault (sebastien.picault@inrae.fr)'
 
 
@@ -63,11 +59,12 @@ levels:
   # name of the level (arbitrary name)
   herd:
     desc: 'level of the population'
-    aggregation_type: 'hybrid'
+    aggregation_type: 'compartment'
     contains:
       - animals
   animals:
     desc: 'level of individuals (not simulated in compartment-based models)'
+
 
 #   _____                       _
 #  / ____|                     (_)
@@ -78,16 +75,10 @@ levels:
 #                        | |             __/ |
 #                        |_|            |___/
 
-# DESCRIPTION OF GROUPINGS
-# A grouping is based on one or more variables. For instance, the
-# grouping for managing the 'infection' process is based on the
-# variable 'health_state' (coming from the state machine with the same
-# name): hence, one group will be defined for all possible values of
-# the health_state variable.
 grouping:
   herd:
-    infection: [health_state]
-    aging: [age_group]
+    infection_by_age: [health_state, age_group]
+
 
 #  _____
 # |  __ \
@@ -97,11 +88,10 @@ grouping:
 # |_|   |_|  \___/ \___\___||___/___/\___||___/
 
 # LIST OF PROCESSES (IN ORDER) TO BE EXECUTED DURING EACH TIME STEP
-# IN HYBRID MODELS, PROCESSES ARE EXPECTED TO RUN ON A SPECIFIC GROUPING:
 processes:
   animals:
-    - health_state: infection    # name of a state machine which runs at the level of indivuals, associated with the grouping
-    - age_group: aging                    
+    - health_state                 # name of a state machine which runs at the level of indivuals
+    - age_group                    # a new process based on the new state machine (see below)
 
 
 
@@ -129,11 +119,16 @@ state_machines:
       - S:
           name: 'Susceptible'
           desc: 'suceptible of becoming infected'
-          fillcolor: 'darkgreen'
+          fillcolor: 'limegreen'
+      - E:
+          name: 'Exposed'
+          desc: 'infected individuals, not yet infectious'
+          fillcolor: 'cyan'
+          duration: 'dur_latency'
       - I:
           name: 'Infectious'
           desc: 'infected and able to transmit the disease'
-          fillcolor: 'red'
+          fillcolor: 'firebrick'
       - R:
           name: 'Resistant'
           desc: 'healthy again and resistant to infection'
@@ -145,14 +140,18 @@ state_machines:
     # the states.
     transitions:
       - from: S
-        to: I
+        to: E
         rate: 'force_of_infection'
         desc: 'infection of susceptibles by infectious, according to the force of infection'
+      - from: E
+        to: I
+        proba: 1
+        desc: 'all infected individuals become infectious after duration dur_latency'
       - from: I
         to: R
         rate: 'recovery'
         desc: 'recovery of infectious individuals, which become resistant at the specified recovery rate'
-      
+
    ## below, the new state machine
   age_group:
     desc: 'the state machine representing the demographic process'
@@ -160,12 +159,13 @@ state_machines:
       - J:
           name: 'Juveniles'
           desc: 'juvenile individuals'
-          fillcolor: 'purple'
+          fillcolor: 'deeppink'
           default: yes
+          duration: 'dur_juvenile'
       - A:
           name: 'Adults'
           desc: 'adult individuals'
-          fillcolor: 'maroon'
+          fillcolor: 'brown'
       - D:
           name: 'Deceased'
           desc: 'decesased individuals (individuals in this state are removed automatically)'
@@ -174,11 +174,12 @@ state_machines:
     transitions:
       - from: J
         to: A
-        rate: 'maturation'
+        proba: 1
         desc: 'maturation of juvenile individuals into adults'
       - from: J
         to: D
         rate: 'mortality'
+        escape: yes
       - from: A
         to: D
         rate: 'mortality'
@@ -207,15 +208,39 @@ parameters:
   transmission_I:
     desc: 'transmission rate from infectious animals (/day)'
     value: 0.5
+  transAA:
+    desc: 'transmission rate between adults (/day)'
+    value: 1
+  transJJ:
+    desc: 'transmission rate between juveniles (/day)'
+    value: 0.1
+  transAJ:
+    desc: 'transmission rate from infectious adults to susceptible juveniles (/day)'
+    value: 0.05
+  transJA:
+    desc: 'transmission rate from infectious juveniles to susceptible adults (/day)'
+    value: 0.05
   recovery:
     desc: 'recovery rate (/day)'
     value: 0.1
   force_of_infection:
-    desc: 'infection function assuming frequency dependence'
-    value: 'transmission_I * total_I / total_herd'
+    desc: 'infection function assuming frequency dependence, depending on age group'
+    value: 'is_J * force_of_infection_juveniles + is_A * force_of_infection_adults'
+  force_of_infection_juveniles:
+    desc: 'force of infection experienced by juveniles'
+    value: '(transJJ * total_I_J + transAJ * total_I_A) / total_herd'
+  force_of_infection_adults:
+    desc: 'force of infection experienced by adults'
+    value: '(transAA * total_I_A + transJA * total_I_J) / total_herd'
   percentage_prevalence:
     desc: 'proportion of infected+infectious animals'
-    value: '100 * total_I / total_herd'
+    value: '100 * (total_I + total_E) / total_herd'
+  percentage_prevalence_adults:
+    desc: 'proportion of infected+infectious adults'
+    value: 'DIV(100 * (total_I_A + total_E_A), total_A)'
+  percentage_prevalence_juveniles:
+    desc: 'proportion of infected+infectious juveniles'
+    value: 'DIV(100 * (total_I_J + total_E_J), total_J)'
   maturation:
     desc: 'maturation rate, i.e. speed at which juveniles become adults'
     value: 0.05
@@ -231,6 +256,15 @@ parameters:
   b:
     desc: 'birth rate'
     value: '2 * mu'
+  dur_juvenile:
+    desc: 'duration of juvenile state'
+    value: '1/maturation'
+  avg_dur_latency:
+    desc: 'average duration of latent (E) state'
+    value: 6
+  dur_latency:
+    desc: 'distribution of the durations in state E'
+    value: 'random_gamma(50, avg_dur_latency/50)'
 
 
 
@@ -249,6 +283,10 @@ prototypes:
     - healthy:
         desc: 'healthy animals'
         health_state: S
+        age_group: default
+    - infected:
+        desc: 'infected animals'
+        health_state: E
         age_group: default
     - infectious:
         desc: 'infectious animals'
@@ -278,7 +316,7 @@ prototypes:
 # Initial conditions describe the amount of sub-populations, identified by prototypes
 initial_conditions:
   herd:
-    - prototype: infectious
+    - prototype: infected
       amount: 'initial_herd_size * initial_prevalence'
     - prototype: healthy
       amount: 'initial_herd_size * (1 - initial_prevalence)'
@@ -305,4 +343,6 @@ outputs:
     extra_vars:
       - percentage_prevalence
       - total_herd
+      - percentage_prevalence_adults
+      - percentage_prevalence_juveniles
 ...

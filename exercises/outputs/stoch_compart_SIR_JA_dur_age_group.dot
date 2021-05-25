@@ -5,7 +5,7 @@ digraph {
         	node[fontsize=16, fontname=Arial, shape=box, style="filled,rounded"];
         	edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip="", headtooltip=""];
 
-        	"J" [shape="Mrecord", label="J", tooltip="J (Juveniles):
+        	"J" [shape="Mrecord", label="J&nbsp;&#9719;", tooltip="J (Juveniles):
 	juvenile individuals", fillcolor="deeppink", style="filled,rounded,bold"] ;
 	"A" [shape="Mrecord", label="A", tooltip="A (Adults):
 	adult individuals", fillcolor="brown", style="filled,rounded"] ;
@@ -17,10 +17,8 @@ digraph {
 	"A" -> "J" [label="rate: b", labeltooltip="b [parameter]:
 	birth rate                                                              
 	2 * mu", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="dashed"];
-	"J" -> "A" [label="rate: maturation", labeltooltip="maturation [parameter]:
-	maturation rate, i.e. speed at which juveniles become adults            
-	0.05", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"J" -> "A" [label="proba: 1", labeltooltip="proba: 1", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
 	"J" -> "D" [label="rate: mortality", labeltooltip="mortality [parameter]:
 	mortality rate, assumed density-dependent                               
-	mu * total_herd / K", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	mu * total_herd / K", arrowtail="noneoinv", arrowhead="normalnone", dir=both, tooltip="ESCAPE: True", minlen=3, style="solid"];
 }

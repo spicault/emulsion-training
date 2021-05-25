@@ -6,9 +6,9 @@ digraph {
         	edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip="", headtooltip=""];
 
         	"S" [shape="Mrecord", label="S", tooltip="S (Susceptible):
-	suceptible of becoming infected", fillcolor="darkgreen", style="filled,rounded"] ;
+	suceptible of becoming infected", fillcolor="limegreen", style="filled,rounded"] ;
 	"I" [shape="Mrecord", label="I", tooltip="I (Infectious):
-	infected and able to transmit the disease", fillcolor="red", style="filled,rounded"] ;
+	infected and able to transmit the disease", fillcolor="firebrick", style="filled,rounded"] ;
 	"R" [shape="Mrecord", label="R", tooltip="R (Resistant):
 	healthy again and resistant to infection", fillcolor="deepskyblue", style="filled,rounded"] ;
 	"I" -> "R" [label="rate: recovery", labeltooltip="recovery [parameter]:

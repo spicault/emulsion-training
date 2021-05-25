@@ -15,14 +15,14 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_compart_SIR_demo
+model_name: stoch_compart_SIR_JA
+
 
 # DESCRIPTION OF THE MODEL
 model_info:
   abstract: 'This model is a simple discrete-time, stochastic,
-  compartment-based SIR model with demography and age structure.
-  '
-  author: 'Sebastien Picault (sebastien.picault@inra.fr)'
+  compartment-based SIR model with demography and age structure.'
+  author: 'Sebastien Picault (sebastien.picault@inrae.fr)'
 
 
 #  _______ _
@@ -37,7 +37,7 @@ model_info:
 # durations, rates, etc.), the duration of the time step, the origin
 # date and total duration of the simulation.
 time_info:
-  time_unit: days
+  time_unit: 'days'
   delta_t: 1
   origin: 'January 1'
   total_duration: '100'
@@ -51,10 +51,18 @@ time_info:
 # |______\___| \_/ \___|_|___/
 
 # ORGANIZATION LEVELS USED IN THE SIMULATION
+# A compartment-based model considers two levels: the population level
+# (herd), which is simulated, and the individuals (animals), which
+# stay virtual
 levels:
+  # name of the level (arbitrary name)
   herd:
     desc: 'level of the population'
-    aggregation_type: compartment
+    aggregation_type: 'compartment'
+    contains:
+      - animals
+  animals:
+    desc: 'level of individuals (not simulated in compartment-based models)'
 
 
 #  _____
@@ -65,39 +73,11 @@ levels:
 # |_|   |_|  \___/ \___\___||___/___/\___||___/
 
 # LIST OF PROCESSES (IN ORDER) TO BE EXECUTED DURING EACH TIME STEP
-# In a Compartment-Based Model (or in a Hybrid model), processes take
-# place at the population level (here, herd) and are managed by groupings
 processes:
-  herd:
-    - infection
-    - aging
+  animals:
+    - health_state                 # name of a state machine which runs at the level of indivuals
+    - age_group                    # a new process based on the new state machine (see below)
 
-
-#   _____                       _
-#  / ____|                     (_)
-# | |  __ _ __ ___  _   _ _ __  _ _ __   __ _
-# | | |_ | '__/ _ \| | | | '_ \| | '_ \ / _` |
-# | |__| | | | (_) | |_| | |_) | | | | | (_| |
-#  \_____|_|  \___/ \__,_| .__/|_|_| |_|\__, |
-#                        | |             __/ |
-#                        |_|            |___/
-
-# DESCRIPTION OF GROUPINGS, ASSOCIATED WITH PROCESSES WHICH ARE NOT
-# DIRECTLY BASED ON STATE MACHINES
-# A grouping is based on one or more variables. For instance, the
-# grouping for managing the 'infection' process is based on the
-# variable 'health_state' (coming from the state machine with the same
-# name): hence, one group will be defined for all possible values of
-# the health_state variable.
-
-grouping:
-  herd:
-    infection:
-      machine_name: health_state
-      key_variables: [health_state]
-    aging:
-      machine_name: age_group
-      key_variables: [age_group]
 
 
 #   _____ _        _         __  __            _     _
@@ -118,20 +98,17 @@ state_machines:
   # Below, the definition of the state machine used by the process
   # 'infection'
   health_state:
-    desc: 'The state machine which defines the evolution of health
-    states
-    '
+    desc: 'The state machine which defines the evolution of health states'
     # Below, the list of states with their attributes.
     states:
       - S:
           name: 'Susceptible'
           desc: 'suceptible of becoming infected'
-          fillcolor: 'wheat'
-          default: yes
+          fillcolor: 'limegreen'
       - I:
           name: 'Infectious'
           desc: 'infected and able to transmit the disease'
-          fillcolor: 'maroon'
+          fillcolor: 'firebrick'
       - R:
           name: 'Resistant'
           desc: 'healthy again and resistant to infection'
@@ -142,32 +119,50 @@ state_machines:
     # assuming a classical exponential distribution of durations in
     # the states.
     transitions:
-      - {from: S, to: I, rate: 'force_of_infection'}
-      - {from: I, to: R, rate: 'recovery'}
+      - from: S
+        to: I
+        rate: 'force_of_infection'
+        desc: 'infection of susceptibles by infectious, according to the force of infection'
+      - from: I
+        to: R
+        rate: 'recovery'
+        desc: 'recovery of infectious individuals, which become resistant at the specified recovery rate'
+
+   ## below, the new state machine
   age_group:
-    desc: 'The state machine which defines the evolution of age groups'
+    desc: 'the state machine representing the demographic process'
     states:
       - J:
-          name: 'Juvenile'
-          desc: 'Young animals'
-          fillcolor: 'orange'
+          name: 'Juveniles'
+          desc: 'juvenile individuals'
+          fillcolor: 'deeppink'
           default: yes
       - A:
-          name: 'Adult'
-          desc: 'Adult animals'
+          name: 'Adults'
+          desc: 'adult individuals'
           fillcolor: 'brown'
       - D:
-          name: 'Dead'
-          desc: 'compartment to represent deceased animals'
+          name: 'Deceased'
+          desc: 'decesased individuals (individuals in this state are removed automatically)'
           fillcolor: 'white'
           autoremove: yes
     transitions:
-      - {from: J, to: A, rate: 'maturation'}
-      - {from: A, to: D, rate: 'mortality'}
-      - {from: J, to: D, rate: 'mortality'}
+      - from: J
+        to: A
+        rate: 'maturation'
+        desc: 'maturation of juvenile individuals into adults'
+      - from: J
+        to: D
+        rate: 'mortality'
+      - from: A
+        to: D
+        rate: 'mortality'
     productions:
-      - {from: A, to: J, rate: 'birth'}
-
+      - from: A
+        to: J
+        rate: 'b'
+        prototype: 'newborn'
+        desc: 'production of juvenile individuals from adults'
 
 #  _____                               _
 # |  __ \                             | |
@@ -181,9 +176,9 @@ parameters:
   initial_herd_size:
     desc: 'initial number of animals in the herd'
     value: 100
-  initial_infected:
-    desc: 'initial number of infectious animals in the herd'
-    value: 1
+  initial_prevalence:
+    desc: 'initial proportion of infectious animals in the herd'
+    value: 0.01
   transmission_I:
     desc: 'transmission rate from infectious animals (/day)'
     value: 0.5
@@ -191,27 +186,27 @@ parameters:
     desc: 'recovery rate (/day)'
     value: 0.1
   force_of_infection:
-    desc: 'infection function'
+    desc: 'infection function assuming frequency dependence'
     value: 'transmission_I * total_I / total_herd'
-    source: 'classical function assuming frequency dependence'
   percentage_prevalence:
     desc: 'proportion of infected+infectious animals'
     value: '100 * total_I / total_herd'
   maturation:
-    desc: 'rate at which juveniles become adults (/day)'
-    value: '1/20'
-  b:
-    desc: 'base mortality rate (/day)'
+    desc: 'maturation rate, i.e. speed at which juveniles become adults'
     value: 0.05
   mortality:
-    desc: 'density-dependent mortality rate'
-    value: 'b * total_herd / carrying_capacity'
-  birth:
-    desc: 'birth rate (/day)'
-    value: 'b * 2'
-  carrying_capacity:
+    desc: 'mortality rate, assumed density-dependent'
+    value: 'mu * total_herd / K'
+  mu:
+    desc: 'base mortality rate'
+    value: 0.05
+  K:
     desc: 'carrying capacity of the environment'
-    value: '150'
+    value: 150
+  b:
+    desc: 'birth rate'
+    value: '2 * mu'
+
 
 
 #  _____           _        _
@@ -223,7 +218,22 @@ parameters:
 #                                __/ | |
 #                               |___/|_|
 
-# to be used soon
+# PROTOTYPES DESCRIBE TYPICAL REPRESENTENTS FOR A LEVEL
+prototypes:
+  animals:
+    - healthy:
+        desc: 'healthy animals'
+        health_state: S
+        age_group: default
+    - infectious:
+        desc: 'infectious animals'
+        health_state: I
+        age_group: default
+    - newborn:
+        desc: 'newborn animals'
+        health_state: S
+        age_group: J
+
 
 #  _____       _ _   _       _
 # |_   _|     (_) | (_)     | |
@@ -240,16 +250,13 @@ parameters:
 #  \_____\___/|_| |_|\__,_|_|\__|_|\___/|_| |_|___/
 
 # INITIAL CONDITIONS FOR THE SIMULATION
-# In compartment-based models, initial conditions describe the amount
-# of population in each state
+# Initial conditions describe the amount of sub-populations, identified by prototypes
 initial_conditions:
   herd:
-    - population:
-        - total: 'initial_herd_size'
-        - vars: [S]
-          amount: 'initial_herd_size - initial_infected'
-        - vars: [I]
-          amount: 'initial_infected'
+    - prototype: infectious
+      amount: 'initial_herd_size * initial_prevalence'
+    - prototype: healthy
+      amount: 'initial_herd_size * (1 - initial_prevalence)'
 
 
 #   ____        _               _

@@ -21,12 +21,7 @@ model_name: stoch_compart_SIR_JA
 # DESCRIPTION OF THE MODEL
 model_info:
   abstract: 'This model is a simple discrete-time, stochastic,
-  compartment-based SIR model. In EMULSION, a model is characterized
-  by several sections (time_info, processes, state_machines, etc.)
-  which are detailed below.
-
-  The organization of this document mainly relies upon correct
-  indentation (2 white spaces) to move from section to sub-section.'
+  compartment-based SIR model with demography and age structure.'
   author: 'Sebastien Picault (sebastien.picault@inrae.fr)'
 
 
@@ -109,11 +104,11 @@ state_machines:
       - S:
           name: 'Susceptible'
           desc: 'suceptible of becoming infected'
-          fillcolor: 'darkgreen'
+          fillcolor: 'limegreen'
       - I:
           name: 'Infectious'
           desc: 'infected and able to transmit the disease'
-          fillcolor: 'red'
+          fillcolor: 'firebrick'
       - R:
           name: 'Resistant'
           desc: 'healthy again and resistant to infection'
@@ -132,7 +127,7 @@ state_machines:
         to: R
         rate: 'recovery'
         desc: 'recovery of infectious individuals, which become resistant at the specified recovery rate'
-      
+
    ## below, the new state machine
   age_group:
     desc: 'the state machine representing the demographic process'
@@ -140,12 +135,12 @@ state_machines:
       - J:
           name: 'Juveniles'
           desc: 'juvenile individuals'
-          fillcolor: 'purple'
+          fillcolor: 'deeppink'
           default: yes
       - A:
           name: 'Adults'
           desc: 'adult individuals'
-          fillcolor: 'maroon'
+          fillcolor: 'brown'
       - D:
           name: 'Deceased'
           desc: 'decesased individuals (individuals in this state are removed automatically)'

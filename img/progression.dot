@@ -1,0 +1,29 @@
+digraph {
+          charset="utf-8"
+          rankdir=LR;
+
+          node[fontsize=16, fontname="Arial", shape="note", style=""];
+          edge[minlen=1, penwidth=1.5];
+
+	  s1 [label="step 1\n(SIR)"];
+	  s2 [label="step 2\n(+ JA)"] ;
+	  s3 [label="step 3\n(+ non-exp.\ndurations)"] ;
+	  s4 [label="step 4\n(+ contact\n struct.)"] ;
+
+	  subgraph {
+		  rank = same ;
+		  s5 [label="step 5\n(=> IBM)"] ;
+		  s6 [label="step 6\n(=> hybrid)"] ;
+	  }
+
+	  s7 [label="step 7\n(+ variable\nshedding)"] ;
+	  s8 [label="step 8\n(+ test\nand cull)"] ;
+	  s9 [label="step 9\n(+ quarantine)"] ;
+	  s10 [label="step 10\n(+ metapop)"] ;
+	  // subgraph {
+	  // 	  rank = same ;
+	  // }
+
+          s1 -> s2 -> s3 -> s4 -> s5 ;
+	  s4 -> s6 -> s7 -> s8 -> s9 -> s10 ;
+}

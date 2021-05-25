@@ -108,11 +108,11 @@ state_machines:
       - S:
           name: 'Susceptible'
           desc: 'suceptible of becoming infected'
-          fillcolor: 'darkgreen'
+          fillcolor: 'limegreen'
       - I:
           name: 'Infectious'
           desc: 'infected and able to transmit the disease'
-          fillcolor: 'red'
+          fillcolor: 'firebrick'
       - R:
           name: 'Resistant'
           desc: 'healthy again and resistant to infection'
@@ -131,7 +131,7 @@ state_machines:
         to: R
         rate: 'recovery'
         desc: 'recovery of infectious individuals, which become resistant at the specified recovery rate'
-      
+
 
 
 #  _____                               _

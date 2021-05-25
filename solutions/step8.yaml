@@ -13,16 +13,17 @@
 #  _| |_| | | | || (_) | |  | | | | | | (_| | |_| | (_) | | | |
 # |_____|_| |_|_| \___/|_|  |_| |_| |_|\__,_|\__|_|\___/|_| |_|
 
+
 # NAME OF THE MODEL
-model_name: stoch_hybrid_SIR_demo_metapop_data
+model_name: stoch_hybrid_SEIR_JA_dur_var_test
+
 
 # DESCRIPTION OF THE MODEL
 model_info:
   abstract: 'This model is a simple discrete-time, stochastic,
-  hybrid SIR model with demography and age structure, at the
-  metapopulation scale, with data-based trade movements.
-  '
-  author: 'Sebastien Picault (sebastien.picault@inra.fr)'
+  hybrid SIR model with demography and age structure,
+  and a contact structure between age group.'
+  author: 'Sebastien Picault (sebastien.picault@inrae.fr)'
 
 
 #  _______ _
@@ -37,9 +38,9 @@ model_info:
 # durations, rates, etc.), the duration of the time step, the origin
 # date and total duration of the simulation.
 time_info:
-  time_unit: days
+  time_unit: 'days'
   delta_t: 1
-  origin: 'January 1, 2018'
+  origin: 'January 1'
   total_duration: '100'
 
 
@@ -51,26 +52,23 @@ time_info:
 # |______\___| \_/ \___|_|___/
 
 # ORGANIZATION LEVELS USED IN THE SIMULATION
-# Here we introduced a third level, aggregating herds within
-# a metapopulation.
+# A compartment-based model considers two levels: the population level
+# (herd), which is simulated, and the individuals (animals), which
+# stay virtual
 levels:
+  # name of the level (arbitrary name)
   herd:
     desc: 'level of the population'
-    aggregation_type: hybrid
+    aggregation_type: 'hybrid'
     contains:
       - animals
+    aggregate_vars:
+      - name: 'total_beta'
+        collect: 'beta_i'
+        operator: 'sum'
   animals:
-    desc: 'level of the individuals'
-  metapop:
-    desc: 'level of the metapopulation'
-    contains:
-      - herd
-    aggregation_type: metapopulation
-    # The metapopulation is explicitly linked to a specific class in a
-    # Python code add-on
-    file: step8.py
-    class_name: Metapopulation
-
+    desc: 'level of individuals (not simulated in compartment-based models)'
+    default_prototype: default_animal
 
 #   _____                       _
 #  / ____|                     (_)
@@ -81,26 +79,10 @@ levels:
 #                        | |             __/ |
 #                        |_|            |___/
 
-# DESCRIPTION OF GROUPINGS, ASSOCIATED WITH PROCESSES WHICH ARE NOT
-# DIRECTLY BASED ON STATE MACHINES
-# A grouping is based on one or more variables. For instance, the
-# grouping for managing the 'infection' process is based on the
-# variable 'health_state' (coming from the state machine with the same
-# name): hence, one group will be defined for all possible values of
-# the health_state variable.
-
-# # Groupings are requimaroon for defining processes in compartement-based
-# # or hybrid models.
-# IBM do not require groupings since processes can be directly
-# associated with state machines.
 grouping:
   herd:
-    infection:
-      machine_name: health_state
-      key_variables: [health_state]
-    aging:
-      machine_name: age_group
-      key_variables: [age_group]
+    infection_by_age: [health_state, age_group]
+    infection_and_test: [test_status, health_state]
 
 
 #  _____
@@ -111,16 +93,12 @@ grouping:
 # |_|   |_|  \___/ \___\___||___/___/\___||___/
 
 # LIST OF PROCESSES (IN ORDER) TO BE EXECUTED DURING EACH TIME STEP
-# In a Compartment-Based Model (or in a Hybrid model), processes take
-# place at the population level (here, herd) and are managed by groupings
 processes:
-  herd:
-    - infection
-    - aging
-  metapop:
-    # here the process is the name of a procedure defined in the
-    # Python code
-    - exchange_animals
+  animals:
+    - health_state: infection_by_age
+    - age_group: infection_by_age
+    - test_status: infection_and_test
+
 
 
 #   _____ _        _         __  __            _     _
@@ -138,23 +116,83 @@ processes:
 # Productions define how individuals in one state can produce
 # new individuals in another state.
 state_machines:
+  test_status:
+    desc: 'The state machine which defines the test protocol'
+    states:
+      - Untested:
+          name: 'Untested'
+          desc: 'individuals not yet tested'
+          default: yes
+      - Negative:
+          name: 'Negative'
+          desc: 'individuals tested negative'
+          duration: 'dur_negative'
+          fillcolor: 'limegreen'
+      - Suspicious:
+          name: 'Suspicious'
+          desc: 'individuals tested positive once'
+          duration: 'delay_before_confirmation'
+          fillcolor: 'orange'
+      - Confirmed:
+          name: 'Confirmed'
+          desc: 'individuals tested positive twice in consecutive tests'
+          fillcolor: 'red'
+          duration: 'delay_before_culling'
+      - Culled:
+          name: 'Culled'
+          desc: 'individuals removed from the herd'
+          autoremove: yes
+          fillcolor: 'white'
+    transitions:
+      - from: Untested
+        to: Negative
+        proba: 'time_to_test * proba_negative_test'
+      - from: Untested
+        to: Suspicious
+        proba: 'time_to_test * proba_positive_test'
+      - from: Suspicious
+        to: Negative
+        proba: 'proba_negative_test'
+      - from: Suspicious
+        to: Confirmed
+        proba: 'proba_positive_test'
+      - from: Negative
+        to: Untested
+        proba: 1
+      - from: Confirmed
+        to: Culled
+        proba: 1
+
   # Below, the definition of the state machine used by the process
   # 'infection'
   health_state:
-    desc: 'The state machine which defines the evolution of health
-    states
-    '
+    desc: 'The state machine which defines the evolution of health states'
     # Below, the list of states with their attributes.
     states:
       - S:
           name: 'Susceptible'
           desc: 'suceptible of becoming infected'
-          fillcolor: 'wheat'
-          default: yes
+          fillcolor: 'limegreen'
+      - E:
+          name: 'Exposed'
+          desc: 'infected individuals, not yet infectious'
+          fillcolor: 'cyan'
+          duration: 'dur_latency'
       - I:
           name: 'Infectious'
           desc: 'infected and able to transmit the disease'
-          fillcolor: 'maroon'
+          fillcolor: 'firebrick'
+          on_enter:
+            - set_var: 'beta_i_max'
+              value: 'beta_max'
+            - set_var: 'beta_i'
+              value: 'beta_i_max'
+          on_stay:
+            - set_var: 'beta_i'
+              value: 'beta'
+          on_exit:
+            - set_var: 'beta_i'
+              value: 0
       - R:
           name: 'Resistant'
           desc: 'healthy again and resistant to infection'
@@ -165,33 +203,56 @@ state_machines:
     # assuming a classical exponential distribution of durations in
     # the states.
     transitions:
-      - {from: S, to: I, rate: 'force_of_infection'}
-      - {from: I, to: R, rate: 'recovery'}
+      - from: S
+        to: E
+        rate: 'force_of_infection'
+        desc: 'infection of susceptibles by infectious, according to the force of infection'
+      - from: E
+        to: I
+        proba: 1
+        desc: 'all infected individuals become infectious after duration dur_latency'
+      - from: I
+        to: R
+        rate: 'recovery'
+        desc: 'recovery of infectious individuals, which become resistant at the specified recovery rate'
+
+   ## below, the new state machine
   age_group:
-    desc: 'The state machine which defines the evolution of age groups
-    '
+    desc: 'the state machine representing the demographic process'
     states:
       - J:
-          name: 'Juvenile'
-          desc: 'Young animals'
-          fillcolor: 'orange'
+          name: 'Juveniles'
+          desc: 'juvenile individuals'
+          fillcolor: 'deeppink'
           default: yes
+          duration: 'dur_juvenile'
       - A:
-          name: 'Adult'
-          desc: 'Adult animals'
+          name: 'Adults'
+          desc: 'adult individuals'
           fillcolor: 'brown'
       - D:
-          name: 'Dead'
-          desc: 'compartment to represent deceased animals'
+          name: 'Deceased'
+          desc: 'decesased individuals (individuals in this state are removed automatically)'
           fillcolor: 'white'
           autoremove: yes
     transitions:
-      - {from: J, to: A, rate: 'maturation'}
-      - {from: A, to: D, rate: 'mortality'}
-      - {from: J, to: D, rate: 'mortality'}
+      - from: J
+        to: A
+        proba: 1
+        desc: 'maturation of juvenile individuals into adults'
+      - from: J
+        to: D
+        rate: 'mortality'
+        escape: yes
+      - from: A
+        to: D
+        rate: 'mortality'
     productions:
-      - {from: A, to: J, rate: 'birth', prototype: 'newborn'}
-
+      - from: A
+        to: J
+        rate: 'b'
+        prototype: 'newborn'
+        desc: 'production of juvenile individuals from adults'
 
 #  _____                               _
 # |  __ \                             | |
@@ -205,43 +266,102 @@ parameters:
   initial_herd_size:
     desc: 'initial number of animals in the herd'
     value: 100
-  initial_infected:
-    desc: 'initial number of infectious animals in the herd'
-    value: 'initial_herd_size * initial_prevalence'
-  transmission_I:
-    desc: 'transmission rate from infectious animals (/day)'
-    value: 0.5
+  initial_prevalence:
+    desc: 'initial proportion of infectious animals in the herd'
+    value: 0.01
   recovery:
     desc: 'recovery rate (/day)'
     value: 0.1
+  max_shedding_low:
+    desc: 'average of the maximum rate in low shedders'
+    value: 1.0
+  max_shedding_high:
+    desc: 'average of the maximum rate in high shedders'
+    value: 2.0
+  beta_max:
+    desc: 'distribution of the maximum shedding rate of individuals, depending on age group'
+    value: 'is_J * random_gamma(50, max_shedding_low/50) + is_A * random_gamma(100, max_shedding_high/100)'
+  beta:
+    desc: 'actual shedding rate of individuals, depending on the time elapsed since infection'
+    value: 'is_I * beta_max * exp(-2 * recovery * duration_in_health_state)'
   force_of_infection:
-    desc: 'infection function'
-    value: 'transmission_I * total_I / total_herd'
-    source: 'classical function assuming frequency dependence'
+    desc: 'infection function assuming frequency dependence'
+    value: 'total_beta / total_herd'
   percentage_prevalence:
     desc: 'proportion of infected+infectious animals'
-    value: '100 * total_I / total_herd'
+    value: '100 * (total_I + total_E) / total_herd'
+  percentage_prevalence_adults:
+    desc: 'proportion of infected+infectious adults'
+    value: 'DIV(100 * (total_I_A + total_E_A), total_A)'
+  percentage_prevalence_juveniles:
+    desc: 'proportion of infected+infectious juveniles'
+    value: 'DIV(100 * (total_I_J + total_E_J), total_J)'
   maturation:
-    desc: 'rate at which juveniles become adults (/day)'
-    value: '1/20'
-  b:
-    desc: 'base mortality rate (/day)'
+    desc: 'maturation rate, i.e. speed at which juveniles become adults'
     value: 0.05
   mortality:
-    desc: 'density-dependent mortality rate'
-    value: 'b * total_herd / carrying_capacity'
-  birth:
-    desc: 'birth rate (/day)'
-    value: 'b * 2'
-  carrying_capacity:
+    desc: 'mortality rate, assumed density-dependent'
+    value: 'mu * total_herd / K'
+  mu:
+    desc: 'base mortality rate'
+    value: 0.05
+  K:
     desc: 'carrying capacity of the environment'
     value: 150
-  nb_herds:
-    desc: 'number of herds in metapopulation'
-    value: 10
-  external_risk:
-    desc: 'probability that an animal imported from outside the metapopulation is infected'
-    value: 0.2
+  b:
+    desc: 'birth rate'
+    value: '2 * mu'
+  dur_juvenile:
+    desc: 'duration of juvenile state'
+    value: '1/maturation'
+  avg_dur_latency:
+    desc: 'average duration of latent (E) state'
+    value: 6
+  dur_latency:
+    desc: 'distribution of the durations in state E'
+    value: 'random_gamma(50, avg_dur_latency/50)'
+  dur_negative:
+    desc: 'validity duration of a negative test (days)'
+    value: '7*12'
+  delay_before_culling:
+    desc: 'delay before culling a confirmed animal (days)'
+    value: 5
+  delay_before_confirmation:
+    desc: 'delay before a suspicious animal is tested again (days)'
+    value: 7
+  threshold_untested:
+    desc: 'minimum number of untested animals to perform tests'
+    value: 50
+  sensitivity:
+    desc: 'sensitivity of the test'
+    value: 0.9
+  specificity:
+    desc: 'specificity of the test'
+    value: 0.7
+  proba_positive_test:
+    desc: 'probability that an individuals is tested positive'
+    value: 'is_I * sensitivity + (1 - is_I) * (1 - specificity)'
+  proba_negative_test:
+    desc: 'probability that an individuals is tested negative'
+    value: '1 - proba_positive_test'
+  time_to_test:
+    desc: 'condition for performing tests'
+    value: '(total_Untested >= threshold_untested)'
+
+
+#   _____ _        _
+#  / ____| |      | |
+# | (___ | |_ __ _| |_ _____   ____ _ _ __ ___
+#  \___ \| __/ _` | __/ _ \ \ / / _` | '__/ __|
+#  ____) | || (_| | ||  __/\ V / (_| | |  \__ \
+# |_____/ \__\__,_|\__\___| \_/ \__,_|_|  |___/
+
+statevars:
+  beta_i_max:
+    desc: 'maximum shedding rate'
+  beta_i:
+    desc: 'current shedding rate'
+
 
 #  _____           _        _
 # |  __ \         | |      | |
@@ -252,40 +372,29 @@ parameters:
 #                                __/ | |
 #                               |___/|_|
 
-# PROTOTYPES describe typical individuals, characterized by specific
-# values of their variables
+# PROTOTYPES DESCRIBE TYPICAL REPRESENTENTS FOR A LEVEL
 prototypes:
-  herd:
-    - healthy_herd:
-        desc: 'herd initially without infected animals'
-        initial_prevalence: 0
-        # init 'purchased' and 'sold' variables which are changed by
-        # Python code
-        purchased: 0
-        sold: 0
-    - infected_herd:
-        desc: 'herd initially infected animals'
-        initial_prevalence: 0.1
-        purchased: 0
-        sold: 0
   animals:
+    - default_animal:
+        beta_i: 0
+        beta_i_max: 0
+        test_status: Untested
     - healthy:
         desc: 'healthy animals'
         health_state: S
         age_group: default
     - infected:
         desc: 'infected animals'
+        health_state: E
+        age_group: default
+    - infectious:
+        desc: 'infectious animals'
         health_state: I
         age_group: default
     - newborn:
-        desc: 'newborn animals assuming no vertical transmission'
+        desc: 'newborn animals'
         health_state: S
         age_group: J
-    - imported_animal:
-        desc: 'animal from outside the metapopulation, assuming an external risk'
-        # health state chosen randomly among S, I, R according to external risk
-        health_state: 'random(1-external_risk, external_risk, 0)'
-        age_group: default
 
 
 #  _____       _ _   _       _
@@ -303,20 +412,14 @@ prototypes:
 #  \_____\___/|_| |_|\__,_|_|\__|_|\___/|_| |_|___/
 
 # INITIAL CONDITIONS FOR THE SIMULATION
-
-# In IBM or hybrid models, initial conditions describe the prototypes
-# involved with the amount of individuals in each of those prototypes
+# Initial conditions describe the amount of sub-populations, identified by prototypes
 initial_conditions:
   herd:
-    - prototype: healthy
-      amount: 'initial_herd_size - initial_infected'
     - prototype: infected
-      amount: 'initial_infected'
-  metapop:
-    - prototype: infected_herd
-      amount: 1
-    - prototype: healthy_herd
-      amount: 'nb_herds - 1'
+      amount: 'initial_herd_size * initial_prevalence'
+    - prototype: healthy
+      amount: 'initial_herd_size * (1 - initial_prevalence)'
+
 
 #   ____        _               _
 #  / __ \      | |             | |
@@ -339,6 +442,7 @@ outputs:
     extra_vars:
       - percentage_prevalence
       - total_herd
-      - purchased
-      - sold
+      - total_beta
+      - percentage_prevalence_adults
+      - percentage_prevalence_juveniles
 ...

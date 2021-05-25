@@ -15,18 +15,13 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_IBM_SIR_JA
+model_name: stoch_compart_SEIR_JA_dur
 
 
 # DESCRIPTION OF THE MODEL
 model_info:
   abstract: 'This model is a simple discrete-time, stochastic,
-  individual-based SIR model. In EMULSION, a model is characterized
-  by several sections (time_info, processes, state_machines, etc.)
-  which are detailed below.
-
-  The organization of this document mainly relies upon correct
-  indentation (2 white spaces) to move from section to sub-section.'
+  compartment-based SIR model with demography and age structure'
   author: 'Sebastien Picault (sebastien.picault@inrae.fr)'
 
 
@@ -63,7 +58,7 @@ levels:
   # name of the level (arbitrary name)
   herd:
     desc: 'level of the population'
-    aggregation_type: 'IBM'
+    aggregation_type: 'compartment'
     contains:
       - animals
   animals:
@@ -109,11 +104,16 @@ state_machines:
       - S:
           name: 'Susceptible'
           desc: 'suceptible of becoming infected'
-          fillcolor: 'darkgreen'
+          fillcolor: 'limegreen'
+      - E:
+          name: 'Exposed'
+          desc: 'infected individuals, not yet infectious'
+          fillcolor: 'cyan'
+          duration: 'dur_latency'
       - I:
           name: 'Infectious'
           desc: 'infected and able to transmit the disease'
-          fillcolor: 'red'
+          fillcolor: 'firebrick'
       - R:
           name: 'Resistant'
           desc: 'healthy again and resistant to infection'
@@ -125,14 +125,18 @@ state_machines:
     # the states.
     transitions:
       - from: S
-        to: I
+        to: E
         rate: 'force_of_infection'
         desc: 'infection of susceptibles by infectious, according to the force of infection'
+      - from: E
+        to: I
+        proba: 1
+        desc: 'all infected individuals become infectious after duration dur_latency'
       - from: I
         to: R
         rate: 'recovery'
         desc: 'recovery of infectious individuals, which become resistant at the specified recovery rate'
-      
+
    ## below, the new state machine
   age_group:
     desc: 'the state machine representing the demographic process'
@@ -140,12 +144,13 @@ state_machines:
       - J:
           name: 'Juveniles'
           desc: 'juvenile individuals'
-          fillcolor: 'purple'
+          fillcolor: 'deeppink'
           default: yes
+          duration: 'dur_juvenile'
       - A:
           name: 'Adults'
           desc: 'adult individuals'
-          fillcolor: 'maroon'
+          fillcolor: 'brown'
       - D:
           name: 'Deceased'
           desc: 'decesased individuals (individuals in this state are removed automatically)'
@@ -154,11 +159,12 @@ state_machines:
     transitions:
       - from: J
         to: A
-        rate: 'maturation'
+        proba: 1
         desc: 'maturation of juvenile individuals into adults'
       - from: J
         to: D
         rate: 'mortality'
+        escape: yes
       - from: A
         to: D
         rate: 'mortality'
@@ -195,7 +201,7 @@ parameters:
     value: 'transmission_I * total_I / total_herd'
   percentage_prevalence:
     desc: 'proportion of infected+infectious animals'
-    value: '100 * total_I / total_herd'
+    value: '100 * (total_I + total_E) / total_herd'
   maturation:
     desc: 'maturation rate, i.e. speed at which juveniles become adults'
     value: 0.05
@@ -211,6 +217,15 @@ parameters:
   b:
     desc: 'birth rate'
     value: '2 * mu'
+  dur_juvenile:
+    desc: 'duration of juvenile state'
+    value: '1/maturation'
+  avg_dur_latency:
+    desc: 'average duration of latent (E) state'
+    value: 6
+  dur_latency:
+    desc: 'distribution of the durations in state E'
+    value: 'random_gamma(50, avg_dur_latency/50)'
 
 
 
@@ -229,6 +244,10 @@ prototypes:
     - healthy:
         desc: 'healthy animals'
         health_state: S
+        age_group: default
+    - infected:
+        desc: 'infected animals'
+        health_state: E
         age_group: default
     - infectious:
         desc: 'infectious animals'
@@ -258,7 +277,7 @@ prototypes:
 # Initial conditions describe the amount of sub-populations, identified by prototypes
 initial_conditions:
   herd:
-    - prototype: infectious
+    - prototype: infected
       amount: 'initial_herd_size * initial_prevalence'
     - prototype: healthy
       amount: 'initial_herd_size * (1 - initial_prevalence)'
