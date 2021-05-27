@@ -15,14 +15,15 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_hybrid_SEIR_JA_dur_var_test_quar
+model_name: stoch_hybrid_SEIR_JA_dur_var_test_quar_metapop
 
 
 # DESCRIPTION OF THE MODEL
 model_info:
   abstract: 'This model is a simple discrete-time, stochastic,
   hybrid SIR model with demography and age structure,
-  and a contact structure between age group.'
+  and a contact structure between age group. It is organized as
+  a metapopulation'
   author: 'Sebastien Picault (sebastien.picault@inrae.fr)'
 
 
@@ -42,6 +43,7 @@ time_info:
   delta_t: 1
   origin: 'January 1'
   total_duration: '100'
+  stop_condition: 'all_populations_infected'
 
 
 #  _                    _
@@ -56,10 +58,22 @@ time_info:
 # (herd), which is simulated, and the individuals (animals), which
 # stay virtual
 levels:
-  # name of the level (arbitrary name)
+  metapop:
+    desc: 'level of the metapopulation'
+    aggregation_type: 'metapopulation'
+    contains:
+      - herd
+    aggregate_vars:
+      - name: 'metapop_total_beta'
+        collect: 'total_beta'
+        operator: 'sum'
+      - name: 'metapop_nb_infected'
+        collect: 'is_Infected'
+        operator: 'sum'
   herd:
     desc: 'level of the population'
     aggregation_type: 'hybrid'
+    default_prototype: default_herd
     contains:
       - animals
     aggregate_vars:
@@ -93,6 +107,8 @@ grouping:
 
 # LIST OF PROCESSES (IN ORDER) TO BE EXECUTED DURING EACH TIME STEP
 processes:
+  herd:
+    - herd_status
   animals:
     - health_state: infection_and_test
     - age_group: infection_by_age
@@ -275,6 +291,48 @@ state_machines:
         prototype: 'newborn'
         desc: 'production of juvenile individuals from adults'
 
+  herd_status:
+    desc: 'a state machine to summarise the status of the herd'
+    states:
+      - DiseaseFree:
+          name: 'Disease-Free'
+          desc: 'No confirmed case'
+          fillcolor: 'green'
+      - Alert:
+          name: 'Alert'
+          desc: 'At risk because of any recent detection (suspicion or confirmed)'
+          fillcolor: 'yellow'
+          duration: 'dur_alert'
+      - Infected:
+          name: 'Confirmed infection'
+          desc: 'Still confirmed cases after the vigilance state — reassessed perdiodically to allow a return to Alert state'
+          fillcolor: 'red'
+          duration: 'dur_infected'
+    transitions:
+      - from: DiseaseFree
+        to: Alert
+        proba: 'any_case'
+      - from: Alert
+        to: DiseaseFree
+        proba: 'NOT(any_case)'
+        desc: 'if no suspicious/confirmed case when situation is re-assessed, return to DiseaseFree'
+      - from: Alert
+        to: Alert
+        proba: 'NOT(any_confirmed) * any_case'
+        desc: 'if no confirmed case but still suspicious, stay in Alert and re-assessed later'
+      - from: Alert
+        to: Infected
+        proba: 'any_confirmed'
+        desc: 'if any confirmed case when re-assessing situation, move to Infected'
+      - from: Infected
+        to: Infected
+        proba: 'any_case'
+        desc: 'if any suspicious/confirmed case when situation is re-assessed, stay in Infected and re-assess later'
+      - from: Infected
+        to: Alert
+        proba: 'NOT(any_case)'
+        desc: 'if no suspicious/confirmed case when situation is re-assessed, return to Alert'
+
 #  _____                               _
 # |  __ \                             | |
 # | |__) |_ _ _ __ __ _ _ __ ___   ___| |_ ___ _ __ ___
@@ -287,9 +345,6 @@ parameters:
   initial_herd_size:
     desc: 'initial number of animals in the herd'
     value: 100
-  initial_prevalence:
-    desc: 'initial proportion of infectious animals in the herd'
-    value: 0.01
   recovery:
     desc: 'recovery rate (/day)'
     value: 0.1
@@ -307,7 +362,7 @@ parameters:
     value: 'is_I * beta_max * exp(-2 * recovery * duration_in_health_state)'
   force_of_infection:
     desc: 'infection function assuming frequency dependence'
-    value: 'is_InGroup * total_beta_InGroup / total_herd'
+    value: 'is_InGroup * (total_beta_InGroup + total_beta_from_metapop) / total_herd'
   percentage_prevalence:
     desc: 'proportion of infected+infectious animals'
     value: '100 * (total_I + total_E) / total_herd'
@@ -371,6 +426,30 @@ parameters:
   dur_quarantine:
     desc: 'duration of isolation for detected/suspicious animals (days))'
     value: 40
+  nb_herds:
+    desc: 'number of herds in the metapopulation'
+    value: 4
+  trans_metapop:
+    desc: 'transmission due to the proportion of pathogen coming from other herds of the metapopulation'
+    value: 0.002
+  total_beta_from_metapop:
+    desc: 'force of infection due to the contribution of other herds of the metapopulation'
+    value: 'trans_metapop * (metapop_total_beta - total_beta)'
+  dur_alert:
+    desc: 'duration of the Alert state before re-assessing the herd status (days)'
+    value: 5
+  dur_infected:
+    desc: 'duration of the Infected state before re-assessing the herd status (days)'
+    value: 15
+  any_case:
+    desc: 'boolean, 1 if any suspicious or confirmed case, 0 otherwise'
+    value: 'total_Suspicious + total_Confirmed > 0'
+  any_confirmed:
+    desc: 'boolean, 1 if any confirmed case, 0 otherwise'
+    value: 'total_Confirmed > 0'
+  all_populations_infected:
+    desc: 'boolean, 1 if all populations of the metapopulation have the herd status Infected, 0 otherwise'
+    value: 'Eq(metapop_nb_infected, nb_herds)'
 
 #   _____ _        _
 #  / ____| |      | |
@@ -384,6 +463,8 @@ statevars:
     desc: 'maximum shedding rate'
   beta_i:
     desc: 'current shedding rate'
+  initial_prevalence:
+    desc: 'initial proportion of infectious animals in the herd'
 
 
 #  _____           _        _
@@ -397,6 +478,14 @@ statevars:
 
 # PROTOTYPES DESCRIBE TYPICAL REPRESENTENTS FOR A LEVEL
 prototypes:
+  herd:
+    - default_herd:
+        desc: 'prototype used to initialize herd variables'
+        herd_status: DiseaseFree
+    - healthy_herd:
+        initial_prevalence: 0
+    - infected_herd:
+        initial_prevalence: 0.1
   animals:
     - default_animal:
         beta_i: 0
@@ -438,6 +527,11 @@ prototypes:
 # INITIAL CONDITIONS FOR THE SIMULATION
 # Initial conditions describe the amount of sub-populations, identified by prototypes
 initial_conditions:
+  metapop:
+    - prototype: infected_herd
+      amount: 1
+    - prototype: healthy_herd
+      amount: 'nb_herds - 1'
   herd:
     - prototype: infected
       amount: 'initial_herd_size * initial_prevalence'
@@ -471,4 +565,7 @@ outputs:
       - percentage_prevalence_juveniles
       - total_beta_InGroup
       - total_beta_Isolated
+      - is_Infected
+      - is_Alert
+      - metapop_nb_infected
 ...
