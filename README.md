@@ -6,15 +6,21 @@
 
 This training (see details [here](https://sourcesup.renater.fr/www/emulsion-public/EGAAL2021/)) is part of the doctoral formation proposed at the EGAAL doctoral school.
 
-## Configuration
+## Documentation for EMULSION 1.2b3
+
+The documentation for this version is available [here](https://spicault.pages.mia.inra.fr/emulsion-training/)
+
+
+## Software configuration for the training
 
 Exercises can be run either on your own machine on through a virtual environment provided by [Binder](https://mybinder.readthedocs.io/en/latest/).
+
 
 ### Solution 1: do everything on-line
 
 We provide a pre-configured virtual environment thanks to Binder, which ensures that all participants work with the same software environment.
 
-This on-line environment can be launched by clicking this button: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fforgemia.inra.fr%2FSebastien.Picault%2Femulsion-training/HEAD?urlpath=lab)
+This on-line environment can be launched by clicking this button: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fforgemia.inra.fr%2Fspicault%2femulsion-training/HEAD?urlpath=lab)
 
 **IMPORTANT NOTES:**
 
@@ -25,8 +31,8 @@ This on-line environment can be launched by clicking this button: [![Binder](htt
 
 Choose this approach if you are already familiar with software installation on your machine.
 
-1. Download this repository (see button above) or clone it with `git` (`git clone https://forgemia.inra.fr/Sebastien.Picault/emulsion-training.git`)
-2. Install and test EMULSION version **1.2b3** (with Graphviz) on your own machine following the [installation instructions](https://sourcesup.renater.fr/www/emulsion-public/pages/Install.html) and the [section regarding development versions](https://sourcesup.renater.fr/www/emulsion-public/pages/Install.html#alternative-2-install-development-version).
+1. Download this repository (see button above) or clone it with `git` (`git clone https://forgemia.inra.fr/spicault/emulsion-training.git`)
+2. Install and test EMULSION version **1.2b3** (with Graphviz) on your own machine following the [installation instructions](https://spicault.pages.mia.inra.fr/emulsion-training/pages/Install.html) and the [section regarding development versions](https://spicault.pages.mia.inra.fr/emulsion-training/pages/Install.html#alternative-2-install-development-version).
 3. For the exercises, follow the instructions provided in the notebook [Getting started](Getting%20started.ipynb). By default, this notebook will be displayed in a read-only mode. To have it work interactively, you need to install [Jupyter lab](https://jupyter.org/) on your machine.
 4. To run the exercises themselves, copy-paste commands in your favourite terminal.
 
@@ -34,4 +40,5 @@ Choose this approach if you are already familiar with software installation on y
 
 - [EMULSION website](https://sourcesup.renater.fr/www/emulsion-public) and [software paper](https://doi.org/10.1371/journal.pcbi.1007342)
 - [DYNAMO team](https://www6.angers-nantes.inrae.fr/bioepar/Equipes/DYNAMO)
-- follow us: [`@bioepar_dynamo`](https://twitter.com/bioepar_dynamo)
+- follow us:
+  [![https://img.shields.io/twitter/follow/bioepar_dynamo?label=DYNAMO%20research%20group&amp;style=plastic&amp;logo=twitter](https://img.shields.io/twitter/follow/bioepar_dynamo?label=DYNAMO%20research%20group&amp;style=plastic&amp;logo=twitter)](http://twitter.com/intent/follow?screen_name=bioepar_dynamo)
