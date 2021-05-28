@@ -376,6 +376,12 @@ parameters:
   mortality:
     desc: 'mortality rate, assumed density-dependent'
     value: 'mu * total_herd / K'
+  mu:
+    desc: 'base mortality rate'
+    value: 0.05
+  K:
+    desc: 'carrying capacity of the environment'
+    value: 150
   b:
     desc: 'birth rate'
     value: '2 * mu'
@@ -459,10 +465,33 @@ statevars:
     desc: 'initial proportion of infectious animals in the herd'
   initial_herd_size:
     desc: 'initial number of animals in the herd'
-  K:
-    desc: 'carrying capacity of the environment'
-  mu:
-    desc: 'base mortality rate'
+
+#  _____                   _
+# |_   _|                 | |
+#   | |  _ __  _ __  _   _| |_
+#   | | | '_ \| '_ \| | | | __|
+#  _| |_| | | | |_) | |_| | |_
+# |_____|_| |_| .__/ \__,_|\__|
+#             | |
+#             |_|
+#  _____        _
+# |  __ \      | |
+# | |  | | __ _| |_ __ _
+# | |  | |/ _` | __/ _` |
+# | |__| | (_| | || (_| |
+# |_____/ \__,_|\__\__,_|
+
+# input_data:
+#   data_based_parameters:
+#     - level: herd
+#       file: 'herd_params.csv'
+#       key_variables: [population_id, step]
+#       parameters:
+#         K:
+#           desc: 'carrying capacity of the environment'
+#         mu:
+#           desc: 'base mortality rate'
+
 
 
 #  _____           _        _
@@ -480,17 +509,11 @@ prototypes:
     - default_herd:
         desc: 'prototype used to initialize herd variables'
         herd_status: DiseaseFree
-    - healthy_herd:
-        desc: 'collection of prototypes specifying initial population characteristics'
-        file: 'herd_prototypes.csv'
-        select: 'random_replace(proportion)'
-        initial_prevalence: 0
-    - infected_herd:
-        desc: 'initially infected herds'
-        file: 'herd_prototypes.csv'
-        select: 'random_replace'
-        filter: 'mu < 0.1'
-        initial_prevalence: 0.1
+    - data_based_herd:
+        desc: 'herd collection with data-driven initial conditions'
+        file: 'herds.csv'
+        select: 'ordered_cycle'
+        herd_status: DiseaseFree
   animals:
     - default_animal:
         beta_i: 0
@@ -533,10 +556,12 @@ prototypes:
 # Initial conditions describe the amount of sub-populations, identified by prototypes
 initial_conditions:
   metapop:
-    - prototype: infected_herd
-      amount: 1
-    - prototype: healthy_herd
-      amount: 'nb_herds - 1'
+    - prototype: data_based_herd
+      amount: 'nb_herds'
+    # - prototype: infected_herd
+    #   amount: 1
+    # - prototype: healthy_herd
+    #   amount: 'nb_herds - 1'
   herd:
     - prototype: infected
       amount: 'initial_herd_size * initial_prevalence'
