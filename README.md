@@ -10,6 +10,7 @@ This training (see details [here](https://sourcesup.renater.fr/www/emulsion-publ
 
 The documentation for this version is available [here](https://spicault.pages.mia.inra.fr/emulsion-training/)
 
+---
 
 ## Software configuration for the training
 
@@ -22,10 +23,39 @@ We provide a pre-configured virtual environment thanks to Binder, which ensures 
 
 This on-line environment can be launched by clicking this button: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fforgemia.inra.fr%2Fspicault%2femulsion-training/HEAD?urlpath=lab)
 
+When the environment is built, you should get the following environment:
+
+![Jupyter Lab](img/jupyterlab.png)
+
+- Open a terminal and type:
+
+```bash
+emulsion --version
+```
+
+![emulsion vesion](img/version.png)
+
+
+- You can also test the notebook
+
+
 **IMPORTANT NOTES:**
 
 - At the very first time, Binder has to build the virtual environment before launching it, which takes some time (about 10 minutes). After that, the Binder environment is cached, hence taking only 1-2 min to launch
 - The Binder environment is **ephemeral**, with a short timeout period (about 10 min). Thus, you have to periodically save (download) the files you modify (e.g. EMULSION model files, or possibly the notebook), to be able to restore them after a break.
+
+> You can either **download** the notebook on your machine or download/upload its state through your web browser
+
+![notebook](img/notebook.png)
+
+
+> You can also download/upload the exercises (YAML files) on your
+> machine
+
+![exercises](img/exercises.png)
+
+
+---
 
 ### Solution 2: install on your own machine
 
@@ -41,6 +71,9 @@ Choose this approach if you are already familiar with software installation on y
 2. Install and test EMULSION version **1.2b3** (with Graphviz) on your own machine following the [installation instructions](https://spicault.pages.mia.inra.fr/emulsion-training/pages/Install.html) and the [section regarding development versions](https://spicault.pages.mia.inra.fr/emulsion-training/pages/Install.html#alternative-2-install-development-version).
 3. For the exercises, follow the instructions provided in the notebook [Getting started](Getting%20started.ipynb). By default, this notebook will be displayed in a read-only mode. To have it work interactively, you need to install [Jupyter lab](https://jupyter.org/) on your machine.
 4. To run the exercises themselves, copy-paste commands in your favourite terminal.
+
+
+---
 
 ## Additional resources
 
