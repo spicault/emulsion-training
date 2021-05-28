@@ -35,9 +35,8 @@ Choose this approach if you are already familiar with software installation on y
    (`git clone
    https://forgemia.inra.fr/spicault/emulsion-training.git`)
 
-   | Download | Clone |
-   |---|---|
-   | ![download](img/download.png) | ![clone](img/clone.png) |
+   - Download: ![download](img/download.png)
+   - Clone: ![clone](img/clone.png)
 
 2. Install and test EMULSION version **1.2b3** (with Graphviz) on your own machine following the [installation instructions](https://spicault.pages.mia.inra.fr/emulsion-training/pages/Install.html) and the [section regarding development versions](https://spicault.pages.mia.inra.fr/emulsion-training/pages/Install.html#alternative-2-install-development-version).
 3. For the exercises, follow the instructions provided in the notebook [Getting started](Getting%20started.ipynb). By default, this notebook will be displayed in a read-only mode. To have it work interactively, you need to install [Jupyter lab](https://jupyter.org/) on your machine.
