@@ -8,11 +8,11 @@ This training (see details [here](https://sourcesup.renater.fr/www/emulsion-publ
 
 
 <table style="border: none;">
-    <tr>
-        <td style="padding: 25px;"><img alt="bloc marque Etat" src="img/Republique_Francaise.jpg" width="300px"></td>
-        <td style="padding: 25px;"><img alt="logo INRAE" src="img/Logo-INRAE.jpg" width="400px"></td>
-        <td style="padding: 25px;"><img alt="logo Oniris" src="img/Logo_Oniris.png" width="350px"></td>
-        <td style="padding: 25px;"><img alt="logo Pays de la Loire" src="img/PDL.jpg" width="500px"></td>
+    <tr style="border: none;">
+        <td style="padding: 25px; border: none;"><img alt="bloc marque Etat" src="img/Republique_Francaise.jpg" width="300px"></td>
+        <td style="padding: 25px; border: none;"><img alt="logo INRAE" src="img/Logo-INRAE.jpg" width="400px"></td>
+        <td style="padding: 25px; border: none;"><img alt="logo Oniris" src="img/Logo_Oniris.png" width="350px"></td>
+        <td style="padding: 25px; border: none;"><img alt="logo Pays de la Loire" src="img/PDL.jpg" width="500px"></td>
     </tr>
 </table>
 </span>
