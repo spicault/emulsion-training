@@ -33,6 +33,8 @@ When the environment is built, you should get the following environment:
 emulsion --version
 ```
 
+Your configuration is correct if you get this:
+
 ![emulsion vesion](img/version.png)
 
 

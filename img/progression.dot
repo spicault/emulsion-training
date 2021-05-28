@@ -8,10 +8,10 @@ digraph {
 	  s1 [label="step 1\n(SIR)"];
 	  s2 [label="step 2\n(+ JA)"] ;
 	  s3 [label="step 3\n(+ non-exp.\ndurations)"] ;
-	  s4 [label="step 4\n(+ contact\n struct.)"] ;
 
 	  subgraph {
 		  rank = same ;
+		  s4 [label="step 4\n(+ contact\n struct.)"] ;
 		  s5 [label="step 5\n(=> IBM)"] ;
 		  s6 [label="step 6\n(=> hybrid)"] ;
 	  }
@@ -22,10 +22,6 @@ digraph {
 	  s10 [label="step 10\n(+ metapop)"] ;
 	  s11 [label="step 11\n(+ pop data)"] ;
 	  s12 [label="step 12\n(+ treatment)"] ;
-	  // subgraph {
-	  // 	  rank = same ;
-	  // }
 
-          s1 -> s2 -> s3 -> s4 -> s5 ;
-	  s4 -> s6 -> s7 -> s8 -> s9 -> s10 -> s11 -> s12;
+          s1 -> s2 -> s3 -> s4 -> s5 -> s6 -> s7 -> s8 -> s9 -> s10 -> s11 -> s12;
 }
