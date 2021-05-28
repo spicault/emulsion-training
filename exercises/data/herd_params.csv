@@ -1,4 +1,4 @@
-population_id,step,K,mortality
+population_id,step,K,mu
 0,0,50,0.07
 0,1,50.1,0.0699605345685654
 0,2,50.2,0.0698422940262896

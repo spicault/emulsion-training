@@ -494,12 +494,6 @@ statevars:
 # |_____/ \__,_|\__\__,_|
 
 input_data:
-  preprocessing:
-    - file: 'step11.py'
-      class_name: TradeMovementsReader
-      desc: 'A preprocessor class for reading the CSV that describes the trade movements and restructuring it as a dictionary, stored in shared information in the simulation.'
-      input_files:
-        trade_file: 'moves.csv'
   data_based_parameters:
     - level: herd
       file: 'herd_params.csv'
@@ -509,6 +503,12 @@ input_data:
           desc: 'carrying capacity of the environment'
         mu:
           desc: 'base mortality rate'
+  preprocessing:
+    - file: 'step11.py'
+      class_name: TradeMovementsReader
+      desc: 'A preprocessor class for reading the CSV that describes the trade movements and restructuring it as a dictionary, stored in shared information in the simulation.'
+      input_files:
+        trade_file: 'moves.csv'
 
 
 

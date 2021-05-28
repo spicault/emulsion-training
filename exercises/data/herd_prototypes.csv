@@ -1,4 +1,0 @@
-prototype_name,desc,initial_herd_size,K,mu,proportion
-small_herd_low_mort,"small herd with low mortality rate",70,50,0.01,25
-normal_herd,"herd of average size with normal mortality rate",80,100,0.05,50
-large_herd_high_mort,"large herd with high mortality rate",100,150,0.1,25
