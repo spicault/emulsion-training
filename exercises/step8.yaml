@@ -15,7 +15,7 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_hybrid_SEIR_JA_dur_var_test
+model_name: stoch_hybrid_SEIR_JA_dur_var
 
 
 # DESCRIPTION OF THE MODEL
@@ -82,7 +82,6 @@ levels:
 grouping:
   herd:
     infection_by_age: [health_state, age_group]
-    infection_and_test: [test_status, health_state]
 
 
 #  _____
@@ -97,7 +96,6 @@ processes:
   animals:
     - health_state: infection_by_age
     - age_group: infection_by_age
-    - test_status: infection_and_test
 
 
 
@@ -116,53 +114,6 @@ processes:
 # Productions define how individuals in one state can produce
 # new individuals in another state.
 state_machines:
-  test_status:
-    desc: 'The state machine which defines the test protocol'
-    states:
-      - Untested:
-          name: 'Untested'
-          desc: 'individuals not yet tested'
-          default: yes
-      - Negative:
-          name: 'Negative'
-          desc: 'individuals tested negative'
-          duration: 'dur_negative'
-          fillcolor: 'limegreen'
-      - Suspicious:
-          name: 'Suspicious'
-          desc: 'individuals tested positive once'
-          duration: 'delay_before_confirmation'
-          fillcolor: 'orange'
-      - Confirmed:
-          name: 'Confirmed'
-          desc: 'individuals tested positive twice in consecutive tests'
-          fillcolor: 'red'
-          duration: 'delay_before_culling'
-      - Culled:
-          name: 'Culled'
-          desc: 'individuals removed from the herd'
-          autoremove: yes
-          fillcolor: 'white'
-    transitions:
-      - from: Untested
-        to: Negative
-        proba: 'time_to_test * proba_negative_test'
-      - from: Untested
-        to: Suspicious
-        proba: 'time_to_test * proba_positive_test'
-      - from: Suspicious
-        to: Negative
-        proba: 'proba_negative_test'
-      - from: Suspicious
-        to: Confirmed
-        proba: 'proba_positive_test'
-      - from: Negative
-        to: Untested
-        proba: 1
-      - from: Confirmed
-        to: Culled
-        proba: 1
-
   # Below, the definition of the state machine used by the process
   # 'infection'
   health_state:
@@ -320,33 +271,6 @@ parameters:
   dur_latency:
     desc: 'distribution of the durations in state E'
     value: 'random_gamma(50, avg_dur_latency/50)'
-  dur_negative:
-    desc: 'validity duration of a negative test (days)'
-    value: '7*12'
-  delay_before_culling:
-    desc: 'delay before culling a confirmed animal (days)'
-    value: 5
-  delay_before_confirmation:
-    desc: 'delay before a suspicious animal is tested again (days)'
-    value: 7
-  threshold_untested:
-    desc: 'minimum number of untested animals to perform tests'
-    value: 50
-  sensitivity:
-    desc: 'sensitivity of the test'
-    value: 0.9
-  specificity:
-    desc: 'specificity of the test'
-    value: 0.7
-  proba_positive_test:
-    desc: 'probability that an individuals is tested positive'
-    value: 'is_I * sensitivity + (1 - is_I) * (1 - specificity)'
-  proba_negative_test:
-    desc: 'probability that an individuals is tested negative'
-    value: '1 - proba_positive_test'
-  time_to_test:
-    desc: 'condition for performing tests'
-    value: '(total_Untested >= threshold_untested)'
 
 
 #   _____ _        _
@@ -378,7 +302,6 @@ prototypes:
     - default_animal:
         beta_i: 0
         beta_i_max: 0
-        test_status: Untested
     - healthy:
         desc: 'healthy animals'
         health_state: S

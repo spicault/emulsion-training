@@ -15,7 +15,7 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_hybrid_SEIR_JA_dur_var_test_quar
+model_name: stoch_hybrid_SEIR_JA_dur_var_test
 
 
 # DESCRIPTION OF THE MODEL
@@ -82,7 +82,8 @@ levels:
 grouping:
   herd:
     infection_by_age: [health_state, age_group]
-    infection_and_test: [test_status, health_state, isolation]
+    infection_and_test: [test_status, health_state]
+
 
 #  _____
 # |  __ \
@@ -94,10 +95,9 @@ grouping:
 # LIST OF PROCESSES (IN ORDER) TO BE EXECUTED DURING EACH TIME STEP
 processes:
   animals:
-    - health_state: infection_and_test
+    - health_state: infection_by_age
     - age_group: infection_by_age
     - test_status: infection_and_test
-    - isolation: infection_and_test
 
 
 
@@ -162,27 +162,6 @@ state_machines:
       - from: Confirmed
         to: Culled
         proba: 1
-
-  isolation:
-    desc: 'The state machine which handles quarantine'
-    states:
-      - InGroup:
-          name: 'InGroup'
-          desc: 'used for animals which are with all other animals of the herd'
-          default: yes
-      - Isolated:
-          name: 'Isolated'
-          desc: 'used for animals set in quarantine due to detection'
-          duration: 'dur_quarantine'
-          fillcolor: 'cyan'
-    transitions:
-      - from: InGroup
-        to: Isolated
-        proba: 'OR(is_Suspicious, is_Confirmed)'
-      - from: Isolated
-        to: InGroup
-        proba: 1
-
 
   # Below, the definition of the state machine used by the process
   # 'infection'
@@ -307,7 +286,7 @@ parameters:
     value: 'is_I * beta_max * exp(-2 * recovery * duration_in_health_state)'
   force_of_infection:
     desc: 'infection function assuming frequency dependence'
-    value: 'is_InGroup * total_beta_InGroup / total_herd'
+    value: 'total_beta / total_herd'
   percentage_prevalence:
     desc: 'proportion of infected+infectious animals'
     value: '100 * (total_I + total_E) / total_herd'
@@ -368,9 +347,7 @@ parameters:
   time_to_test:
     desc: 'condition for performing tests'
     value: '(total_Untested >= threshold_untested)'
-  dur_quarantine:
-    desc: 'duration of isolation for detected/suspicious animals (days))'
-    value: 40
+
 
 #   _____ _        _
 #  / ____| |      | |
@@ -402,7 +379,6 @@ prototypes:
         beta_i: 0
         beta_i_max: 0
         test_status: Untested
-        isolation: InGroup
     - healthy:
         desc: 'healthy animals'
         health_state: S
@@ -469,6 +445,4 @@ outputs:
       - total_beta
       - percentage_prevalence_adults
       - percentage_prevalence_juveniles
-      - total_beta_InGroup
-      - total_beta_Isolated
 ...

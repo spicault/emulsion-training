@@ -15,14 +15,13 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_compart_SEIR_JA_dur_struct
+model_name: stoch_compart_SEIR_JA_dur
 
 
 # DESCRIPTION OF THE MODEL
 model_info:
   abstract: 'This model is a simple discrete-time, stochastic,
-  compartment-based SIR model with demography and age structure,
-  and a contact structure between age group.'
+  compartment-based SIR model with demography and age structure'
   author: 'Sebastien Picault (sebastien.picault@inrae.fr)'
 
 
@@ -64,20 +63,6 @@ levels:
       - animals
   animals:
     desc: 'level of individuals (not simulated in compartment-based models)'
-
-
-#   _____                       _
-#  / ____|                     (_)
-# | |  __ _ __ ___  _   _ _ __  _ _ __   __ _
-# | | |_ | '__/ _ \| | | | '_ \| | '_ \ / _` |
-# | |__| | | | (_) | |_| | |_) | | | | | (_| |
-#  \_____|_|  \___/ \__,_| .__/|_|_| |_|\__, |
-#                        | |             __/ |
-#                        |_|            |___/
-
-grouping:
-  herd:
-    infection_by_age: [health_state, age_group]
 
 
 #  _____
@@ -208,39 +193,15 @@ parameters:
   transmission_I:
     desc: 'transmission rate from infectious animals (/day)'
     value: 0.5
-  transAA:
-    desc: 'transmission rate between adults (/day)'
-    value: 1
-  transJJ:
-    desc: 'transmission rate between juveniles (/day)'
-    value: 0.1
-  transAJ:
-    desc: 'transmission rate from infectious adults to susceptible juveniles (/day)'
-    value: 0.05
-  transJA:
-    desc: 'transmission rate from infectious juveniles to susceptible adults (/day)'
-    value: 0.05
   recovery:
     desc: 'recovery rate (/day)'
     value: 0.1
   force_of_infection:
-    desc: 'infection function assuming frequency dependence, depending on age group'
-    value: 'is_J * force_of_infection_juveniles + is_A * force_of_infection_adults'
-  force_of_infection_juveniles:
-    desc: 'force of infection experienced by juveniles'
-    value: '(transJJ * total_I_J + transAJ * total_I_A) / total_herd'
-  force_of_infection_adults:
-    desc: 'force of infection experienced by adults'
-    value: '(transAA * total_I_A + transJA * total_I_J) / total_herd'
+    desc: 'infection function assuming frequency dependence'
+    value: 'transmission_I * total_I / total_herd'
   percentage_prevalence:
     desc: 'proportion of infected+infectious animals'
     value: '100 * (total_I + total_E) / total_herd'
-  percentage_prevalence_adults:
-    desc: 'proportion of infected+infectious adults'
-    value: 'DIV(100 * (total_I_A + total_E_A), total_A)'
-  percentage_prevalence_juveniles:
-    desc: 'proportion of infected+infectious juveniles'
-    value: 'DIV(100 * (total_I_J + total_E_J), total_J)'
   maturation:
     desc: 'maturation rate, i.e. speed at which juveniles become adults'
     value: 0.05
@@ -343,6 +304,4 @@ outputs:
     extra_vars:
       - percentage_prevalence
       - total_herd
-      - percentage_prevalence_adults
-      - percentage_prevalence_juveniles
 ...

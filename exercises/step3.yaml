@@ -15,13 +15,13 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_compart_SEIR_JA_dur
+model_name: stoch_compart_SIR_JA
 
 
 # DESCRIPTION OF THE MODEL
 model_info:
   abstract: 'This model is a simple discrete-time, stochastic,
-  compartment-based SIR model with demography and age structure'
+  compartment-based SIR model with demography and age structure.'
   author: 'Sebastien Picault (sebastien.picault@inrae.fr)'
 
 
@@ -105,11 +105,6 @@ state_machines:
           name: 'Susceptible'
           desc: 'suceptible of becoming infected'
           fillcolor: 'limegreen'
-      - E:
-          name: 'Exposed'
-          desc: 'infected individuals, not yet infectious'
-          fillcolor: 'cyan'
-          duration: 'dur_latency'
       - I:
           name: 'Infectious'
           desc: 'infected and able to transmit the disease'
@@ -125,13 +120,9 @@ state_machines:
     # the states.
     transitions:
       - from: S
-        to: E
+        to: I
         rate: 'force_of_infection'
         desc: 'infection of susceptibles by infectious, according to the force of infection'
-      - from: E
-        to: I
-        proba: 1
-        desc: 'all infected individuals become infectious after duration dur_latency'
       - from: I
         to: R
         rate: 'recovery'
@@ -146,7 +137,6 @@ state_machines:
           desc: 'juvenile individuals'
           fillcolor: 'deeppink'
           default: yes
-          duration: 'dur_juvenile'
       - A:
           name: 'Adults'
           desc: 'adult individuals'
@@ -159,12 +149,11 @@ state_machines:
     transitions:
       - from: J
         to: A
-        proba: 1
+        rate: 'maturation'
         desc: 'maturation of juvenile individuals into adults'
       - from: J
         to: D
         rate: 'mortality'
-        escape: yes
       - from: A
         to: D
         rate: 'mortality'
@@ -201,7 +190,7 @@ parameters:
     value: 'transmission_I * total_I / total_herd'
   percentage_prevalence:
     desc: 'proportion of infected+infectious animals'
-    value: '100 * (total_I + total_E) / total_herd'
+    value: '100 * total_I / total_herd'
   maturation:
     desc: 'maturation rate, i.e. speed at which juveniles become adults'
     value: 0.05
@@ -217,15 +206,6 @@ parameters:
   b:
     desc: 'birth rate'
     value: '2 * mu'
-  dur_juvenile:
-    desc: 'duration of juvenile state'
-    value: '1/maturation'
-  avg_dur_latency:
-    desc: 'average duration of latent (E) state'
-    value: 6
-  dur_latency:
-    desc: 'distribution of the durations in state E'
-    value: 'random_gamma(50, avg_dur_latency/50)'
 
 
 
@@ -244,10 +224,6 @@ prototypes:
     - healthy:
         desc: 'healthy animals'
         health_state: S
-        age_group: default
-    - infected:
-        desc: 'infected animals'
-        health_state: E
         age_group: default
     - infectious:
         desc: 'infectious animals'
@@ -277,7 +253,7 @@ prototypes:
 # Initial conditions describe the amount of sub-populations, identified by prototypes
 initial_conditions:
   herd:
-    - prototype: infected
+    - prototype: infectious
       amount: 'initial_herd_size * initial_prevalence'
     - prototype: healthy
       amount: 'initial_herd_size * (1 - initial_prevalence)'

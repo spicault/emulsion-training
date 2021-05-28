@@ -15,13 +15,13 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_IBM_SEIR_JA_dur_struct
+model_name: stoch_compart_SEIR_JA_dur_struct
 
 
 # DESCRIPTION OF THE MODEL
 model_info:
   abstract: 'This model is a simple discrete-time, stochastic,
-  individual-based SIR model with demography and age structure,
+  compartment-based SIR model with demography and age structure,
   and a contact structure between age group.'
   author: 'Sebastien Picault (sebastien.picault@inrae.fr)'
 
@@ -59,11 +59,12 @@ levels:
   # name of the level (arbitrary name)
   herd:
     desc: 'level of the population'
-    aggregation_type: 'IBM'
+    aggregation_type: 'compartment'
     contains:
       - animals
   animals:
     desc: 'level of individuals (not simulated in compartment-based models)'
+
 
 #   _____                       _
 #  / ____|                     (_)

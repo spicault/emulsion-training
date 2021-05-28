@@ -15,7 +15,7 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_hybrid_SEIR_JA_dur_var
+model_name: stoch_hybrid_SEIR_JA_dur_struct
 
 
 # DESCRIPTION OF THE MODEL
@@ -62,13 +62,8 @@ levels:
     aggregation_type: 'hybrid'
     contains:
       - animals
-    aggregate_vars:
-      - name: 'total_beta'
-        collect: 'beta_i'
-        operator: 'sum'
   animals:
     desc: 'level of individuals (not simulated in compartment-based models)'
-    default_prototype: default_animal
 
 #   _____                       _
 #  / ____|                     (_)
@@ -133,17 +128,6 @@ state_machines:
           name: 'Infectious'
           desc: 'infected and able to transmit the disease'
           fillcolor: 'firebrick'
-          on_enter:
-            - set_var: 'beta_i_max'
-              value: 'beta_max'
-            - set_var: 'beta_i'
-              value: 'beta_i_max'
-          on_stay:
-            - set_var: 'beta_i'
-              value: 'beta'
-          on_exit:
-            - set_var: 'beta_i'
-              value: 0
       - R:
           name: 'Resistant'
           desc: 'healthy again and resistant to infection'
@@ -220,24 +204,33 @@ parameters:
   initial_prevalence:
     desc: 'initial proportion of infectious animals in the herd'
     value: 0.01
+  transmission_I:
+    desc: 'transmission rate from infectious animals (/day)'
+    value: 0.5
+  transAA:
+    desc: 'transmission rate between adults (/day)'
+    value: 1
+  transJJ:
+    desc: 'transmission rate between juveniles (/day)'
+    value: 0.1
+  transAJ:
+    desc: 'transmission rate from infectious adults to susceptible juveniles (/day)'
+    value: 0.05
+  transJA:
+    desc: 'transmission rate from infectious juveniles to susceptible adults (/day)'
+    value: 0.05
   recovery:
     desc: 'recovery rate (/day)'
     value: 0.1
-  max_shedding_low:
-    desc: 'average of the maximum rate in low shedders'
-    value: 1.0
-  max_shedding_high:
-    desc: 'average of the maximum rate in high shedders'
-    value: 2.0
-  beta_max:
-    desc: 'distribution of the maximum shedding rate of individuals, depending on age group'
-    value: 'is_J * random_gamma(50, max_shedding_low/50) + is_A * random_gamma(100, max_shedding_high/100)'
-  beta:
-    desc: 'actual shedding rate of individuals, depending on the time elapsed since infection'
-    value: 'is_I * beta_max * exp(-2 * recovery * duration_in_health_state)'
   force_of_infection:
-    desc: 'infection function assuming frequency dependence'
-    value: 'total_beta / total_herd'
+    desc: 'infection function assuming frequency dependence, depending on age group'
+    value: 'is_J * force_of_infection_juveniles + is_A * force_of_infection_adults'
+  force_of_infection_juveniles:
+    desc: 'force of infection experienced by juveniles'
+    value: '(transJJ * total_I_J + transAJ * total_I_A) / total_herd'
+  force_of_infection_adults:
+    desc: 'force of infection experienced by adults'
+    value: '(transAA * total_I_A + transJA * total_I_J) / total_herd'
   percentage_prevalence:
     desc: 'proportion of infected+infectious animals'
     value: '100 * (total_I + total_E) / total_herd'
@@ -273,19 +266,6 @@ parameters:
     value: 'random_gamma(50, avg_dur_latency/50)'
 
 
-#   _____ _        _
-#  / ____| |      | |
-# | (___ | |_ __ _| |_ _____   ____ _ _ __ ___
-#  \___ \| __/ _` | __/ _ \ \ / / _` | '__/ __|
-#  ____) | || (_| | ||  __/\ V / (_| | |  \__ \
-# |_____/ \__\__,_|\__\___| \_/ \__,_|_|  |___/
-
-statevars:
-  beta_i_max:
-    desc: 'maximum shedding rate'
-  beta_i:
-    desc: 'current shedding rate'
-
 
 #  _____           _        _
 # |  __ \         | |      | |
@@ -299,9 +279,6 @@ statevars:
 # PROTOTYPES DESCRIBE TYPICAL REPRESENTENTS FOR A LEVEL
 prototypes:
   animals:
-    - default_animal:
-        beta_i: 0
-        beta_i_max: 0
     - healthy:
         desc: 'healthy animals'
         health_state: S
@@ -365,7 +342,6 @@ outputs:
     extra_vars:
       - percentage_prevalence
       - total_herd
-      - total_beta
       - percentage_prevalence_adults
       - percentage_prevalence_juveniles
 ...

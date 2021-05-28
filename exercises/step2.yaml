@@ -15,13 +15,18 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_compart_SIR_JA
+model_name: stoch_compart_SIR
 
 
 # DESCRIPTION OF THE MODEL
 model_info:
   abstract: 'This model is a simple discrete-time, stochastic,
-  compartment-based SIR model with demography and age structure.'
+  compartment-based SIR model. In EMULSION, a model is characterized
+  by several sections (time_info, processes, state_machines, etc.)
+  which are detailed below.
+
+  The organization of this document mainly relies upon correct
+  indentation (2 white spaces) to move from section to sub-section.'
   author: 'Sebastien Picault (sebastien.picault@inrae.fr)'
 
 
@@ -76,7 +81,6 @@ levels:
 processes:
   animals:
     - health_state                 # name of a state machine which runs at the level of indivuals
-    - age_group                    # a new process based on the new state machine (see below)
 
 
 
@@ -128,41 +132,7 @@ state_machines:
         rate: 'recovery'
         desc: 'recovery of infectious individuals, which become resistant at the specified recovery rate'
 
-   ## below, the new state machine
-  age_group:
-    desc: 'the state machine representing the demographic process'
-    states:
-      - J:
-          name: 'Juveniles'
-          desc: 'juvenile individuals'
-          fillcolor: 'deeppink'
-          default: yes
-      - A:
-          name: 'Adults'
-          desc: 'adult individuals'
-          fillcolor: 'brown'
-      - D:
-          name: 'Deceased'
-          desc: 'decesased individuals (individuals in this state are removed automatically)'
-          fillcolor: 'white'
-          autoremove: yes
-    transitions:
-      - from: J
-        to: A
-        rate: 'maturation'
-        desc: 'maturation of juvenile individuals into adults'
-      - from: J
-        to: D
-        rate: 'mortality'
-      - from: A
-        to: D
-        rate: 'mortality'
-    productions:
-      - from: A
-        to: J
-        rate: 'b'
-        prototype: 'newborn'
-        desc: 'production of juvenile individuals from adults'
+
 
 #  _____                               _
 # |  __ \                             | |
@@ -189,24 +159,8 @@ parameters:
     desc: 'infection function assuming frequency dependence'
     value: 'transmission_I * total_I / total_herd'
   percentage_prevalence:
-    desc: 'proportion of infected+infectious animals'
+    desc: 'proportion of infected animals'
     value: '100 * total_I / total_herd'
-  maturation:
-    desc: 'maturation rate, i.e. speed at which juveniles become adults'
-    value: 0.05
-  mortality:
-    desc: 'mortality rate, assumed density-dependent'
-    value: 'mu * total_herd / K'
-  mu:
-    desc: 'base mortality rate'
-    value: 0.05
-  K:
-    desc: 'carrying capacity of the environment'
-    value: 150
-  b:
-    desc: 'birth rate'
-    value: '2 * mu'
-
 
 
 #  _____           _        _
@@ -224,15 +178,9 @@ prototypes:
     - healthy:
         desc: 'healthy animals'
         health_state: S
-        age_group: default
     - infectious:
         desc: 'infectious animals'
         health_state: I
-        age_group: default
-    - newborn:
-        desc: 'newborn animals'
-        health_state: S
-        age_group: J
 
 
 #  _____       _ _   _       _

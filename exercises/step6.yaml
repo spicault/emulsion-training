@@ -15,13 +15,13 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_hybrid_SEIR_JA_dur_struct
+model_name: stoch_compart_SEIR_JA_dur_struct
 
 
 # DESCRIPTION OF THE MODEL
 model_info:
   abstract: 'This model is a simple discrete-time, stochastic,
-  hybrid SIR model with demography and age structure,
+  compartment-based SIR model with demography and age structure,
   and a contact structure between age group.'
   author: 'Sebastien Picault (sebastien.picault@inrae.fr)'
 
@@ -59,11 +59,12 @@ levels:
   # name of the level (arbitrary name)
   herd:
     desc: 'level of the population'
-    aggregation_type: 'hybrid'
+    aggregation_type: 'compartment'
     contains:
       - animals
   animals:
     desc: 'level of individuals (not simulated in compartment-based models)'
+
 
 #   _____                       _
 #  / ____|                     (_)
@@ -89,8 +90,8 @@ grouping:
 # LIST OF PROCESSES (IN ORDER) TO BE EXECUTED DURING EACH TIME STEP
 processes:
   animals:
-    - health_state: infection_by_age
-    - age_group: infection_by_age
+    - health_state                 # name of a state machine which runs at the level of indivuals
+    - age_group                    # a new process based on the new state machine (see below)
 
 
 
