@@ -7,7 +7,7 @@
 This training (see details [here](https://sourcesup.renater.fr/www/emulsion-public/EGAAL2021/)) is part of the doctoral formation proposed at the EGAAL doctoral school.
 
 
-<table>
+<table style="border: none;">
     <tr>
         <td style="padding: 25px;"><img alt="bloc marque Etat" src="img/Republique_Francaise.jpg" width="300px"></td>
         <td style="padding: 25px;"><img alt="logo INRAE" src="img/Logo-INRAE.jpg" width="400px"></td>
