@@ -6,6 +6,17 @@
 
 This training (see details [here](https://sourcesup.renater.fr/www/emulsion-public/EGAAL2021/)) is part of the doctoral formation proposed at the EGAAL doctoral school.
 
+
+<table>
+    <tr>
+        <td style="padding: 25px;"><img alt="bloc marque Etat" src="img/Republique_Francaise.jpg" width="300px"></td>
+        <td style="padding: 25px;"><img alt="logo INRAE" src="img/Logo-INRAE.jpg" width="400px"></td>
+        <td style="padding: 25px;"><img alt="logo Oniris" src="img/Logo_Oniris.png" width="350px"></td>
+        <td style="padding: 25px;"><img alt="logo Pays de la Loire" src="img/PDL.jpg" width="500px"></td>
+    </tr>
+</table>
+</span>
+
 ## Documentation for EMULSION 1.2b3
 
 The documentation for this version is available [here](https://spicault.pages.mia.inra.fr/emulsion-training/)
