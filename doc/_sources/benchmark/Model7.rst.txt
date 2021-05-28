@@ -1,0 +1,47 @@
+Model 7 (M6 + new epidemiological state)
+****************************************
+
+Introducing a new epidemiological state at a late stage in modelling
+mainly consists in modifying the ``health_state`` state machine:
+
+- a new state ``E`` is added to the list of states, associated with the
+  specification of a duration (defined in ``parameters`` as a
+  species-dependent expression)
+- the transition from ``S`` to ``I`` is split into a transition from ``S``
+  to ``E`` and a transition from ``E`` to ``I``
+- in ``parameters``, expressions defining the prevalence are modified to count also
+  individuals in ``E`` state
+
+To produce the diagrams of the state machines which control health
+states, age groups and species:
+
+.. code-block:: bash
+
+   emulsion diagrams model7.yaml
+
+Which gives:
+
+.. graphviz:: ../_images/benchmark/model7-VH.dot
+
+.. graphviz:: ../_images/benchmark/model7-SEIR.dot
+
+.. graphviz:: ../_images/benchmark/model7-UJA.dot
+
+
+The Python add-on was exactly the same as in Model 6.
+
+Model file with full comments: `model7.yaml <../_static/benchmark/model7.yaml>`_
+
+.. literalinclude:: ../_static/benchmark/model7-short.yaml
+   :emphasize-lines: 86-90, 100-105, 173-178, 211-213, 240-248
+
+To have some data-driven movements considered coming from outside the
+metapopulation, we ran the model with 10 populations instead of 20
+(one stochastic repetition) with constant external risk (0.1) for
+individuals coming from outside the metapopulation:
+
+.. code-block:: bash
+
+  emulsion run --plot model7.yaml -r 1 -p nb_populations=10 -p use_metapop_prevalence=0
+
+which produced `the following outputs <../_static/benchmark/model7-outputs.html>`_

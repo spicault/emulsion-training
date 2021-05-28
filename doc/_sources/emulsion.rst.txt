@@ -1,0 +1,29 @@
+emulsion package
+================
+
+.. automodule:: emulsion
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    emulsion.agent
+    emulsion.model
+    emulsion.tools
+
+Submodules
+----------
+
+emulsion.init\_emulsion module
+------------------------------
+
+.. automodule:: emulsion.init_emulsion
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

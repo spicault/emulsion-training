@@ -1,0 +1,243 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>1. Information &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2. Installation" href="Install.html" />
+    <link rel="prev" title="EMULSION Manual" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="information">
+<h1>1. Information<a class="headerlink" href="#information" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="contributors-and-contact">
+<h2>1.1. Contributors and contact<a class="headerlink" href="#contributors-and-contact" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Sébastien Picault (<a class="reference external" href="mailto:sebastien&#46;picault&#37;&#52;&#48;inrae&#46;fr">sebastien<span>&#46;</span>picault<span>&#64;</span>inrae<span>&#46;</span>fr</a>)</li>
+<li>Yu-Lin Huang</li>
+<li>Sandie Arnoux</li>
+<li>Vianney Sicard</li>
+<li>Gaël Beaunée</li>
+<li>Pauline Ezanno (<a class="reference external" href="mailto:pauline&#46;ezanno&#37;&#52;&#48;inrae&#46;fr">pauline<span>&#46;</span>ezanno<span>&#64;</span>inrae<span>&#46;</span>fr</a>)</li>
+</ul>
+<a class="reference external image-reference" href="http://twitter.com/intent/follow?screen_name=bioepar_dynamo"><img alt="https://img.shields.io/twitter/follow/bioepar_dynamo?label=DYNAMO%20research%20group&amp;style=plastic&amp;logo=twitter" src="https://img.shields.io/twitter/follow/bioepar_dynamo?label=DYNAMO%20research%20group&amp;style=plastic&amp;logo=twitter" /></a>
+<p>INRAE, Oniris, BIOEPAR, 44300 Nantes, France</p>
+</div>
+<div class="section" id="how-to-cite">
+<h2>1.2. How to cite<a class="headerlink" href="#how-to-cite" title="Permalink to this headline">¶</a></h2>
+<p>If you are using EMULSION in your work, please acknowledge it when
+publishing, with a reference to the following article:</p>
+<div class="admonition-main-reference admonition">
+<p class="first admonition-title">Main reference</p>
+<p>S. Picault, Y.-L. Huang, V. Sicard, S. Arnoux, G. Beaunée, P. Ezanno
+(2019). “EMULSION: Transparent and flexible multiscale
+stochastic models in human, animal and plant epidemiology”, PLoS
+Computational Biology 15(9): e1007342.</p>
+<p>DOI: <a class="reference external" href="https://doi.org/10.1371/journal.pcbi.1007342">10.1371/journal.pcbi.1007342</a></p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@Article</span><span class="p">{</span><span class="n">EMULSION</span><span class="o">-</span><span class="n">ploscb2019</span><span class="p">,</span>
+  <span class="n">author</span> <span class="o">=</span>	 <span class="p">{</span><span class="n">Picault</span><span class="p">,</span> <span class="n">Sébastien</span> <span class="ow">and</span> <span class="n">Huang</span><span class="p">,</span> <span class="n">Yu</span><span class="o">-</span><span class="n">Lin</span> <span class="ow">and</span> <span class="n">Sicard</span><span class="p">,</span>
+                  <span class="n">Vianney</span> <span class="ow">and</span> <span class="n">Arnoux</span><span class="p">,</span> <span class="n">Sandie</span> <span class="ow">and</span> <span class="n">Beaunée</span><span class="p">,</span> <span class="n">Gaël</span> <span class="ow">and</span>
+                  <span class="n">Ezanno</span><span class="p">,</span> <span class="n">Pauline</span><span class="p">},</span>
+  <span class="n">title</span> <span class="o">=</span>	 <span class="p">{{</span><span class="n">EMULSION</span><span class="p">}:</span> <span class="n">Transparent</span> <span class="ow">and</span> <span class="n">flexible</span> <span class="n">multiscale</span>
+                  <span class="n">stochastic</span> <span class="n">models</span> <span class="ow">in</span> <span class="n">human</span><span class="p">,</span> <span class="n">animal</span> <span class="ow">and</span> <span class="n">plant</span>
+                  <span class="n">epidemiology</span><span class="p">},</span>
+  <span class="n">journal</span> <span class="o">=</span>	 <span class="p">{{</span><span class="n">PLoS</span><span class="p">}</span> <span class="p">{</span><span class="n">C</span><span class="p">}</span><span class="n">omputational</span> <span class="p">{</span><span class="n">B</span><span class="p">}</span><span class="n">iology</span><span class="p">},</span>
+  <span class="n">year</span> <span class="o">=</span>	 <span class="p">{</span><span class="mi">2019</span><span class="p">},</span>
+  <span class="n">volume</span> <span class="o">=</span>	 <span class="p">{</span><span class="mi">15</span><span class="p">},</span>
+  <span class="n">number</span> <span class="o">=</span>	 <span class="p">{</span><span class="mi">9</span><span class="p">},</span>
+  <span class="n">pages</span> <span class="o">=</span>	 <span class="p">{</span><span class="n">e1007342</span><span class="p">},</span>
+  <span class="n">DOI</span> <span class="o">=</span>		 <span class="p">{</span><span class="mf">10.1371</span><span class="o">/</span><span class="n">journal</span><span class="o">.</span><span class="n">pcbi</span><span class="o">.</span><span class="mi">1007342</span><span class="p">},</span>
+  <span class="n">url</span> <span class="o">=</span>		 <span class="p">{</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">doi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="mf">10.1371</span><span class="o">/</span><span class="n">journal</span><span class="o">.</span><span class="n">pcbi</span><span class="o">.</span><span class="mi">1007342</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="selected-publications">
+<h2>1.3. Selected publications<a class="headerlink" href="#selected-publications" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">On bovine respiratory disease (BRD) in feedlots:</p>
+<p>S. Picault, P. Ezanno, S. Assié (2019). “Combining early
+hyperthermia detection with metaphylaxis for reducing antibiotics
+usage in newly received beef bulls at fattening operations: a
+simulation-based approach”, in: <em>SVEPM Annual Conference and General
+Meeting</em> (in press)</p>
+</li>
+<li><p class="first">On Q fever (Coxiellosis) in dairy herds:</p>
+<ul>
+<li><p class="first">S. Picault, Y.-L. Huang, V. Sicard, F. Beaudeau, P. Ezanno
+(2017). “A Multi-Level Multi-Agent Simulation Framework in Animal
+Epidemiology”, in: Demazeau <em>et al.</em> (eds.), <em>15th International
+Conference on Practical Applications of Agents and Multi-Agent
+Systems (PAAMS)</em>, Lecture Notes in Computer Science
+10349, p. 209-221, Springer.</p>
+<p>DOI: <a class="reference external" href="http://doi.org/10.1007/978-3-319-59930-4_17">10.1007/978-3-319-59930-4_17</a></p>
+</li>
+</ul>
+</li>
+<li><p class="first">On Artificial Intelligence research involved in EMULSION:</p>
+<ul>
+<li><p class="first">P. Mathieu, G. Morvan, S. Picault (2018). “Multi-level agent-based
+simulations: Four design patterns”, <em>Simulation Modelling Practice
+and Theory</em> 83, p. 51-64, Agent-Based Modelling and Simulation
+special issue Elsevier.</p>
+<p>DOI: <a class="reference external" href="http://doi.org/10.1016/j.simpat.2017.12.015">10.1016/j.simpat.2017.12.015</a></p>
+</li>
+<li><p class="first">S. Picault, Y.-L. Huang, V. Sicard, P. Ezanno (2017). “Enhancing
+Sustainability of Complex Epidemiological Models through a Generic
+Multilevel Agent-based Approach” in: C. Sierra (ed.), <em>26th
+International Joint Conference on Artificial Intelligence
+(IJCAI)</em>, AAAI, p. 374-380.</p>
+<p>DOI: <a class="reference external" href="http://doi.org/10.24963/ijcai.2017/53">10.24963/ijcai.2017/53</a></p>
+</li>
+<li><p class="first">S. Picault, P. Mathieu (2011). “An Interaction-Oriented Model for
+Multi-Scale Simulation”, in: T. Walsh (ed.), <em>22nd International
+Joint Conference on Artificial Intelligence (IJCAI)</em>,
+AAAI, p. 332-337.</p>
+<p>DOI: <a class="reference external" href="http://doi.org/10.5591/978-1-57735-516-8/IJCAI11-065">10.5591/978-1-57735-516-8/IJCAI11-065</a></p>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="acknowledgements">
+<h2>1.4. Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h2>
+<p>This work was carried out with the financial support of:</p>
+<blockquote>
+<div><ul class="simple">
+<li>the French Research Agency (ANR), Program Investments for the
+Future, project ANR-10-BINF-07 (MIHMES)</li>
+<li>the European Union through the European fund for the regional
+development (FEDER) of Pays de la Loire</li>
+<li>the French Research Agency (ANR), project ANR-16-CE32-0007-01
+(CADENCE)</li>
+<li>INRAE, the French National Research Institute for Agriculture,
+Food and Environment (Animal Health Division)</li>
+<li>the SANT’Innov project of the For and On Regional Development
+(PSDR) French research programme, which is funded by INRAE and the
+French regions of Bretagne, Pays de la Loire, Normandie and
+Nouvelle Aquitaine.</li>
+<li>the Région Pays de la Loire</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. Information</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#contributors-and-contact">1.1. Contributors and contact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-cite">1.2. How to cite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#selected-publications">1.3. Selected publications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#acknowledgements">1.4. Acknowledgements</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">EMULSION Manual</a></li>
+      <li>Next: <a href="Install.html" title="next chapter">2. Installation</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/pages/Information.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

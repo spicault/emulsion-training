@@ -1,0 +1,107 @@
+*************
+Release notes
+*************
+
+Notes on EMULSION 1.1
+*********************
+
+Release date: October 19, 2020
+
+Documentation
+=============
+
+- fixed minor errors in installation instructions or code examples
+- introduced example models for new features of the modelling language
+- improved the documentation of built-in functions available for model design
+
+Command-line
+============
+
+- added an option ``--table-params`` which prints a table of
+  parameters and initial conditions
+- added an option ``--no-count`` which disables the production of the
+  ``counts.csv`` file to accelerate simulation (hence, relevant
+  outputs must be handled explicitly with actions such as
+  ``log_vars``)
+
+Modelling language
+==================
+
+- introduced wrapper function ``MIN`` and ``MAX`` to be used with any number of arguments in models, instead of ``min`` and ``max``
+
+- modified :ref:`built-in action <become_action>` ``become`` to accept a list of prototypes and a keyword ``proba`` with a list of probabilities (similar to ``clone``)
+- added :ref:`built-in action <record_change_action>` ``record_change`` to add the number of agents performing an action to a state variable from the upper level (useful e.g. for counting the cumulative incidence)::
+
+    states:
+      - I:
+        ...
+        on_enter:
+          - record_change: cumulative_incidence
+
+- modified keyword ``random`` in :ref:`prototype definition <Define prototypes>` to allow choosing states proportionnally to a list of weights, e.g. to have generic individuals initialized in a SIR model with a given prevalence (assuming all non-infectious individuals are susceptible)::
+
+    health_state: random(1-prevalence, prevalence, 0)
+
+- modified :ref:`initial conditions <initial_conditions>` for hybrid/IBM models, now accepting a multinomial sampling between several prototypes::
+
+    level:
+      - prototype: [list of prototypes]
+        amount: total_nb_of_individuals
+        proba: [list of probabilities]
+
+- added two keywords in :ref:`state definition <next_previous>`, and
+  two in :ref:`prototype definition <Define prototypes>`, respectively
+  ``next`` and ``previous`` for states, ``next_state`` and
+  ``previous_state`` for prototypes. They allow to define a
+  predecessor/successor relationship between nodes (by default, the
+  definition order between non-autoremove nodes is used), and to use
+  it for changing a statevar related to a state machine
+
+- added built-in variables ``duration_of_EVENT`` where ``EVENT`` is
+  any event declared in the :ref:`calendar section <Regulate time>`.
+  The duration is expressed in time units
+
+- added :ref:`built-in action <log_vars_action>` ``log_vars`` to store information about
+  agents. This action is followed by a list of variables or expressions. Results are
+  stored in a file ``log.txt`` in the output dir
+
+- added a possibility to declare a :ref:`default prototype <Default prototypes>`
+  in each level. This prototype is applied when creating an agent at this level,
+  before the application of any other prototype
+
+- added a possibility to specify a filename when declaring a
+  prototype. This links the prototype name with a
+  :ref:`prototype collection <Data-based prototype collections>`
+  defined in a CSV file, allowing to define a large number of typical
+  individuals or populations with their frequency. See doc for
+  complete syntax and additional options (experimental feature)
+
+- introduced a possibility to :ref:`specify the order in which variables are assigned in prototypes <Order of variables assignment in prototypes>` with keywords ``begin_with`` and ``end_with``
+
+- added a keyword ``line_style`` in :ref:`node definition <Set states attributes>` to make it possible to draw corresponding populations with other styles than solid lines
+
+Bugfixes
+========
+
+- Fixed YAML unsafe loading
+- set explicit encoding to utf8 when writing graphviz/dot file (to overcome problems in Windows version)
+- changed default format value for state machine diagrams to svg (works better with windows, otherwise some glyphs are not recognized)
+- in python add-ons for metapop, fixed indentation error
+- modified calculation of production links to allow empty compartments to "produce" new individuals (e.g. using a constant value)
+- modified calculation of production links to allow empty compartments to 'produce' new individuals (e.g. using a constant value)
+- in SetVar action, allow variables to be assigned directly from another statevar
+- fixed calculation error on periodic calendars for intervals with begin > end
+- prototype definitions now accept expressions and parameter values
+- possibility to use ``set_var`` with parameter values (not only from other statevars values)
+- prototype variables can contain a list of values
+- new populations can be added to metapopulations during simulations
+
+
+Notes on EMULSION 1.0
+*********************
+
+Release date: February 20, 2019
+
+First public release of EMULSION (support Python 3.6+)
+
+Last stable version: 1.0.12 (August 17, 2020)

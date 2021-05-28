@@ -1,0 +1,1386 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.agent package &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="emulsion.agent.core package" href="emulsion.agent.core.html" />
+    <link rel="prev" title="11. emulsion package" href="emulsion.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-emulsion.agent">
+<span id="emulsion-agent-package"></span><h1>emulsion.agent package<a class="headerlink" href="#module-emulsion.agent" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-emulsion.agent"></span><p>A Python implementation of EMULSION framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>This module contains classes and functions for handling all kinds of
+entities involved in epidemiologic models.</p>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="emulsion.agent.core.html">emulsion.agent.core package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.agent.core.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.agent.core.html#module-emulsion.agent.core.abstract_agent">emulsion.agent.core.abstract_agent module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.agent.core.html#module-emulsion.agent.core.emulsion_agent">emulsion.agent.core.emulsion_agent module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.agent.core.html#module-emulsion.agent.core.groups">emulsion.agent.core.groups module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="emulsion.agent.managers.html">emulsion.agent.managers package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.agent.managers.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.agent.managers.html#module-emulsion.agent.managers.abstract_process_manager">emulsion.agent.managers.abstract_process_manager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.agent.managers.html#module-emulsion.agent.managers.compart_process_manager">emulsion.agent.managers.compart_process_manager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.agent.managers.html#module-emulsion.agent.managers.functions">emulsion.agent.managers.functions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.agent.managers.html#module-emulsion.agent.managers.group_manager">emulsion.agent.managers.group_manager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.agent.managers.html#module-emulsion.agent.managers.ibm_process_manager">emulsion.agent.managers.ibm_process_manager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.agent.managers.html#module-emulsion.agent.managers.metapop_process_manager">emulsion.agent.managers.metapop_process_manager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.agent.managers.html#module-emulsion.agent.managers.multi_process_manager">emulsion.agent.managers.multi_process_manager module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-emulsion.agent.action">
+<span id="emulsion-agent-action-module"></span><h2>emulsion.agent.action module<a class="headerlink" href="#module-emulsion.agent.action" title="Permalink to this headline">¶</a></h2>
+<p>A Python implementation of the EMuLSion framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>Classes and functions for actions.</p>
+<dl class="class">
+<dt id="emulsion.agent.action.AbstractAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">AbstractAction</code><span class="sig-paren">(</span><em>state_machine=None</em>, <em>**_</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#AbstractAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.AbstractAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>AbstractActions are aimed at describing actions triggered by a
+state machine.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.AbstractAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>state_machine=None</em>, <em>**_</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#AbstractAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.AbstractAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="emulsion.agent.action.AbstractAction.build_action">
+<em class="property">classmethod </em><code class="descname">build_action</code><span class="sig-paren">(</span><em>action_name</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#AbstractAction.build_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.AbstractAction.build_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an instance of the appropriate Action subclass,
+depending on its name. The appropriate parameters for this
+action should be passed as a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.action.AbstractAction.execute_action">
+<code class="descname">execute_action</code><span class="sig-paren">(</span><em>unit</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#AbstractAction.execute_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.AbstractAction.execute_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the action on the specified unit.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.BecomeAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">BecomeAction</code><span class="sig-paren">(</span><em>prototypes=[]</em>, <em>probas=None</em>, <em>model=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#BecomeAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.BecomeAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.AbstractAction" title="emulsion.agent.action.AbstractAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.AbstractAction</span></code></a></p>
+<p>A BecomeAction is aimed at making an agent change its state
+according to one ore more specified prototypes.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.BecomeAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>prototypes=[]</em>, <em>probas=None</em>, <em>model=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#BecomeAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.BecomeAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.action.BecomeAction.execute_action">
+<code class="descname">execute_action</code><span class="sig-paren">(</span><em>unit</em>, <em>agents=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#BecomeAction.execute_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.BecomeAction.execute_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the action in the specified unit. If the <cite>agents</cite> parameter
+is specified (as a list), each agent of this list will execute
+the action. If changes of state variables in relation to a
+state machine occur, the corresponding actions (if any) are
+executed: on_exit from the current state, and on_enter for the
+new state.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.CloneAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">CloneAction</code><span class="sig-paren">(</span><em>prototypes=[]</em>, <em>amount=None</em>, <em>probas=None</em>, <em>model=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#CloneAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.CloneAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.AbstractAction" title="emulsion.agent.action.AbstractAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.AbstractAction</span></code></a></p>
+<p>A CloneAction produces several copies of the agent with a given
+prototype.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.CloneAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>prototypes=[]</em>, <em>amount=None</em>, <em>probas=None</em>, <em>model=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#CloneAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.CloneAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.action.CloneAction.execute_action">
+<code class="descname">execute_action</code><span class="sig-paren">(</span><em>action_performer</em>, <em>agents=None</em>, <em>population=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#CloneAction.execute_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.CloneAction.execute_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the action in the specified unit. If the <cite>agents</cite> parameter
+is specified (as a list), each agent of this list will execute
+the action. If changes of state variables in relation to a
+state machine occur, the corresponding actions (if any) are
+executed: on_exit from the current state, and on_enter for the
+new state.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.FunctionAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">FunctionAction</code><span class="sig-paren">(</span><em>function=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#FunctionAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.FunctionAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.MethodAction" title="emulsion.agent.action.MethodAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.MethodAction</span></code></a></p>
+<p>A FunctionAction is aimed at making an agent perform an action
+on a specific population. It requires a function, and optionnally
+a list and a dictionary of parameters. A FunctionAction runs
+faster than a MethodAction since it does not require to retrieve
+the method in each agent.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.FunctionAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>function=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#FunctionAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.FunctionAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.action.FunctionAction.execute_action">
+<code class="descname">execute_action</code><span class="sig-paren">(</span><em>unit</em>, <em>agents=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#FunctionAction.execute_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.FunctionAction.execute_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the action using the specified unit. If the
+<cite>agents</cite> parameter is a list of units, each unit of this list
+will execute the action.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="emulsion.agent.action.InvalidActionException">
+<em class="property">exception </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">InvalidActionException</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#InvalidActionException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.InvalidActionException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception raised when a semantic error occurs in action definition.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.InvalidActionException.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#InvalidActionException.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.InvalidActionException.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.LogVarsAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">LogVarsAction</code><span class="sig-paren">(</span><em>parameter=None</em>, <em>l_params=[]</em>, <em>d_params={}</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#LogVarsAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.LogVarsAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.StringAction" title="emulsion.agent.action.StringAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.StringAction</span></code></a></p>
+<p>A LogVarsAction is aimed at making an agent print a list of
+variables into a file. Output is formatted in several
+comma-separated fields: the simulation ID, the time step when the
+message was produced, the class and ID of agent speaking, and the
+values of variables (in the order they were defined in the
+action).</p>
+<dl class="method">
+<dt id="emulsion.agent.action.LogVarsAction.execute_action">
+<code class="descname">execute_action</code><span class="sig-paren">(</span><em>unit</em>, <em>agents=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#LogVarsAction.execute_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.LogVarsAction.execute_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the action in the specified unit. If the <cite>agents</cite> parameter
+is specified (as a list), each agent of this list will execute
+the action.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.MessageAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">MessageAction</code><span class="sig-paren">(</span><em>parameter=None</em>, <em>l_params=[]</em>, <em>d_params={}</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#MessageAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.MessageAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.StringAction" title="emulsion.agent.action.StringAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.StringAction</span></code></a></p>
+<p>A MessageAction is aimed at making an agent print a given
+string. It requires a string message. This string can contain one
+reference to a variable or method of the agent, using Python’s
+formatting syntax.</p>
+<p>For instance, ‘My state is {.statevars.health_state}’ will print
+the current health state of the agent.</p>
+<p>Output is formatted in four comma-separated fields: the simulation
+ID, the time step when the message was produced, the agent
+speaking, and the message itself.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.MessageAction.execute_action">
+<code class="descname">execute_action</code><span class="sig-paren">(</span><em>unit</em>, <em>agents=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#MessageAction.execute_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.MessageAction.execute_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the action in the specified unit. If the <cite>agents</cite> parameter
+is specified (as a list), each agent of this list will execute
+the action.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.MethodAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">MethodAction</code><span class="sig-paren">(</span><em>method=None</em>, <em>l_params=[]</em>, <em>d_params={}</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#MethodAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.MethodAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.AbstractAction" title="emulsion.agent.action.AbstractAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.AbstractAction</span></code></a></p>
+<p>A MethodAction is aimed at making an agent perform an action on
+a specific population. It requires a method name, and optionnally
+a list and a dictionary of parameters.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.MethodAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>method=None</em>, <em>l_params=[]</em>, <em>d_params={}</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#MethodAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.MethodAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.action.MethodAction.execute_action">
+<code class="descname">execute_action</code><span class="sig-paren">(</span><em>unit</em>, <em>agents=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#MethodAction.execute_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.MethodAction.execute_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the action using the specified unit. If the
+<cite>agents</cite> parameter is a list of units, each unit of this list
+will execute the action.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.RateAdditiveAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">RateAdditiveAction</code><span class="sig-paren">(</span><em>sign=1</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#RateAdditiveAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.RateAdditiveAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.ValueAction" title="emulsion.agent.action.ValueAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.ValueAction</span></code></a></p>
+<p>A RateChangeAction is aimed at increasing or decreasing a
+specific state variable or attribute, according to a specific rate
+(i.e. the actual increase or decrease is the product of the
+<cite>parameter</cite> attribute and a population size).</p>
+<dl class="method">
+<dt id="emulsion.agent.action.RateAdditiveAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>sign=1</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#RateAdditiveAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.RateAdditiveAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ValueAction aimed at modifying the specified
+statevar according to the parameter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.action.RateAdditiveAction.execute_action">
+<code class="descname">execute_action</code><span class="sig-paren">(</span><em>unit</em>, <em>population=None</em>, <em>agents=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#RateAdditiveAction.execute_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.RateAdditiveAction.execute_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the action on the specified unit, with the
+specified population size.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.RateDecreaseAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">RateDecreaseAction</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#RateDecreaseAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.RateDecreaseAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.RateAdditiveAction" title="emulsion.agent.action.RateAdditiveAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.RateAdditiveAction</span></code></a></p>
+<p>A RateDecreaseAction is aimed at decreasing a specific state
+variable or attribute, according to a specific rate (i.e. the
+actual decrease is the product of the <cite>parameter</cite> attribute and a
+population size).</p>
+<dl class="method">
+<dt id="emulsion.agent.action.RateDecreaseAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#RateDecreaseAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.RateDecreaseAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ValueAction aimed at modifying the specified
+statevar according to the parameter.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.RateIncreaseAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">RateIncreaseAction</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#RateIncreaseAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.RateIncreaseAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.RateAdditiveAction" title="emulsion.agent.action.RateAdditiveAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.RateAdditiveAction</span></code></a></p>
+<p>A RateIncreaseAction is aimed at increasing a specific state
+variable or attribute, according to a specific rate (i.e. the
+actual increase is the product of the <cite>parameter</cite> attribute and a
+population size).</p>
+<dl class="method">
+<dt id="emulsion.agent.action.RateIncreaseAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#RateIncreaseAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.RateIncreaseAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ValueAction aimed at modifying the specified
+statevar according to the parameter.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.RecordChangeAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">RecordChangeAction</code><span class="sig-paren">(</span><em>parameter=None</em>, <em>model=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#RecordChangeAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.RecordChangeAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.ValueAction" title="emulsion.agent.action.ValueAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.ValueAction</span></code></a></p>
+<p>RecordChangeAction allows to record how many agents performed an
+action set. The corresponding value is added to a variable assumed
+to be defined at the upper level.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.RecordChangeAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>parameter=None</em>, <em>model=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#RecordChangeAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.RecordChangeAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a RecordChangeAction aimed at modifying the specified
+parameter, (assumed to be a statevar defined at the upper
+level).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.action.RecordChangeAction.execute_action">
+<code class="descname">execute_action</code><span class="sig-paren">(</span><em>unit</em>, <em>population=None</em>, <em>agents=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#RecordChangeAction.execute_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.RecordChangeAction.execute_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the action on the specified unit, with the
+specified population size.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.SampleDurationsAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">SampleDurationsAction</code><span class="sig-paren">(</span><em>duration=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#SampleDurationsAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.SampleDurationsAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.AbstractAction" title="emulsion.agent.action.AbstractAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.AbstractAction</span></code></a></p>
+<p>SampleDurationsAction computes N exit dates for the state of a given state machine, N being the number of individuals that enter the state.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.SampleDurationsAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>duration=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#SampleDurationsAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.SampleDurationsAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a SampleDurationsAction aimed at using the specified duration (possibly a distribution) for a specific state machine (given as an argument to the parent class).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.action.SampleDurationsAction.execute_action">
+<code class="descname">execute_action</code><span class="sig-paren">(</span><em>action_performer</em>, <em>population=None</em>, <em>agents=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#SampleDurationsAction.execute_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.SampleDurationsAction.execute_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the action on the specified <em>action_performer</em> agent, with a target that is expected to be a <em>population</em> size. If the caller specifies a list of target agents instead of a population size, the population size is computed as the size of the agents list.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.SetUpperVarAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">SetUpperVarAction</code><span class="sig-paren">(</span><em>statevar_name=None</em>, <em>parameter=None</em>, <em>model=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#SetUpperVarAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.SetUpperVarAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.ValueAction" title="emulsion.agent.action.ValueAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.ValueAction</span></code></a></p>
+<p>SetUpperVarAction allows to set the variable of the upper level of the agent.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.SetUpperVarAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>statevar_name=None</em>, <em>parameter=None</em>, <em>model=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#SetUpperVarAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.SetUpperVarAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a SetUpperVarAction aimed at modifying the specified statevar
+according to the parameter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.action.SetUpperVarAction.execute_action">
+<code class="descname">execute_action</code><span class="sig-paren">(</span><em>unit</em>, <em>agents=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#SetUpperVarAction.execute_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.SetUpperVarAction.execute_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the action in the upper level of the specified unit. If the <cite>agents</cite> parameter
+is specified (as a list), each agent of this list will execute
+the action. If changes of state variables in relation to a
+state machine occur, the corresponding actions (if any) are
+executed: on_exit from the current state, and on_enter for the
+new state.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.SetVarAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">SetVarAction</code><span class="sig-paren">(</span><em>statevar_name=None</em>, <em>parameter=None</em>, <em>model=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#SetVarAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.SetVarAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.ValueAction" title="emulsion.agent.action.ValueAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.ValueAction</span></code></a></p>
+<p>SetVarAction allows to set the variable of the agent.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.SetVarAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>statevar_name=None</em>, <em>parameter=None</em>, <em>model=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#SetVarAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.SetVarAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a SetVarAction aimed at modifying the specified statevar
+according to the parameter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.action.SetVarAction.execute_action">
+<code class="descname">execute_action</code><span class="sig-paren">(</span><em>unit</em>, <em>agents=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#SetVarAction.execute_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.SetVarAction.execute_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the action in the specified unit. If the <cite>agents</cite> parameter
+is specified (as a list), each agent of this list will execute
+the action. If changes of state variables in relation to a
+state machine occur, the corresponding actions (if any) are
+executed: on_exit from the current state, and on_enter for the
+new state.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.StochAdditiveAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">StochAdditiveAction</code><span class="sig-paren">(</span><em>sign=1</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#StochAdditiveAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.StochAdditiveAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.ValueAction" title="emulsion.agent.action.ValueAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.ValueAction</span></code></a></p>
+<p>A StochAdditiveAction is aimed at increasing or decreasing a
+specific state variable or attribute, according to a specific
+rate, using a <em>binomial sampling</em>.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.StochAdditiveAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>sign=1</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#StochAdditiveAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.StochAdditiveAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ValueAction aimed at modifying the specified
+statevar according to the parameter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.action.StochAdditiveAction.execute_action">
+<code class="descname">execute_action</code><span class="sig-paren">(</span><em>unit</em>, <em>population=None</em>, <em>agents=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#StochAdditiveAction.execute_action"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.StochAdditiveAction.execute_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute the action on the specified unit, with the
+specified population size.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.StochDecreaseAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">StochDecreaseAction</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#StochDecreaseAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.StochDecreaseAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.StochAdditiveAction" title="emulsion.agent.action.StochAdditiveAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.StochAdditiveAction</span></code></a></p>
+<p>A StochDecreaseAction is aimed at decreasing a specific state
+variable or attribute, according to a specific rate, using a
+<em>binomial sampling</em>.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.StochDecreaseAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#StochDecreaseAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.StochDecreaseAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ValueAction aimed at modifying the specified
+statevar according to the parameter.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.StochIncreaseAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">StochIncreaseAction</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#StochIncreaseAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.StochIncreaseAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.StochAdditiveAction" title="emulsion.agent.action.StochAdditiveAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.StochAdditiveAction</span></code></a></p>
+<p>A StochIncreaseAction is aimed at increasing a specific state
+variable or attribute, according to a specific rate, using a
+<em>binomial sampling</em>.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.StochIncreaseAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#StochIncreaseAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.StochIncreaseAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ValueAction aimed at modifying the specified
+statevar according to the parameter.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.StringAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">StringAction</code><span class="sig-paren">(</span><em>parameter=None</em>, <em>l_params=[]</em>, <em>d_params={}</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#StringAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.StringAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.AbstractAction" title="emulsion.agent.action.AbstractAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.AbstractAction</span></code></a></p>
+<p>A StringAction is based on the specification of a string
+parameter.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.StringAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>parameter=None</em>, <em>l_params=[]</em>, <em>d_params={}</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#StringAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.StringAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.action.ValueAction">
+<em class="property">class </em><code class="descclassname">emulsion.agent.action.</code><code class="descname">ValueAction</code><span class="sig-paren">(</span><em>statevar_name=None</em>, <em>parameter=None</em>, <em>delta_t=1</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#ValueAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.ValueAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.action.AbstractAction" title="emulsion.agent.action.AbstractAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.action.AbstractAction</span></code></a></p>
+<p>ValueActions represent modifications of state variables or
+attributes.</p>
+<dl class="method">
+<dt id="emulsion.agent.action.ValueAction.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>statevar_name=None</em>, <em>parameter=None</em>, <em>delta_t=1</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/action.html#ValueAction.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.action.ValueAction.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ValueAction aimed at modifying the specified
+statevar according to the parameter.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.atoms">
+<span id="emulsion-agent-atoms-module"></span><h2>emulsion.agent.atoms module<a class="headerlink" href="#module-emulsion.agent.atoms" title="Permalink to this headline">¶</a></h2>
+<p>A Python implementation of the EMuLSion framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>Classes and functions for entities management.</p>
+<dl class="class">
+<dt id="emulsion.agent.atoms.AtomAgent">
+<em class="property">class </em><code class="descclassname">emulsion.agent.atoms.</code><code class="descname">AtomAgent</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#AtomAgent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.AtomAgent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="emulsion.agent.core.html#emulsion.agent.core.emulsion_agent.EmulsionAgent" title="emulsion.agent.core.emulsion_agent.EmulsionAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.core.emulsion_agent.EmulsionAgent</span></code></a></p>
+<p>The AtomAgent is aimed at representing an ‘individual’, i.e. the
+smallest organization level to be modeled as an entity in the
+simulation. An AtomAgent may be situated in several hosts, each one
+associated with a specific tuple of state variables.</p>
+<dl class="method">
+<dt id="emulsion.agent.atoms.AtomAgent.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#AtomAgent.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.AtomAgent.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the unit with a health state and a name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.atoms.AtomAgent.add_host">
+<code class="descname">add_host</code><span class="sig-paren">(</span><em>host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#AtomAgent.add_host"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.AtomAgent.add_host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified host to the current AtomAgent, associated
+with the specified key.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.atoms.AtomAgent.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.atoms.AtomAgent.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.atoms.AtomAgent.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.atoms.AtomAgent.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.atoms.AtomAgent.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><em>prototype=None</em>, <em>custom_prototype=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#AtomAgent.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.AtomAgent.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a copy of the current compartment with the specified
+observable/value settings. If a prototype is provided, it is
+applied to the new atom.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.atoms.AtomAgent.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['AtomAgent'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.atoms.AtomAgent.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.atoms.AtomAgent.get_content">
+<code class="descname">get_content</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#AtomAgent.get_content"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.AtomAgent.get_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the population (1) of the current unit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.atoms.AtomAgent.get_host">
+<code class="descname">get_host</code><span class="sig-paren">(</span><em>key='MASTER'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#AtomAgent.get_host"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.AtomAgent.get_host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the host of the current AtomAgent identified by the
+specific key.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.atoms.AtomAgent.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', '__len__', 'get_content', 'add_host', 'remove_host', 'get_host', 'clone', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.atoms.AtomAgent.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.atoms.AtomAgent.remove_host">
+<code class="descname">remove_host</code><span class="sig-paren">(</span><em>host</em>, <em>keys=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#AtomAgent.remove_host"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.AtomAgent.remove_host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the specified host from the current AtomAgent,
+associated with the specified key.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.atoms.EvolvingAtom">
+<em class="property">class </em><code class="descclassname">emulsion.agent.atoms.</code><code class="descname">EvolvingAtom</code><span class="sig-paren">(</span><em>statemachines=[]</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#EvolvingAtom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.EvolvingAtom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.atoms.AtomAgent" title="emulsion.agent.atoms.AtomAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.atoms.AtomAgent</span></code></a></p>
+<p>An EvolvingAtom is able to change state according to its
+own statemachines.</p>
+<dl class="method">
+<dt id="emulsion.agent.atoms.EvolvingAtom.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>statemachines=[]</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#EvolvingAtom.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.EvolvingAtom.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the unit with a health state and a name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.atoms.EvolvingAtom.add_method_process">
+<code class="descname">add_method_process</code><span class="sig-paren">(</span><em>process_name</em>, <em>method=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#EvolvingAtom.add_method_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.EvolvingAtom.add_method_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a process based on a method name.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.atoms.EvolvingAtom.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.atoms.EvolvingAtom.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.atoms.EvolvingAtom.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.atoms.EvolvingAtom.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.atoms.EvolvingAtom.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>machine=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#EvolvingAtom.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.EvolvingAtom.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is aimed at defining what has systematically to
+be done in the unit at each time step (e.g. age change…). It
+has to be overriden if needed in subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.atoms.EvolvingAtom.evolve_states">
+<code class="descname">evolve_states</code><span class="sig-paren">(</span><em>machine=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#EvolvingAtom.evolve_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.EvolvingAtom.evolve_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the state of the current unit according to the
+specified state machine name. If no special state machine is
+provided, executes all the machines.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.atoms.EvolvingAtom.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['EvolvingAtom'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.atoms.EvolvingAtom.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.atoms.EvolvingAtom.get_machine">
+<code class="descname">get_machine</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#EvolvingAtom.get_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.EvolvingAtom.get_machine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the state machine with the specified name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.atoms.EvolvingAtom.init_level_processes">
+<code class="descname">init_level_processes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#EvolvingAtom.init_level_processes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.EvolvingAtom.init_level_processes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the level of the agent.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.atoms.EvolvingAtom.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', 'set_statemachines', 'init_level_processes', 'add_method_process', 'get_machine', 'evolve', 'evolve_states', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.atoms.EvolvingAtom.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.atoms.EvolvingAtom.set_statemachines">
+<code class="descname">set_statemachines</code><span class="sig-paren">(</span><em>statemachines</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/atoms.html#EvolvingAtom.set_statemachines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.atoms.EvolvingAtom.set_statemachines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the state machines that this agent is able to execute.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.comparts">
+<span id="emulsion-agent-comparts-module"></span><h2>emulsion.agent.comparts module<a class="headerlink" href="#module-emulsion.agent.comparts" title="Permalink to this headline">¶</a></h2>
+<p>A Python implementation of the EMuLSion framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>Classes and functions for entities management.</p>
+<dl class="class">
+<dt id="emulsion.agent.comparts.Compartment">
+<em class="property">class </em><code class="descclassname">emulsion.agent.comparts.</code><code class="descname">Compartment</code><span class="sig-paren">(</span><em>population=0</em>, <em>stochastic=True</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/comparts.html#Compartment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.comparts.Compartment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="emulsion.agent.core.html#emulsion.agent.core.groups.GroupAgent" title="emulsion.agent.core.groups.GroupAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.core.groups.GroupAgent</span></code></a></p>
+<p>An Compartment is a compartment which does not
+represent the underlying level but with aggregate information such
+as the total population (‘individuals’ are not represented).</p>
+<dl class="method">
+<dt id="emulsion.agent.comparts.Compartment.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>population=0</em>, <em>stochastic=True</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/comparts.html#Compartment.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.comparts.Compartment.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an Compartment with an initial population.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.comparts.Compartment.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>population</em>, <em>d_exit_steps={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/comparts.html#Compartment.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.comparts.Compartment.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified population to the current population of
+the compartment.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.comparts.Compartment.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.comparts.Compartment.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.comparts.Compartment.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.comparts.Compartment.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.comparts.Compartment.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/comparts.html#Compartment.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.comparts.Compartment.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a copy of the current compartment with the specified
+observable/value settings. The new content is empty.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.comparts.Compartment.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['Compartment'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.comparts.Compartment.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.comparts.Compartment.get_content">
+<code class="descname">get_content</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/comparts.html#Compartment.get_content"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.comparts.Compartment.get_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the population of the current unit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.comparts.Compartment.get_random_exit_dates">
+<code class="descname">get_random_exit_dates</code><span class="sig-paren">(</span><em>total_qty</em>, <em>machine_name</em>, <em>escape=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/comparts.html#Compartment.get_random_exit_dates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.comparts.Compartment.get_random_exit_dates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary of steps (to exit the specified machine_name) with a quantity (at most the quantity available for the step and this machine_name), sampled randomly. The total of all quantities is total_qty. Exit dates are chosen according to the <em>escape</em> parameter: None = all dates (default), False: dates corresponding only to current step, True: dates others than current step</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.comparts.Compartment.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', '__len__', '__str__', 'get_content', 'update_time_to_exit', 'add', 'remove', '_base_move', 'get_random_exit_dates', 'move_to', 'population', 'shift_times_to_exit', 'clone', 'next_states', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.comparts.Compartment.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.comparts.Compartment.move_to">
+<code class="descname">move_to</code><span class="sig-paren">(</span><em>target_comp</em>, <em>population=(0</em>, <em>None)</em>, <em>state_machine=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/comparts.html#Compartment.move_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.comparts.Compartment.move_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the specified population from the current population
+of the compartment (the population is kept positive) to the
+target compartment <em>target_comp</em>. If a state machine is provided, executes the
+corresponding actions when entering/exiting nodes and crossing
+edges if needed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.comparts.Compartment.next_states">
+<code class="descname">next_states</code><span class="sig-paren">(</span><em>states</em>, <em>values</em>, <em>populations</em>, <em>actions</em>, <em>method=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/comparts.html#Compartment.next_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.comparts.Compartment.next_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the population moving from the current compartment to each
+of the destination states, handling the values according the
+the specified method. Values can be handled either as absolute
+amounts (‘amount’ method), as proportions (‘rate’, in a
+deterministic approach) or as probabilities (‘proba’, in a
+stochastic approach). Actions are to be performed when
+changing state. The actual population affected by the
+transitions is stored in the first element of the
+<cite>populations</cite> parameter, as a tuple (‘population’, number, esc).
+Several edges can lead to the same state.</p>
+<dl class="docutils">
+<dt>Return a list of tuples:</dt>
+<dd>(state, {‘population’: (qty, esc), ‘actions:’ list of actions})</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.comparts.Compartment.population">
+<code class="descname">population</code><a class="headerlink" href="#emulsion.agent.comparts.Compartment.population" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.comparts.Compartment.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/comparts.html#Compartment.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.comparts.Compartment.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the specified population from the current population
+of the compartment (the population is kept positive).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.comparts.Compartment.shift_times_to_exit">
+<code class="descname">shift_times_to_exit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/comparts.html#Compartment.shift_times_to_exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.comparts.Compartment.shift_times_to_exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update times to exit at the end of the current time step to make populations remaining at current time step available for next time step.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.comparts.Compartment.update_time_to_exit">
+<code class="descname">update_time_to_exit</code><span class="sig-paren">(</span><em>d_steps_by_statemachine</em>, <em>remove=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/comparts.html#Compartment.update_time_to_exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.comparts.Compartment.update_time_to_exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the <em>duration</em> this agent is expected to stay in the current
+state of the specified state machine (<em>machine_name</em>).</p>
+<p>The time step value after which the agent is allowed to leave
+the current state is stored in a statevar called
+<code class="docutils literal notranslate"><span class="pre">_time_to_exit_machine_name</span></code>, is computed from the
+current time (<code class="docutils literal notranslate"><span class="pre">step</span></code>) plus the <em>duration</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>machine_name</strong> (<em>str</em>) – name of the state machine for which
+the duration in the current state must be updated</li>
+<li><strong>duration</strong> (<em>datetime.timedelta</em>) – the new duration for the
+agent to stay in the current state, calculated from the
+current time in the simulation</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.exceptions">
+<span id="emulsion-agent-exceptions-module"></span><h2>emulsion.agent.exceptions module<a class="headerlink" href="#module-emulsion.agent.exceptions" title="Permalink to this headline">¶</a></h2>
+<p>A Python implementation of the EMuLSion framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>Exceptions raised by agents.</p>
+<dl class="exception">
+<dt id="emulsion.agent.exceptions.InvalidCompartmentOperation">
+<em class="property">exception </em><code class="descclassname">emulsion.agent.exceptions.</code><code class="descname">InvalidCompartmentOperation</code><span class="sig-paren">(</span><em>source</em>, <em>operation</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/exceptions.html#InvalidCompartmentOperation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.exceptions.InvalidCompartmentOperation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception raised when a compartiment is asked for impossible
+operations, such as adding numbers to a list of units.</p>
+<dl class="method">
+<dt id="emulsion.agent.exceptions.InvalidCompartmentOperation.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>source</em>, <em>operation</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/exceptions.html#InvalidCompartmentOperation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.exceptions.InvalidCompartmentOperation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="emulsion.agent.exceptions.LevelException">
+<em class="property">exception </em><code class="descclassname">emulsion.agent.exceptions.</code><code class="descname">LevelException</code><span class="sig-paren">(</span><em>cause</em>, <em>level</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/exceptions.html#LevelException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.exceptions.LevelException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception raised when a semantic error occurs during model parsing.</p>
+<dl class="method">
+<dt id="emulsion.agent.exceptions.LevelException.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>cause</em>, <em>level</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/exceptions.html#LevelException.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.exceptions.LevelException.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="emulsion.agent.exceptions.StateVarNotFoundException">
+<em class="property">exception </em><code class="descclassname">emulsion.agent.exceptions.</code><code class="descname">StateVarNotFoundException</code><span class="sig-paren">(</span><em>statevar</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/exceptions.html#StateVarNotFoundException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.exceptions.StateVarNotFoundException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception raised when a semantic error occurs during model parsing.</p>
+<dl class="method">
+<dt id="emulsion.agent.exceptions.StateVarNotFoundException.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>statevar</em>, <em>source</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/exceptions.html#StateVarNotFoundException.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.exceptions.StateVarNotFoundException.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.meta">
+<span id="emulsion-agent-meta-module"></span><h2>emulsion.agent.meta module<a class="headerlink" href="#module-emulsion.agent.meta" title="Permalink to this headline">¶</a></h2>
+<p>A Python implementation of the EMuLSion framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>Classes and functions for abstract agent management.</p>
+<p>Part of this code was adapted from the PADAWAN framework (S. Picault,
+Univ. Lille).</p>
+<dl class="class">
+<dt id="emulsion.agent.meta.MetaAgent">
+<em class="property">class </em><code class="descclassname">emulsion.agent.meta.</code><code class="descname">MetaAgent</code><a class="reference internal" href="_modules/emulsion/agent/meta.html#MetaAgent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.meta.MetaAgent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABCMeta</span></code></p>
+<p>The Metaclass definition for all agents. When created, agents
+are stored in a class-specific dictionaries of agents. They are
+given an ID value (unique value within each class) and can be
+assigned to several agents families (by default, each agent is
+assigned to its own class).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.process">
+<span id="emulsion-agent-process-module"></span><h2>emulsion.agent.process module<a class="headerlink" href="#module-emulsion.agent.process" title="Permalink to this headline">¶</a></h2>
+<p>A Python implementation of the EMuLSion framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>Classes and functions for process management in MultiProcessCompartments.</p>
+<dl class="class">
+<dt id="emulsion.agent.process.AbstractProcess">
+<em class="property">class </em><code class="descclassname">emulsion.agent.process.</code><code class="descname">AbstractProcess</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/process.html#AbstractProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.process.AbstractProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An AbstractProcess is aimed at controlling a specific activity
+in a compartment, and is identified by its name.</p>
+<dl class="method">
+<dt id="emulsion.agent.process.AbstractProcess.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/process.html#AbstractProcess.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.process.AbstractProcess.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.process.AbstractProcess.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/process.html#AbstractProcess.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.process.AbstractProcess.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the actions that the process must perform.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.process.MethodProcess">
+<em class="property">class </em><code class="descclassname">emulsion.agent.process.</code><code class="descname">MethodProcess</code><span class="sig-paren">(</span><em>name</em>, <em>method</em>, <em>lparams=[]</em>, <em>dparams={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/process.html#MethodProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.process.MethodProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.process.AbstractProcess" title="emulsion.agent.process.AbstractProcess"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.process.AbstractProcess</span></code></a></p>
+<p>A MethodProcess is aimed at running a specific method (and
+possibly any function or even any callable object).</p>
+<dl class="method">
+<dt id="emulsion.agent.process.MethodProcess.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>name</em>, <em>method</em>, <em>lparams=[]</em>, <em>dparams={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/process.html#MethodProcess.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.process.MethodProcess.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.process.MethodProcess.detach_model">
+<code class="descname">detach_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/process.html#MethodProcess.detach_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.process.MethodProcess.detach_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.process.MethodProcess.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/process.html#MethodProcess.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.process.MethodProcess.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the actions that the process must perform. In a
+MethodProcess, those actions consist in running the method of
+the target compartment.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.process.StateMachineProcess">
+<em class="property">class </em><code class="descclassname">emulsion.agent.process.</code><code class="descname">StateMachineProcess</code><span class="sig-paren">(</span><em>name</em>, <em>agent</em>, <em>state_machine</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/process.html#StateMachineProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.process.StateMachineProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.process.AbstractProcess" title="emulsion.agent.process.AbstractProcess"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.process.AbstractProcess</span></code></a></p>
+<p>A StateMachineProcess is aimed at running a specific state machine
+within the agent (not within a grouping).</p>
+<dl class="method">
+<dt id="emulsion.agent.process.StateMachineProcess.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>name</em>, <em>agent</em>, <em>state_machine</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/process.html#StateMachineProcess.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.process.StateMachineProcess.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.process.StateMachineProcess.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/process.html#StateMachineProcess.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.process.StateMachineProcess.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the actions that the process must perform. In a
+StateMachineProcess, those actions consist in 1) executing the
+transitions of the state machine to change the agent’s states
+and 2) computing productions and transmit them to the upper
+level of the agent.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.process.StateMachineProcess.evolve_productions">
+<code class="descname">evolve_productions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/process.html#StateMachineProcess.evolve_productions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.process.StateMachineProcess.evolve_productions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.process.StateMachineProcess.evolve_transitions">
+<code class="descname">evolve_transitions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/process.html#StateMachineProcess.evolve_transitions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.process.StateMachineProcess.evolve_transitions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.views">
+<span id="emulsion-agent-views-module"></span><h2>emulsion.agent.views module<a class="headerlink" href="#module-emulsion.agent.views" title="Permalink to this headline">¶</a></h2>
+<p>A Python implementation of the EMuLSion framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>Classes and functions for entities management.</p>
+<dl class="class">
+<dt id="emulsion.agent.views.AdaptiveView">
+<em class="property">class </em><code class="descclassname">emulsion.agent.views.</code><code class="descname">AdaptiveView</code><span class="sig-paren">(</span><em>observables=(None</em>, <em>)</em>, <em>values=(None</em>, <em>)</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#AdaptiveView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.AdaptiveView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.views.SimpleView" title="emulsion.agent.views.SimpleView"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.views.SimpleView</span></code></a></p>
+<p>An AdaptiveView is able to evaluate conditions on individuals
+(AtomAgents) for state transitions, and to detect changes in its
+content and automatically report it to the upper level. Each
+compartment is associated with a particular value of a specific
+state variable or attribute of the units in its content. At the
+end of the evolve step, the compartment checks the values of the
+units in its content and reports units where changes occured.</p>
+<dl class="method">
+<dt id="emulsion.agent.views.AdaptiveView.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>observables=(None</em>, <em>)</em>, <em>values=(None</em>, <em>)</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#AdaptiveView.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.AdaptiveView.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the state variables or attributes associated with
+this compartment (<code class="docutils literal notranslate"><span class="pre">observables</span></code>) and the expected values.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.AdaptiveView.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.views.AdaptiveView.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.AdaptiveView.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.views.AdaptiveView.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.AdaptiveView.check_consistency">
+<code class="descname">check_consistency</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#AdaptiveView.check_consistency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.AdaptiveView.check_consistency" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the value of the observables of the current
+compartment. Units which do not have the expected values are
+notified to the upper level.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.AdaptiveView.clone">
+<code class="descname">clone</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#AdaptiveView.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.AdaptiveView.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a copy of the current compartment with the specified
+observable/value settings. The new content is empty.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.AdaptiveView.evaluate_condition">
+<code class="descname">evaluate_condition</code><span class="sig-paren">(</span><em>condition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#AdaptiveView.evaluate_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.AdaptiveView.evaluate_condition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the population of the compartment if the condition
+is fulfilled, 0 otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.AdaptiveView.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>machine=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#AdaptiveView.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.AdaptiveView.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>After the ordinary <code class="docutils literal notranslate"><span class="pre">evolve</span></code> step, check units which have
+changed their value(s) of the compartment-specific
+observable(s). The corresponding units are reported to the
+upper level.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.AdaptiveView.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['AdaptiveView'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.views.AdaptiveView.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.AdaptiveView.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', 'evaluate_condition', 'next_states', 'evolve', 'check_consistency', 'clone', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.views.AdaptiveView.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.AdaptiveView.next_states">
+<code class="descname">next_states</code><span class="sig-paren">(</span><em>states</em>, <em>values</em>, <em>populations</em>, <em>actions</em>, <em>method=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#AdaptiveView.next_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.AdaptiveView.next_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute stochastically the population moving from each population
+(tuples (‘agents’: list_of_agents)) in the <cite>populations</cite>
+parameter, to each of the possible destination states,
+according to each of the values interpreted as
+probabilities. Actions are to be performed when changing
+state. Several edges can lead to the same state.</p>
+<dl class="docutils">
+<dt>Return a list of tuples:</dt>
+<dd>(state, {‘agent’: list of agents, ‘actions’: list of actions})</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.views.AutoStructuredView">
+<em class="property">class </em><code class="descclassname">emulsion.agent.views.</code><code class="descname">AutoStructuredView</code><span class="sig-paren">(</span><em>key_variable</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#AutoStructuredView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.AutoStructuredView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.views.StructuredView" title="emulsion.agent.views.StructuredView"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.views.StructuredView</span></code></a></p>
+<p>An AutoStructuredView stores agents in an OrderedDict, using a
+specific statevar as key.</p>
+<dl class="method">
+<dt id="emulsion.agent.views.AutoStructuredView.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>key_variable</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#AutoStructuredView.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.AutoStructuredView.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the unit with a health state and a name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.AutoStructuredView.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#AutoStructuredView.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.AutoStructuredView.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified population (SortedSet or list) to the
+current view.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.AutoStructuredView.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.views.AutoStructuredView.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.AutoStructuredView.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.views.AutoStructuredView.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.AutoStructuredView.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['AutoStructuredView'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.views.AutoStructuredView.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.AutoStructuredView.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', 'add', 'remove', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.views.AutoStructuredView.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.AutoStructuredView.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#AutoStructuredView.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.AutoStructuredView.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the specified population from the current view. The
+population is expected to be a SortedSet or list.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.views.SimpleView">
+<em class="property">class </em><code class="descclassname">emulsion.agent.views.</code><code class="descname">SimpleView</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#SimpleView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.SimpleView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="emulsion.agent.core.html#emulsion.agent.core.groups.Aggregation" title="emulsion.agent.core.groups.Aggregation"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.core.groups.Aggregation</span></code></a></p>
+<p>A SimpleView uses a set to store the underlying
+units. It is rather aimed at storing AtomAgents. All units are
+considered in the same state, thus conditions in the state
+machines are evaluated for the whole compartment, not for
+individuals.</p>
+<dl class="method">
+<dt id="emulsion.agent.views.SimpleView.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#SimpleView.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.SimpleView.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the unit with a health state and a name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.SimpleView.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#SimpleView.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.SimpleView.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified population to the current compartment.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.SimpleView.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.views.SimpleView.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.SimpleView.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.views.SimpleView.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.SimpleView.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['SimpleView'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.views.SimpleView.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.SimpleView.get_content">
+<code class="descname">get_content</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#SimpleView.get_content"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.SimpleView.get_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the units contained in the current unit.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.SimpleView.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', '__iter__', 'get_content', 'add', 'remove', 'next_states', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.views.SimpleView.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.SimpleView.next_states">
+<code class="descname">next_states</code><span class="sig-paren">(</span><em>states</em>, <em>values</em>, <em>populations</em>, <em>actions</em>, <em>method=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#SimpleView.next_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.SimpleView.next_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute stochastically the population moving from the current
+compartment to each of the destination states, according to
+the values interpreted as probabilities. Actions are to be
+performed when changing state. The population affected by the
+transitions is stored in the first element of the
+<cite>populations</cite> parameter, as a tuple: (‘agents’,
+list_of_agents). Several edges can lead to the same state.</p>
+<dl class="docutils">
+<dt>Return a list of tuples:</dt>
+<dd>(state, {‘agent’: list of agents, ‘actions’: list of actions})</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.SimpleView.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#SimpleView.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.SimpleView.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the specified population from the current
+compartment.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.views.StructuredView">
+<em class="property">class </em><code class="descclassname">emulsion.agent.views.</code><code class="descname">StructuredView</code><span class="sig-paren">(</span><em>keep_history=True</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="emulsion.agent.core.html#emulsion.agent.core.groups.Aggregation" title="emulsion.agent.core.groups.Aggregation"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.core.groups.Aggregation</span></code></a></p>
+<p>A StructuredView uses ad dict list to store the underlying
+units. It is rather aimed at storing other compartiments.</p>
+<dl class="method">
+<dt id="emulsion.agent.views.StructuredView.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>keep_history=True</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredView.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredView.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the unit with a health state and a name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.StructuredView.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredView.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredView.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified population to the current
+compartment. The population is expected to be a dictionary
+with names as keys and compartments as values.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.StructuredView.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.views.StructuredView.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.StructuredView.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.views.StructuredView.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.StructuredView.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>machine=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredView.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredView.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ask each unit in the current compartment to make its content evolve
+according to its own capabilities. A specific state machine
+can be specified if needed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.StructuredView.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['StructuredView'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.views.StructuredView.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.StructuredView.get_content">
+<code class="descname">get_content</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredView.get_content"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredView.get_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the agents contained in the current view.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.StructuredView.get_or_build">
+<code class="descname">get_or_build</code><span class="sig-paren">(</span><em>key</em>, <em>source=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredView.get_or_build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredView.get_or_build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the compartment with the specified key if any, or
+build one by cloning the source if not found.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.StructuredView.handle_notifications">
+<code class="descname">handle_notifications</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredView.handle_notifications"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredView.handle_notifications" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle all notifications received during the time step.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.StructuredView.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', '__iter__', '__getitem__', 'get_content', 'add', 'remove', 'notify_changed_units', 'handle_notifications', 'get_or_build', 'evolve', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.views.StructuredView.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.StructuredView.notify_changed_units">
+<code class="descname">notify_changed_units</code><span class="sig-paren">(</span><em>source_compartment</em>, <em>units</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredView.notify_changed_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredView.notify_changed_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive a change notification concerning several units
+which cannot be stored anymore in the source compartment.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.StructuredView.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredView.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredView.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the specified population from the current
+compartment.  The population is expected to be a dictionary
+with names as keys and compartments as values.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.views.StructuredViewWithCounts">
+<em class="property">class </em><code class="descclassname">emulsion.agent.views.</code><code class="descname">StructuredViewWithCounts</code><span class="sig-paren">(</span><em>allowed_values=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredViewWithCounts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredViewWithCounts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.views.StructuredView" title="emulsion.agent.views.StructuredView"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.views.StructuredView</span></code></a></p>
+<p>Same as StructuredView, plus the capability of handling counts for
+key values.</p>
+<dl class="method">
+<dt id="emulsion.agent.views.StructuredViewWithCounts.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>allowed_values=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredViewWithCounts.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredViewWithCounts.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the unit with a health state and a name.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.StructuredViewWithCounts.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.views.StructuredViewWithCounts.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.StructuredViewWithCounts.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.views.StructuredViewWithCounts.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.StructuredViewWithCounts.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredViewWithCounts.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredViewWithCounts.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ask each unit in the current compartment to make its content evolve
+according to its own capabilities. A specific state machine
+can be specified if needed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.StructuredViewWithCounts.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['StructuredViewWithCounts'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.views.StructuredViewWithCounts.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.StructuredViewWithCounts.init_counts">
+<code class="descname">init_counts</code><span class="sig-paren">(</span><em>index=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredViewWithCounts.init_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredViewWithCounts.init_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the counts.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.views.StructuredViewWithCounts.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', 'init_counts', 'update_counts', '__contains__', 'evolve', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.views.StructuredViewWithCounts.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.views.StructuredViewWithCounts.update_counts">
+<code class="descname">update_counts</code><span class="sig-paren">(</span><em>index=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/views.html#StructuredViewWithCounts.update_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.views.StructuredViewWithCounts.update_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the counts.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="emulsion.html">11. emulsion package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="emulsion.html#subpackages">11.1. Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">emulsion.agent package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emulsion.model.html">emulsion.model package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emulsion.tools.html">emulsion.tools package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.html#submodules">11.2. Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.html#module-emulsion.init_emulsion">11.3. emulsion.init_emulsion module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="emulsion.html">11. emulsion package</a><ul>
+      <li>Previous: <a href="emulsion.html" title="previous chapter">11. emulsion package</a></li>
+      <li>Next: <a href="emulsion.agent.core.html" title="next chapter">emulsion.agent.core package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/emulsion.agent.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

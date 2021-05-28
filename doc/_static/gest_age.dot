@@ -1,0 +1,23 @@
+digraph {
+          charset="utf-8"
+        	rankdir=LR;
+        
+        	node[fontsize=16, fontname=Arial, shape=box, style="filled,rounded"];
+        	edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip="", headtooltip=""];
+
+        	"J" [shape="Mrecord", label="{{\ J\ |&#9670;}}", tooltip="J (Juvenile):
+	juvenile animals", fillcolor=orange, style="filled,rounded"] ;
+	"A" [shape="Mrecord", label="{{\ A\ |&#9670;}}", tooltip="A (Non-gestating Adult):
+	adult animals", fillcolor=brown, style="filled,rounded"] ;
+	"G" [shape="Mrecord", label="{{\ G&nbsp;&#9719;\ |&#9670;}}", tooltip="G (Gestating Adult):
+	adult animals (producing new juveniles)", fillcolor=deepskyblue, style="filled,rounded"] ;
+	"D" [shape="Mrecord", label="D", tooltip="D (Dead):
+	compartment to put dead animals", fillcolor=white, style="filled,rounded,dotted"] ;
+	"A" -> "D" [label="rate: 1 / avg_adult_death_age", labeltooltip="rate: 1 / avg_adult_death_age", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"A" -> "G" [label="rate: reproduction", labeltooltip="reproduction [parameter]:
+	reproduction rate (/days)                                               
+	1/20", arrowtail="nonetee", arrowhead="normalnone", dir=both, tooltip="COND: is_Female", minlen=3, style="solid"];
+	"G" -> "A" [label="proba: 1", labeltooltip="proba: 1", arrowtail="none", arrowhead="normalnonediamond", dir=both, tooltip="", minlen=3, style="solid"];
+	"G" -> "D" [label="rate: 1 / avg_adult_death_age", labeltooltip="rate: 1 / avg_adult_death_age", arrowtail="noneoinv", arrowhead="normalnone", dir=both, tooltip="ESCAPE: True", minlen=3, style="solid"];
+	"J" -> "A" [label="proba: 1", labeltooltip="proba: 1", arrowtail="nonetee", arrowhead="normalnone", dir=both, tooltip="COND: GreaterThan(age, adult_age)", minlen=3, style="solid"];
+}

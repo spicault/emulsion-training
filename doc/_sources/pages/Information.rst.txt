@@ -1,0 +1,112 @@
+***********
+Information
+***********
+
+Contributors and contact
+************************
+
+- Sébastien Picault (sebastien.picault@inrae.fr)
+- Yu-Lin Huang
+- Sandie Arnoux
+- Vianney Sicard
+- Gaël Beaunée
+- Pauline Ezanno (pauline.ezanno@inrae.fr)
+
+.. image:: https://img.shields.io/twitter/follow/bioepar_dynamo?label=DYNAMO%20research%20group&style=plastic&logo=twitter
+   :target: http://twitter.com/intent/follow?screen_name=bioepar_dynamo
+
+INRAE, Oniris, BIOEPAR, 44300 Nantes, France
+
+How to cite
+***********
+
+If you are using EMULSION in your work, please acknowledge it when
+publishing, with a reference to the following article:
+
+.. admonition:: Main reference
+
+   S. Picault, Y.-L. Huang, V. Sicard, S. Arnoux, G. Beaunée, P. Ezanno
+   (2019). "EMULSION: Transparent and flexible multiscale
+   stochastic models in human, animal and plant epidemiology", PLoS
+   Computational Biology 15(9): e1007342.
+
+   DOI: `10.1371/journal.pcbi.1007342 <https://doi.org/10.1371/journal.pcbi.1007342>`_
+
+   .. literalinclude:: ../_static/how_to_cite.bib
+
+
+Selected publications
+*********************
+
+- On bovine respiratory disease (BRD) in feedlots:
+
+  S. Picault, P. Ezanno, S. Assié (2019). "Combining early
+  hyperthermia detection with metaphylaxis for reducing antibiotics
+  usage in newly received beef bulls at fattening operations: a
+  simulation-based approach", in: *SVEPM Annual Conference and General
+  Meeting* (in press)
+
+- On Q fever (Coxiellosis) in dairy herds:
+
+  ..
+     - S. Picault, Y.-L. Huang, V. Sicard, T. Hoch, E. Vergu,
+       F. Beaudeau, P. Ezanno (2019).  "A generic multi-level stochastic
+       modelling framework in computational epidemiology", pre-print on
+       `BioRXiV
+       <http://biorxiv.org/content/early/2018/12/10/491605.abstract>`_
+
+       DOI: `10.1101/491605 <http://doi.org/10.1101/491605>`_
+
+  - S. Picault, Y.-L. Huang, V. Sicard, F. Beaudeau, P. Ezanno
+    (2017). "A Multi-Level Multi-Agent Simulation Framework in Animal
+    Epidemiology", in: Demazeau *et al.* (eds.), *15th International
+    Conference on Practical Applications of Agents and Multi-Agent
+    Systems (PAAMS)*, Lecture Notes in Computer Science
+    10349, p. 209-221, Springer.
+
+    DOI: `10.1007/978-3-319-59930-4_17 <http://doi.org/10.1007/978-3-319-59930-4_17>`_
+
+- On Artificial Intelligence research involved in EMULSION:
+
+  - P. Mathieu, G. Morvan, S. Picault (2018). "Multi-level agent-based
+    simulations: Four design patterns", *Simulation Modelling Practice
+    and Theory* 83, p. 51-64, Agent-Based Modelling and Simulation
+    special issue Elsevier.
+
+    DOI: `10.1016/j.simpat.2017.12.015 <http://doi.org/10.1016/j.simpat.2017.12.015>`_
+
+  - S. Picault, Y.-L. Huang, V. Sicard, P. Ezanno (2017). "Enhancing
+    Sustainability of Complex Epidemiological Models through a Generic
+    Multilevel Agent-based Approach" in: C. Sierra (ed.), *26th
+    International Joint Conference on Artificial Intelligence
+    (IJCAI)*, AAAI, p. 374-380.
+
+    DOI: `10.24963/ijcai.2017/53 <http://doi.org/10.24963/ijcai.2017/53>`_
+
+  - S. Picault, P. Mathieu (2011). "An Interaction-Oriented Model for
+    Multi-Scale Simulation", in: T. Walsh (ed.), *22nd International
+    Joint Conference on Artificial Intelligence (IJCAI)*,
+    AAAI, p. 332-337.
+
+    DOI: `10.5591/978-1-57735-516-8/IJCAI11-065
+    <http://doi.org/10.5591/978-1-57735-516-8/IJCAI11-065>`_
+
+
+Acknowledgements
+****************
+
+This work was carried out with the financial support of:
+
+  - the French Research Agency (ANR), Program Investments for the
+    Future, project ANR-10-BINF-07 (MIHMES)
+  - the European Union through the European fund for the regional
+    development (FEDER) of Pays de la Loire
+  - the French Research Agency (ANR), project ANR-16-CE32-0007-01
+    (CADENCE)
+  - INRAE, the French National Research Institute for Agriculture,
+    Food and Environment (Animal Health Division)
+  - the SANT'Innov project of the For and On Regional Development
+    (PSDR) French research programme, which is funded by INRAE and the
+    French regions of Bretagne, Pays de la Loire, Normandie and
+    Nouvelle Aquitaine.
+  - the Région Pays de la Loire

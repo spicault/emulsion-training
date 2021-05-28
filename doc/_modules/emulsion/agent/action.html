@@ -1,0 +1,730 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.agent.action &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.agent.action</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A Python implementation of the EMuLSion framework (Epidemiologic</span>
+<span class="sd">MUlti-Level SImulatiONs).</span>
+
+<span class="sd">Classes and functions for actions.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># [HEADER]</span>
+
+<span class="kn">from</span>   <span class="nn">abc</span>                 <span class="k">import</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span>   <span class="nn">collections</span>         <span class="k">import</span> <span class="n">Counter</span>
+<span class="kn">import</span> <span class="nn">numpy</span>               <span class="k">as</span>     <span class="nn">np</span>
+
+<span class="kn">from</span>   <span class="nn">emulsion.tools.misc</span>  <span class="k">import</span> <span class="n">retrieve_value</span><span class="p">,</span> <span class="n">rates_to_probabilities</span>
+<span class="kn">from</span>   <span class="nn">emulsion.tools.debug</span> <span class="k">import</span> <span class="n">debuginfo</span>
+
+
+<span class="c1">#  ______                    _   _</span>
+<span class="c1"># |  ____|                  | | (_)</span>
+<span class="c1"># | |__  __  _____ ___ _ __ | |_ _  ___  _ __  ___</span>
+<span class="c1"># |  __| \ \/ / __/ _ \ &#39;_ \| __| |/ _ \| &#39;_ \/ __|</span>
+<span class="c1"># | |____ &gt;  &lt; (_|  __/ |_) | |_| | (_) | | | \__ \</span>
+<span class="c1"># |______/_/\_\___\___| .__/ \__|_|\___/|_| |_|___/</span>
+<span class="c1">#                     | |</span>
+<span class="c1">#                     |_|</span>
+
+<div class="viewcode-block" id="InvalidActionException"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.InvalidActionException">[docs]</a><span class="k">class</span> <span class="nc">InvalidActionException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Exception raised when a semantic error occurs in action definition.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="InvalidActionException.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.InvalidActionException.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span></div>
+
+
+<span class="c1">#   _____ _</span>
+<span class="c1">#  / ____| |</span>
+<span class="c1"># | |    | | __ _ ___ ___  ___  ___</span>
+<span class="c1"># | |    | |/ _` / __/ __|/ _ \/ __|</span>
+<span class="c1"># | |____| | (_| \__ \__ \  __/\__ \</span>
+<span class="c1">#  \_____|_|\__,_|___/___/\___||___/</span>
+
+
+<div class="viewcode-block" id="AbstractAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.AbstractAction">[docs]</a><span class="k">class</span> <span class="nc">AbstractAction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AbstractActions are aimed at describing actions triggered by a</span>
+<span class="sd">    state machine.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="AbstractAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.AbstractAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_machine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_machine</span> <span class="o">=</span> <span class="n">state_machine</span></div>
+
+<div class="viewcode-block" id="AbstractAction.execute_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.AbstractAction.execute_action">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">execute_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute the action on the specified unit.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="AbstractAction.build_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.AbstractAction.build_action">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">build_action</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">action_name</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an instance of the appropriate Action subclass,</span>
+<span class="sd">        depending on its name. The appropriate parameters for this</span>
+<span class="sd">        action should be passed as a dictionary.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ACTION_DICT</span><span class="p">[</span><span class="n">action_name</span><span class="p">](</span><span class="o">**</span><span class="n">others</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span></div>
+
+<div class="viewcode-block" id="ValueAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.ValueAction">[docs]</a><span class="k">class</span> <span class="nc">ValueAction</span><span class="p">(</span><span class="n">AbstractAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;ValueActions represent modifications of state variables or</span>
+<span class="sd">    attributes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ValueAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.ValueAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statevar_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parameter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delta_t</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a ValueAction aimed at modifying the specified</span>
+<span class="sd">        statevar according to the parameter.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span> <span class="o">=</span> <span class="n">statevar_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameter</span> <span class="o">=</span> <span class="n">parameter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta_t</span> <span class="o">=</span> <span class="n">delta_t</span></div></div>
+
+<div class="viewcode-block" id="RecordChangeAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.RecordChangeAction">[docs]</a><span class="k">class</span> <span class="nc">RecordChangeAction</span><span class="p">(</span><span class="n">ValueAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;RecordChangeAction allows to record how many agents performed an</span>
+<span class="sd">    action set. The corresponding value is added to a variable assumed</span>
+<span class="sd">    to be defined at the upper level.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RecordChangeAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.RecordChangeAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a RecordChangeAction aimed at modifying the specified</span>
+<span class="sd">        parameter, (assumed to be a statevar defined at the upper</span>
+<span class="sd">        level).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span> <span class="o">=</span> <span class="n">parameter</span></div>
+
+<div class="viewcode-block" id="RecordChangeAction.execute_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.RecordChangeAction.execute_action">[docs]</a>    <span class="k">def</span> <span class="nf">execute_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute the action on the specified unit, with the</span>
+<span class="sd">        specified population size.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">population</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">population</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">agents</span><span class="p">)</span> <span class="k">if</span> <span class="n">agents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">target_agent</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">upper_level</span><span class="p">()</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">target_agent</span><span class="o">.</span><span class="n">statevars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">]</span>\
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span> <span class="ow">in</span> <span class="n">target_agent</span><span class="o">.</span><span class="n">statevars</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">target_agent</span><span class="o">.</span><span class="n">statevars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span> <span class="o">+</span> <span class="n">population</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; on </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">)</span>
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span></div>
+
+
+<div class="viewcode-block" id="SampleDurationsAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.SampleDurationsAction">[docs]</a><span class="k">class</span> <span class="nc">SampleDurationsAction</span><span class="p">(</span><span class="n">AbstractAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;SampleDurationsAction computes N exit dates for the state of a given state machine, N being the number of individuals that enter the state.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SampleDurationsAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.SampleDurationsAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a SampleDurationsAction aimed at using the specified duration (possibly a distribution) for a specific state machine (given as an argument to the parent class).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span></div>
+
+<div class="viewcode-block" id="SampleDurationsAction.execute_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.SampleDurationsAction.execute_action">[docs]</a>    <span class="k">def</span> <span class="nf">execute_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_performer</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute the action on the specified *action_performer* agent, with a target that is expected to be a *population* size. If the caller specifies a list of target agents instead of a population size, the population size is computed as the size of the agents list.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">population</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">population</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">agents</span><span class="p">)</span> <span class="k">if</span> <span class="n">agents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">current_step</span> <span class="o">=</span> <span class="n">action_performer</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">step</span>
+        <span class="c1">## WARNING just for initialization because when creating initial conditions current_step is -1</span>
+        <span class="k">if</span> <span class="n">current_step</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">current_step</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># debuginfo([(current_step, action_performer.get_model_value(self.duration)) for _ in range(population)])</span>
+        <span class="n">l_exit_steps</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">current_step</span> <span class="o">+</span> <span class="n">action_performer</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">population</span><span class="p">)]</span>
+        <span class="n">action_performer</span><span class="o">.</span><span class="n">update_time_to_exit</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">state_machine</span><span class="o">.</span><span class="n">machine_name</span><span class="p">:</span> <span class="n">Counter</span><span class="p">(</span><span class="n">l_exit_steps</span><span class="p">)})</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; on </span><span class="si">{}</span><span class="s1"> for state machine </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_machine</span><span class="p">)</span>
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span></div>
+
+
+<div class="viewcode-block" id="SetVarAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.SetVarAction">[docs]</a><span class="k">class</span> <span class="nc">SetVarAction</span><span class="p">(</span><span class="n">ValueAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;SetVarAction allows to set the variable of the agent.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SetVarAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.SetVarAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statevar_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parameter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a SetVarAction aimed at modifying the specified statevar</span>
+<span class="sd">        according to the parameter.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">statevar_name</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">state_machines</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidActionException</span><span class="p">(</span><span class="s2">&quot;Action set_var must not change values of state machines. Use action become instead.</span><span class="se">\n\t</span><span class="s2">set_var: </span><span class="si">{}</span><span class="s2"> value: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">statevar_name</span><span class="p">,</span> <span class="n">parameter</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span> <span class="o">=</span> <span class="n">statevar_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameter</span> <span class="o">=</span> <span class="n">parameter</span></div>
+
+<div class="viewcode-block" id="SetVarAction.execute_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.SetVarAction.execute_action">[docs]</a>    <span class="k">def</span> <span class="nf">execute_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute the action in the specified unit. If the `agents` parameter</span>
+<span class="sd">        is specified (as a list), each agent of this list will execute</span>
+<span class="sd">        the action. If changes of state variables in relation to a</span>
+<span class="sd">        state machine occur, the corresponding actions (if any) are</span>
+<span class="sd">        executed: on_exit from the current state, and on_enter for the</span>
+<span class="sd">        new state.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">agents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="p">[</span><span class="n">unit</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+            <span class="c1"># if the value which has to be affected to the variable is</span>
+            <span class="c1"># a value defined in the model, get it</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_values</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameter</span><span class="p">)</span>
+            <span class="c1"># otherwise get its value through the agent</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameter</span><span class="p">)</span>
+            <span class="c1"># agent.set_information(self.statevar_name, value)</span>
+            <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">level</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">upper_level</span><span class="p">()</span><span class="o">.</span><span class="n">statevars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">statevars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; </span><span class="si">{}</span><span class="s1"> &lt;- </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">parameter</span><span class="p">)</span>
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span></div>
+
+
+<div class="viewcode-block" id="SetUpperVarAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.SetUpperVarAction">[docs]</a><span class="k">class</span> <span class="nc">SetUpperVarAction</span><span class="p">(</span><span class="n">ValueAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;SetUpperVarAction allows to set the variable of the upper level of the agent.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SetUpperVarAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.SetUpperVarAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statevar_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parameter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a SetUpperVarAction aimed at modifying the specified statevar</span>
+<span class="sd">        according to the parameter.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">statevar_name</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">state_machines</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidActionException</span><span class="p">(</span><span class="s2">&quot;Action set_var must not change values of state machines. Use action become instead.</span><span class="se">\n\t</span><span class="s2">set_var: </span><span class="si">{}</span><span class="s2"> value: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">statevar_name</span><span class="p">,</span> <span class="n">parameter</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span> <span class="o">=</span> <span class="n">statevar_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameter</span> <span class="o">=</span> <span class="n">parameter</span></div>
+
+<div class="viewcode-block" id="SetUpperVarAction.execute_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.SetUpperVarAction.execute_action">[docs]</a>    <span class="k">def</span> <span class="nf">execute_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute the action in the upper level of the specified unit. If the `agents` parameter</span>
+<span class="sd">        is specified (as a list), each agent of this list will execute</span>
+<span class="sd">        the action. If changes of state variables in relation to a</span>
+<span class="sd">        state machine occur, the corresponding actions (if any) are</span>
+<span class="sd">        executed: on_exit from the current state, and on_enter for the</span>
+<span class="sd">        new state.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">agents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="p">[</span><span class="n">unit</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+            <span class="c1"># if the value which has to be affected to the variable is</span>
+            <span class="c1"># a value defined in the model, get it</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_values</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameter</span><span class="p">)</span>
+            <span class="c1"># otherwise get its value through the agent</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameter</span><span class="p">)</span>
+            <span class="c1"># agent.set_information(self.statevar_name, value)</span>
+            <span class="n">upper_level</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">upper_level</span><span class="p">()</span> <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">agent</span><span class="o">.</span><span class="n">upper_level</span><span class="p">()</span><span class="o">.</span><span class="n">upper_level</span><span class="p">()</span>
+            <span class="n">upper_level</span><span class="o">.</span><span class="n">statevars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; </span><span class="si">{}</span><span class="s1"> &lt;- </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">parameter</span><span class="p">)</span>
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span></div>
+
+
+<div class="viewcode-block" id="RateAdditiveAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.RateAdditiveAction">[docs]</a><span class="k">class</span> <span class="nc">RateAdditiveAction</span><span class="p">(</span><span class="n">ValueAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A RateChangeAction is aimed at increasing or decreasing a</span>
+<span class="sd">    specific state variable or attribute, according to a specific rate</span>
+<span class="sd">    (i.e. the actual increase or decrease is the product of the</span>
+<span class="sd">    `parameter` attribute and a population size).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RateAdditiveAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.RateAdditiveAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sign</span> <span class="o">=</span> <span class="n">sign</span></div>
+
+<div class="viewcode-block" id="RateAdditiveAction.execute_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.RateAdditiveAction.execute_action">[docs]</a>    <span class="k">def</span> <span class="nf">execute_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute the action on the specified unit, with the</span>
+<span class="sd">        specified population size.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">execute_action</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">population</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">population</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">agents</span><span class="p">)</span>
+        <span class="n">rate_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_machine</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameter</span><span class="p">)</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">retrieve_value</span><span class="p">(</span><span class="n">rate_value</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+        <span class="n">current_val</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">)</span>
+        <span class="n">new_val</span> <span class="o">=</span> <span class="n">current_val</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sign</span><span class="o">*</span><span class="n">rate</span><span class="o">*</span><span class="n">population</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">delta_t</span>
+        <span class="n">unit</span><span class="o">.</span><span class="n">set_information</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">,</span> <span class="n">new_val</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; (</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">parameter</span><span class="p">)</span>
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span></div>
+
+
+<div class="viewcode-block" id="RateDecreaseAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.RateDecreaseAction">[docs]</a><span class="k">class</span> <span class="nc">RateDecreaseAction</span><span class="p">(</span><span class="n">RateAdditiveAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A RateDecreaseAction is aimed at decreasing a specific state</span>
+<span class="sd">    variable or attribute, according to a specific rate (i.e. the</span>
+<span class="sd">    actual decrease is the product of the `parameter` attribute and a</span>
+<span class="sd">    population size).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RateDecreaseAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.RateDecreaseAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sign</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="RateIncreaseAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.RateIncreaseAction">[docs]</a><span class="k">class</span> <span class="nc">RateIncreaseAction</span><span class="p">(</span><span class="n">RateAdditiveAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A RateIncreaseAction is aimed at increasing a specific state</span>
+<span class="sd">    variable or attribute, according to a specific rate (i.e. the</span>
+<span class="sd">    actual increase is the product of the `parameter` attribute and a</span>
+<span class="sd">    population size).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RateIncreaseAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.RateIncreaseAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sign</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="StochAdditiveAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.StochAdditiveAction">[docs]</a><span class="k">class</span> <span class="nc">StochAdditiveAction</span><span class="p">(</span><span class="n">ValueAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A StochAdditiveAction is aimed at increasing or decreasing a</span>
+<span class="sd">    specific state variable or attribute, according to a specific</span>
+<span class="sd">    rate, using a *binomial sampling*.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="StochAdditiveAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.StochAdditiveAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sign</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sign</span> <span class="o">=</span> <span class="n">sign</span></div>
+
+<div class="viewcode-block" id="StochAdditiveAction.execute_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.StochAdditiveAction.execute_action">[docs]</a>    <span class="k">def</span> <span class="nf">execute_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute the action on the specified unit, with the</span>
+<span class="sd">        specified population size.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">execute_action</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">population</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">population</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">agents</span><span class="p">)</span>
+        <span class="n">rate_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_machine</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameter</span><span class="p">)</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">retrieve_value</span><span class="p">(</span><span class="n">rate_value</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+        <span class="c1"># convert rate into a probability</span>
+        <span class="n">proba</span> <span class="o">=</span> <span class="n">rates_to_probabilities</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="p">[</span><span class="n">rate</span><span class="p">],</span> <span class="n">delta_t</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delta_t</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">current_val</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">)</span>
+        <span class="n">new_val</span> <span class="o">=</span> <span class="n">current_val</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sign</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">proba</span><span class="p">)</span>
+        <span class="n">unit</span><span class="o">.</span><span class="n">set_information</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">,</span> <span class="n">new_val</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; (</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevar_name</span><span class="p">,</span>
+                                                      <span class="bp">self</span><span class="o">.</span><span class="n">parameter</span><span class="p">)</span>
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span></div>
+
+
+<div class="viewcode-block" id="StochDecreaseAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.StochDecreaseAction">[docs]</a><span class="k">class</span> <span class="nc">StochDecreaseAction</span><span class="p">(</span><span class="n">StochAdditiveAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A StochDecreaseAction is aimed at decreasing a specific state</span>
+<span class="sd">    variable or attribute, according to a specific rate, using a</span>
+<span class="sd">    *binomial sampling*.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="StochDecreaseAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.StochDecreaseAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sign</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="StochIncreaseAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.StochIncreaseAction">[docs]</a><span class="k">class</span> <span class="nc">StochIncreaseAction</span><span class="p">(</span><span class="n">StochAdditiveAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A StochIncreaseAction is aimed at increasing a specific state</span>
+<span class="sd">    variable or attribute, according to a specific rate, using a</span>
+<span class="sd">    *binomial sampling*.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="StochIncreaseAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.StochIncreaseAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">sign</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="StringAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.StringAction">[docs]</a><span class="k">class</span> <span class="nc">StringAction</span><span class="p">(</span><span class="n">AbstractAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A StringAction is based on the specification of a string</span>
+<span class="sd">    parameter.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="StringAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.StringAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">l_params</span><span class="o">=</span><span class="p">[],</span> <span class="n">d_params</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameter</span> <span class="o">=</span> <span class="n">parameter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l_params</span> <span class="o">=</span> <span class="n">l_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_params</span> <span class="o">=</span> <span class="n">d_params</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; (</span><span class="si">{!s}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameter</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">l_params</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">d_params</span><span class="p">)</span>
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span></div>
+
+
+<div class="viewcode-block" id="BecomeAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.BecomeAction">[docs]</a><span class="k">class</span> <span class="nc">BecomeAction</span><span class="p">(</span><span class="n">AbstractAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A BecomeAction is aimed at making an agent change its state</span>
+<span class="sd">    according to one ore more specified prototypes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="BecomeAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.BecomeAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prototypes</span><span class="o">=</span><span class="p">[],</span> <span class="n">probas</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prototype_names</span> <span class="o">=</span> <span class="n">prototypes</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prototypes</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>\
+                               <span class="k">else</span> <span class="p">[</span><span class="n">prototypes</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">probas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">probas</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prototype_names</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prototype_names</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">probas</span> <span class="o">=</span> <span class="n">probas</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">probas</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">probas</span><span class="p">]</span>
+        <span class="k">assert</span><span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prototype_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">probas</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">probas</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">add_expression</span><span class="p">(</span><span class="n">pr</span><span class="p">)</span> <span class="k">for</span> <span class="n">pr</span> <span class="ow">in</span> <span class="n">probas</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; (</span><span class="si">{!s}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prototype_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">probas</span><span class="p">)</span>
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
+
+<div class="viewcode-block" id="BecomeAction.execute_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.BecomeAction.execute_action">[docs]</a>    <span class="k">def</span> <span class="nf">execute_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute the action in the specified unit. If the `agents` parameter</span>
+<span class="sd">        is specified (as a list), each agent of this list will execute</span>
+<span class="sd">        the action. If changes of state variables in relation to a</span>
+<span class="sd">        state machine occur, the corresponding actions (if any) are</span>
+<span class="sd">        executed: on_exit from the current state, and on_enter for the</span>
+<span class="sd">        new state.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">agents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="p">[</span><span class="n">unit</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+            <span class="n">protos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prototype_names</span><span class="p">)</span>
+            <span class="c1"># compute actual values for probabilities</span>
+            <span class="n">proba_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">agent</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>\
+                            <span class="k">if</span> <span class="n">prob</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_values</span> <span class="k">else</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">prob</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">probas</span><span class="p">]</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">proba_values</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">total</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">proba_values</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">protos</span><span class="p">):</span>
+                <span class="c1"># add complement</span>
+                <span class="n">proba_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">total</span><span class="p">)</span>
+                <span class="c1"># if N-1 probabilities were given for N prototypes, no</span>
+                <span class="c1"># problem: the last prototype is getting the 1-total</span>
+                <span class="c1"># value.</span>
+            <span class="k">elif</span> <span class="n">total</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># otherwise (N probas with N protos but total &lt; 1),</span>
+                <span class="c1"># this means that there is a possibility that no</span>
+                <span class="c1"># individuals are produced =&gt; None</span>
+                <span class="n">protos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="n">proba_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">total</span><span class="p">)</span>
+            <span class="n">prototype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">protos</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">proba_values</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">prototype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">apply_prototype</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">prototype</span><span class="p">,</span> <span class="n">execute_actions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="CloneAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.CloneAction">[docs]</a><span class="k">class</span> <span class="nc">CloneAction</span><span class="p">(</span><span class="n">AbstractAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A CloneAction produces several copies of the agent with a given</span>
+<span class="sd">    prototype.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CloneAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.CloneAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prototypes</span><span class="o">=</span><span class="p">[],</span> <span class="n">amount</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">probas</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prototype_names</span> <span class="o">=</span> <span class="n">prototypes</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prototypes</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>\
+                               <span class="k">else</span> <span class="p">[</span><span class="n">prototypes</span><span class="p">]</span>
+        <span class="n">amount</span><span class="o">=</span> <span class="n">amount</span> <span class="k">if</span> <span class="n">amount</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">probas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">probas</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prototype_names</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prototype_names</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">probas</span> <span class="o">=</span> <span class="n">probas</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">probas</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">probas</span><span class="p">]</span>
+        <span class="k">assert</span><span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prototype_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">probas</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">amount</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">add_expression</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">probas</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">add_expression</span><span class="p">(</span><span class="n">pr</span><span class="p">)</span> <span class="k">for</span> <span class="n">pr</span> <span class="ow">in</span> <span class="n">probas</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; (</span><span class="si">{!s}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prototype_names</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">amount</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">probas</span><span class="p">)</span>
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
+
+<div class="viewcode-block" id="CloneAction.execute_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.CloneAction.execute_action">[docs]</a>    <span class="k">def</span> <span class="nf">execute_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_performer</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute the action in the specified unit. If the `agents` parameter</span>
+<span class="sd">        is specified (as a list), each agent of this list will execute</span>
+<span class="sd">        the action. If changes of state variables in relation to a</span>
+<span class="sd">        state machine occur, the corresponding actions (if any) are</span>
+<span class="sd">        executed: on_exit from the current state, and on_enter for the</span>
+<span class="sd">        new state.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># debuginfo(population, agents, self.amount, action_performer.get_model_value(self.amount))</span>
+        <span class="c1"># if no list of agents is provided, use the action performer as single agent to perform action</span>
+        <span class="k">if</span> <span class="n">agents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1">## this is the case of IBM and compartment models</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="p">[</span><span class="n">action_performer</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+            <span class="n">l_protos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prototype_names</span><span class="p">)</span>
+            <span class="c1"># compute actual values for probabilities</span>
+            <span class="n">l_proba_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">agent</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span> <span class="k">for</span> <span class="n">prob</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">probas</span><span class="p">]</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">l_proba_values</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">total</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">total</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># add complement</span>
+                <span class="n">l_proba_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">total</span><span class="p">)</span>
+                <span class="c1"># if N-1 probabilities were given for N prototypes, no</span>
+                <span class="c1"># problem: the last prototype is getting the 1-total</span>
+                <span class="c1"># value. Otherwise, this means that there is a</span>
+                <span class="c1"># possibility that no individuals are produced =&gt; None</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l_proba_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">l_protos</span><span class="p">):</span>
+                    <span class="n">l_protos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="c1">##</span>
+            <span class="n">nb_offspring_by_parent</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">amount</span><span class="p">))</span>
+            <span class="n">parent_population</span> <span class="o">=</span> <span class="n">population</span> <span class="k">if</span> <span class="n">population</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">1</span>
+            <span class="n">l_quantities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">nb_offspring_by_parent</span> <span class="o">*</span> <span class="n">parent_population</span><span class="p">,</span> <span class="n">l_proba_values</span><span class="p">)</span>
+            <span class="c1"># debuginfo(l_protos, l_quantities, action_performer, agent)</span>
+            <span class="k">for</span> <span class="n">prototype</span><span class="p">,</span> <span class="n">quantity</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">l_protos</span><span class="p">,</span> <span class="n">l_quantities</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">prototype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">quantity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">agent</span><span class="o">.</span><span class="n">upper_level</span><span class="p">()</span><span class="o">.</span><span class="n">clone_and_add</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">prototype</span><span class="p">,</span> <span class="n">quantity</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="MessageAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.MessageAction">[docs]</a><span class="k">class</span> <span class="nc">MessageAction</span><span class="p">(</span><span class="n">StringAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A MessageAction is aimed at making an agent print a given</span>
+<span class="sd">    string. It requires a string message. This string can contain one</span>
+<span class="sd">    reference to a variable or method of the agent, using Python&#39;s</span>
+<span class="sd">    formatting syntax.</span>
+
+<span class="sd">    For instance, &#39;My state is {.statevars.health_state}&#39; will print</span>
+<span class="sd">    the current health state of the agent.</span>
+
+<span class="sd">    Output is formatted in four comma-separated fields: the simulation</span>
+<span class="sd">    ID, the time step when the message was produced, the agent</span>
+<span class="sd">    speaking, and the message itself.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MessageAction.execute_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.MessageAction.execute_action">[docs]</a>    <span class="k">def</span> <span class="nf">execute_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute the action in the specified unit. If the `agents` parameter</span>
+<span class="sd">        is specified (as a list), each agent of this list will execute</span>
+<span class="sd">        the action.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">agents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="p">[</span><span class="n">unit</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">agent</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;$</span><span class="si">{}</span><span class="s2">,@</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="s1">&#39;simu_id&#39;</span><span class="p">),</span> <span class="n">agent</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">step</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">message</span><span class="p">))</span></div></div>
+
+<div class="viewcode-block" id="LogVarsAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.LogVarsAction">[docs]</a><span class="k">class</span> <span class="nc">LogVarsAction</span><span class="p">(</span><span class="n">StringAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A LogVarsAction is aimed at making an agent print a list of</span>
+<span class="sd">    variables into a file. Output is formatted in several</span>
+<span class="sd">    comma-separated fields: the simulation ID, the time step when the</span>
+<span class="sd">    message was produced, the class and ID of agent speaking, and the</span>
+<span class="sd">    values of variables (in the order they were defined in the</span>
+<span class="sd">    action).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="LogVarsAction.execute_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.LogVarsAction.execute_action">[docs]</a>    <span class="k">def</span> <span class="nf">execute_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute the action in the specified unit. If the `agents` parameter</span>
+<span class="sd">        is specified (as a list), each agent of this list will execute</span>
+<span class="sd">        the action.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">agents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="p">[</span><span class="n">unit</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">,</span><span class="si">{}</span><span class="s1">,</span><span class="si">{}</span><span class="s1">,</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="s1">&#39;simu_id&#39;</span><span class="p">),</span> <span class="n">agent</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">step</span><span class="p">,</span> <span class="n">agent</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">agent</span><span class="o">.</span><span class="n">agid</span><span class="p">)</span>
+            <span class="n">variables</span> <span class="o">=</span> <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="n">varname</span><span class="p">))</span>
+                                  <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_params</span><span class="p">])</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">log_path</span><span class="p">(),</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">logfile</span><span class="p">:</span>
+                <span class="n">logfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">,</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">variables</span><span class="p">))</span></div></div>
+
+<div class="viewcode-block" id="MethodAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.MethodAction">[docs]</a><span class="k">class</span> <span class="nc">MethodAction</span><span class="p">(</span><span class="n">AbstractAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A MethodAction is aimed at making an agent perform an action on</span>
+<span class="sd">    a specific population. It requires a method name, and optionnally</span>
+<span class="sd">    a list and a dictionary of parameters.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MethodAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.MethodAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">l_params</span><span class="o">=</span><span class="p">[],</span> <span class="n">d_params</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l_params</span> <span class="o">=</span> <span class="n">l_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_params</span> <span class="o">=</span> <span class="n">d_params</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; (</span><span class="si">{!s}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">l_params</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">d_params</span><span class="p">)</span>
+    <span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__str__</span>
+
+<div class="viewcode-block" id="MethodAction.execute_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.MethodAction.execute_action">[docs]</a>    <span class="k">def</span> <span class="nf">execute_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute the action using the specified unit. If the</span>
+<span class="sd">        `agents` parameter is a list of units, each unit of this list</span>
+<span class="sd">        will execute the action.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">agents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="p">[</span><span class="n">unit</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+            <span class="c1"># if current agent is not a level, get action at upper level:</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">)</span> <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">upper_level</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
+            <span class="n">l_params</span> <span class="o">=</span> <span class="p">[</span><span class="n">retrieve_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_machine</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">expr</span><span class="p">),</span> <span class="n">agent</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">expr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_params</span><span class="p">]</span>
+            <span class="c1">### introduced to pass internal information such as population</span>
+            <span class="n">d_params</span> <span class="o">=</span> <span class="n">others</span>
+            <span class="n">d_params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">retrieve_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_machine</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">expr</span><span class="p">),</span> <span class="n">agent</span><span class="p">)</span>
+                             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">expr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_params</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+            <span class="n">action</span><span class="p">(</span><span class="o">*</span><span class="n">l_params</span><span class="p">,</span> <span class="o">**</span><span class="n">d_params</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="FunctionAction"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.FunctionAction">[docs]</a><span class="k">class</span> <span class="nc">FunctionAction</span><span class="p">(</span><span class="n">MethodAction</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A FunctionAction is aimed at making an agent perform an action</span>
+<span class="sd">    on a specific population. It requires a function, and optionnally</span>
+<span class="sd">    a list and a dictionary of parameters. A FunctionAction runs</span>
+<span class="sd">    faster than a MethodAction since it does not require to retrieve</span>
+<span class="sd">    the method in each agent.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="FunctionAction.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.FunctionAction.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="vm">__name__</span></div>
+
+<div class="viewcode-block" id="FunctionAction.execute_action"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.action.FunctionAction.execute_action">[docs]</a>    <span class="k">def</span> <span class="nf">execute_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute the action using the specified unit. If the</span>
+<span class="sd">        `agents` parameter is a list of units, each unit of this list</span>
+<span class="sd">        will execute the action.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">agents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="p">[</span><span class="n">unit</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">agents</span><span class="p">:</span>
+            <span class="n">l_params</span> <span class="o">=</span> <span class="p">[</span><span class="n">retrieve_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_machine</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">expr</span><span class="p">),</span>
+                                       <span class="n">agent</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">expr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_params</span><span class="p">]</span>
+            <span class="c1">### introduced to pass internal information such as population</span>
+            <span class="n">d_params</span> <span class="o">=</span> <span class="n">others</span>
+            <span class="n">d_params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span>\
+                             <span class="n">retrieve_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_machine</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">expr</span><span class="p">),</span>
+                                            <span class="n">agent</span><span class="p">)</span>
+                             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">expr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_params</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="o">*</span><span class="n">l_params</span><span class="p">,</span> <span class="o">**</span><span class="n">d_params</span><span class="p">)</span></div></div>
+
+
+<span class="n">ACTION_DICT</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;increase&#39;</span><span class="p">:</span> <span class="n">RateIncreaseAction</span><span class="p">,</span>
+    <span class="s1">&#39;decrease&#39;</span><span class="p">:</span> <span class="n">RateDecreaseAction</span><span class="p">,</span>
+    <span class="s1">&#39;increase_stoch&#39;</span><span class="p">:</span> <span class="n">StochIncreaseAction</span><span class="p">,</span>
+    <span class="s1">&#39;decrease_stoch&#39;</span><span class="p">:</span> <span class="n">StochDecreaseAction</span><span class="p">,</span>
+    <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="n">MessageAction</span><span class="p">,</span>
+    <span class="s1">&#39;log_vars&#39;</span><span class="p">:</span> <span class="n">LogVarsAction</span><span class="p">,</span>
+    <span class="s1">&#39;become&#39;</span><span class="p">:</span> <span class="n">BecomeAction</span><span class="p">,</span>
+    <span class="s1">&#39;clone&#39;</span><span class="p">:</span> <span class="n">CloneAction</span><span class="p">,</span>
+    <span class="s1">&#39;produce_offspring&#39;</span><span class="p">:</span> <span class="n">CloneAction</span><span class="p">,</span>
+    <span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="n">MethodAction</span><span class="p">,</span>
+    <span class="s1">&#39;duration&#39;</span><span class="p">:</span> <span class="n">FunctionAction</span><span class="p">,</span>
+    <span class="s1">&#39;set_var&#39;</span><span class="p">:</span> <span class="n">SetVarAction</span><span class="p">,</span>
+    <span class="s1">&#39;set_upper_var&#39;</span><span class="p">:</span> <span class="n">SetUpperVarAction</span><span class="p">,</span>
+    <span class="s1">&#39;record_change&#39;</span><span class="p">:</span> <span class="n">RecordChangeAction</span><span class="p">,</span>
+    <span class="s1">&#39;sample_durations&#39;</span><span class="p">:</span> <span class="n">SampleDurationsAction</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

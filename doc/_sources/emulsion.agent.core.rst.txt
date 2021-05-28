@@ -1,0 +1,36 @@
+emulsion.agent.core package
+===========================
+
+.. automodule:: emulsion.agent.core
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+emulsion.agent.core.abstract\_agent module
+------------------------------------------
+
+.. automodule:: emulsion.agent.core.abstract_agent
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+emulsion.agent.core.emulsion\_agent module
+------------------------------------------
+
+.. automodule:: emulsion.agent.core.emulsion_agent
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+emulsion.agent.core.groups module
+---------------------------------
+
+.. automodule:: emulsion.agent.core.groups
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

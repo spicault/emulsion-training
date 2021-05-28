@@ -1,0 +1,69 @@
+
+Model 3 (Model 2 + contact structure in population)
+***************************************************
+
+Due to current limitations in the implementation of compartement-based
+models, we used for this exercise a "hybrid" modelling paradigm where
+individuals are grouped automatically, according to their health state
+and age group.
+
+In the experiments below, we assume that only juveniles are initially
+infected (to see the infection spread among adults).
+
+File with full comments: `model3.yaml <../_static/benchmark/model3.yaml>`_
+
+.. literalinclude:: ../_static/benchmark/model3-short.yaml
+
+
+To run the model for 100 stochastic repetitions:
+
+.. code-block:: bash
+
+  emulsion run --plot model3.yaml -r 100 --silent
+
+Which produces the following outputs:
+
+.. image:: ../_images/benchmark/model3-output1.png
+   :width: 75%
+
+.. image:: ../_images/benchmark/model3-output2.png
+   :width: 75%
+
+.. image:: ../_images/benchmark/model3-output3.png
+   :width: 75%
+
+To produce the diagrams of the state machines which control health
+states and age groups:
+
+.. code-block:: bash
+
+   emulsion diagrams model3.yaml
+
+Which gives:
+
+.. graphviz:: ../_images/benchmark/model3-SIR.dot
+
+.. graphviz:: ../_images/benchmark/model3-JA.dot
+
+
+To view model parameters:
+
+.. code-block:: bash
+
+   emulsion show model3.yaml
+
+which produces:
+
+.. literalinclude:: ../_images/benchmark/model3.txt
+
+
+It is also possible to view the description of the forces of infection
+experienced by each group:
+
+.. code-block:: bash
+
+   emulsion describe model3.yaml force_infection_juveniles force_infection_adults
+
+which produces:
+
+.. literalinclude:: ../_images/benchmark/model3-2.txt

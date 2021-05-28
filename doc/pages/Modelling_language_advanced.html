@@ -1,0 +1,1074 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>6. Modelling language (advanced) &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="7. Feature examples" href="Feature_examples.html" />
+    <link rel="prev" title="5. Modelling language (basics)" href="Modelling_language_basics.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="modelling-language-advanced">
+<h1>6. Modelling language (advanced)<a class="headerlink" href="#modelling-language-advanced" title="Permalink to this headline">¶</a></h1>
+<p>EMULSION modelling language allows model designers to specify complex
+assumptions in a readable way, to foster interactions with other
+scientists and facilitate model revision throughout the design process
+without having to dive into the simulation code.</p>
+<p>Most language features documented below are associated with example
+files, located in the <code class="docutils literal notranslate"><span class="pre">models/features</span></code> directory.</p>
+<div class="section" id="compartments-ibm-or-hybrid-models">
+<h2>6.1. Compartments, IBM or hybrid models?<a class="headerlink" href="#compartments-ibm-or-hybrid-models" title="Permalink to this headline">¶</a></h2>
+<p>EMULSION helps to transform compartment-based models into
+invidual-based models (or vice-versa, assuming the individual-based
+model can get rid of individual specificities). An intermediate
+approach is the hybrid model, which preserves individual
+characteristics but drives system evolution through compartment-like
+groupings (see: <a class="reference internal" href="Modelling_principles.html#individuals-populations-metapopulations"><span class="std std-ref">Individuals, populations, metapopulations</span></a>).</p>
+<p>The table below summarises the main differences between each kind of
+models, regarding the sections and keywords to modify in an EMULSION
+model file.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="24%" />
+<col width="18%" />
+<col width="13%" />
+<col width="19%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" rowspan="2">EMULSION section</th>
+<th class="head" rowspan="2">section keyword</th>
+<th class="head" colspan="3">Modelling paradigm</th>
+</tr>
+<tr class="row-even"><th class="head">compartment</th>
+<th class="head">hybrid</th>
+<th class="head">IBM</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-odd"><td rowspan="2"><code class="docutils literal notranslate"><span class="pre">levels</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">aggregation_type</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">compartment</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">hybrid</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">IBM</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">contains</span></code></td>
+<td><em>not used</em></td>
+<td colspan="2"><em>sublevels</em></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><code class="docutils literal notranslate"><span class="pre">grouping</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">key_variables</span></code></td>
+<td colspan="2"><em>list of variables</em></td>
+<td rowspan="2"><em>not used</em></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">state_machine</span></code></td>
+<td colspan="2"><em>machine name</em> (optional)</td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><code class="docutils literal notranslate"><span class="pre">processes</span></code></td>
+<td><em>level</em></td>
+<td colspan="2"><em>population</em></td>
+<td><em>individuals</em></td>
+</tr>
+<tr class="row-even"><td><em>list of processes</em></td>
+<td colspan="2"><em>names of groupings</em></td>
+<td><em>machine name</em></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">state_machines</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">productions</span></code></td>
+<td>&#160;</td>
+<td colspan="2"><em>based on prototypes</em></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">prototypes</span></code></td>
+<td>&#160;</td>
+<td><em>not used</em></td>
+<td colspan="2"><em>for individuals/populations</em></td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">initial_conditions</span></code></td>
+<td>&#160;</td>
+<td><em>per state</em></td>
+<td colspan="2"><em>based on prototypes</em></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p>Also, in <code class="docutils literal notranslate"><span class="pre">model/features</span></code>, many examples are provided with the
+three modelling paradigms when possible, especially the simplest
+SIR model (<code class="docutils literal notranslate"><span class="pre">compart_SIR.yaml</span></code>, <code class="docutils literal notranslate"><span class="pre">hybrid_SIR.yaml</span></code>,
+<code class="docutils literal notranslate"><span class="pre">IBM_SIR.yaml</span></code>) and the corresponding version with demographic
+processes (<code class="docutils literal notranslate"><span class="pre">compart_SIR_demo.yaml</span></code>, <code class="docutils literal notranslate"><span class="pre">hybrid_SIR_demo.yaml</span></code>,
+<code class="docutils literal notranslate"><span class="pre">IBM_SIR_demo.yaml</span></code>).</p>
+<p class="last">See <a class="reference internal" href="Feature_examples.html#sir-model"><span class="std std-ref">SIR model</span></a>, <a class="reference internal" href="Feature_examples.html#seirs-model"><span class="std std-ref">SEIRS model</span></a>, <a class="reference internal" href="Feature_examples.html#sir-model-with-basic-demography-births-deaths"><span class="std std-ref">SIR model with basic demography (births/deaths)</span></a> and many others in <a class="reference internal" href="Feature_examples.html#feature-examples"><span class="std std-ref">Feature examples</span></a>.</p>
+</div>
+</div>
+<div class="section" id="master-state-machines">
+<h2>6.2. Master state machines<a class="headerlink" href="#master-state-machines" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="set-states-attributes">
+<h3>Set states attributes<a class="headerlink" href="#set-states-attributes" title="Permalink to this headline">¶</a></h3>
+<p>States can be endowed with <em>attributes</em>. For instance, <code class="docutils literal notranslate"><span class="pre">fillcolor</span></code>
+(default: gray) or <code class="docutils literal notranslate"><span class="pre">line_style</span></code> (default: solid) defines,
+respectively, the color of the boxes on state machine diagrams, which
+is the same than the color of plots in outputs, and the line style of
+the plots.</p>
+<p>A state can define three main properties:</p>
+<dl class="docutils" id="autoremove-state">
+<dt><code class="docutils literal notranslate"><span class="pre">autoremove:</span> <span class="pre">yes</span></code></dt>
+<dd><p class="first">Autoremove states are intended as “sink”, so that all individuals
+that reach such a state are removed from the system. This is a
+very convenient way to represent deaths or outgoing commercial
+movements.</p>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-basic-demography-births-deaths"><span class="std std-ref">SIR model with basic demography (births/deaths)</span></a></p>
+</div>
+</dd>
+</dl>
+<dl class="docutils" id="default-state">
+<dt><code class="docutils literal notranslate"><span class="pre">default:</span> <span class="pre">yes</span></code></dt>
+<dd><p class="first">A state can be labelled as “default state”. Default state plays
+the same role but the way to use them differs in compartment-based
+models and in others:</p>
+<ul class="last">
+<li><p class="first">in compartment-based models, when no indication is provided in
+initial conditions or production links regarding new
+individuals, they will be put in the default state for each of
+their state machines</p>
+</li>
+<li><p class="first">in IBM/hybrid models and metapopulations, <code class="docutils literal notranslate"><span class="pre">default</span></code> is a valid
+value for prototypes definition. For instance, writing
+<code class="docutils literal notranslate"><span class="pre">health_state:</span> <span class="pre">default</span></code> in a prototype will set the health
+state to the default state of the <code class="docutils literal notranslate"><span class="pre">health_state</span></code> state machine</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><span class="xref std std-ref">Default state</span>, <a class="reference internal" href="Feature_examples.html#sir-model-with-age-groups"><span class="std std-ref">SIR model with age groups</span></a>, <a class="reference internal" href="#design-prototypes-for-typical-individuals-or-populations"><span class="std std-ref">Design prototypes for typical individuals or populations</span></a></p>
+</div>
+</li>
+</ul>
+</dd>
+</dl>
+<dl class="docutils" id="next-previous">
+<dt><code class="docutils literal notranslate"><span class="pre">next:</span> <span class="pre">AnotherState</span></code> / <code class="docutils literal notranslate"><span class="pre">previous:</span> <span class="pre">AnotherState</span></code></dt>
+<dd><p class="first">A state, especially when used in a state machine without
+transitions (e.g. representing a set of discrete states which are
+driven by another process, such as animal parities) can specify
+explicitly a predecessor/successor relation with other states from
+the same state machine. This can be quite useful to induce
+incremental changes in a state without knowing its value, by using
+the <code class="docutils literal notranslate"><span class="pre">next_state</span></code> and <code class="docutils literal notranslate"><span class="pre">previous_state</span></code> keywords in prototypes.</p>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-explicit-gestation"><span class="std std-ref">SIR model with explicit gestation</span></a></p>
+</div>
+</dd>
+</dl>
+<dl class="docutils" id="duration">
+<dt><code class="docutils literal notranslate"><span class="pre">duration</span></code> (valid for <strong>IBM</strong>/<strong>hybrid</strong> models)</dt>
+<dd><p class="first">This keyword allows to assign a specific duration to a
+state. Durations can be constant values or arbitrary expressions,
+including a random distribution. When an individual enters the
+state, it receives a value calculated from this expression
+(possibly involving a random sample) and cannot leave this state
+until the duration is over (with the exception of
+<a class="reference internal" href="#escape-conditions"><span class="std std-ref">escape conditions</span></a>).</p>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#custom-state-durations"><span class="std std-ref">Custom state durations</span></a></p>
+</div>
+</dd>
+</dl>
+<dl class="docutils" id="on-enter-stay-exit">
+<dt><code class="docutils literal notranslate"><span class="pre">on_enter</span></code>, <code class="docutils literal notranslate"><span class="pre">on_stay</span></code>, <code class="docutils literal notranslate"><span class="pre">on_exit</span></code> (valid for <strong>IBM</strong>/<strong>hybrid</strong> models)</dt>
+<dd><p class="first">These keywords are used to specify lists of <strong>actions</strong> that
+individuals have to perform when, respectively, entering, staying
+in, or leaving the state.</p>
+<p>Actions can be either built-in actions (listed <a class="reference internal" href="#built-in-actions"><span class="std std-ref">there</span></a>) or the name of a function provided in a code
+add-on (e.g. <code class="docutils literal notranslate"><span class="pre">action:</span> <span class="pre">my_custom_function</span></code>).</p>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-individual-actions-and-variable-aggregation"><span class="std std-ref">SIR model with individual actions and variable aggregation</span></a></p>
+</div>
+</dd>
+</dl>
+</div>
+<div class="section" id="customize-transitions">
+<h3>Customize transitions<a class="headerlink" href="#customize-transitions" title="Permalink to this headline">¶</a></h3>
+<p>In state machines, transitions are composed of at least three items:</p>
+<ul class="simple" id="quantifiers">
+<li><code class="docutils literal notranslate"><span class="pre">from</span></code> followed by the origin state</li>
+<li><code class="docutils literal notranslate"><span class="pre">to</span></code> followed by the destination state</li>
+<li>a <strong>quantifier</strong> to indicate the flow from origin to destination
+state, which can be:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">rate</span></code> with a transition rate per individual i.e. a number per
+time unit. In stochastic models , rates are automatically
+converted into probabilities, assuming that durations in the
+origin state follow an exponential distribution</li>
+<li><code class="docutils literal notranslate"><span class="pre">proba</span></code> with the probabiliy that, during <em>one time unit</em>, an
+individual moves from origin to destination state</li>
+<li><code class="docutils literal notranslate"><span class="pre">amount</span></code> which indicates an absolute number of individuals,
+(bounded by the number of individuals actually in origin state)</li>
+<li><code class="docutils literal notranslate"><span class="pre">amount-all-but</span></code> which indicates an absolute number of
+individuals which have to <em>stay</em> in origin state while the others
+move to destination state. Hence, writing <code class="docutils literal notranslate"><span class="pre">amount-all-but:</span> <span class="pre">0</span></code>
+means “all individuals in origin state”</li>
+</ul>
+</li>
+</ul>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">In a state machine, all quantifiers may be used. However, from a
+given origin state, all transitions that can be used simultaneously
+must have the same quantifiers (i.e. only <code class="docutils literal notranslate"><span class="pre">rate</span></code>, or only
+<code class="docutils literal notranslate"><span class="pre">proba</span></code>, or only <code class="docutils literal notranslate"><span class="pre">amount</span></code>/<code class="docutils literal notranslate"><span class="pre">amount-all-but</span></code>).</p>
+</div>
+<p>Transitions can also incorporate additional elements:</p>
+<ul class="simple" id="escape-conditions">
+<li><code class="docutils literal notranslate"><span class="pre">cond</span></code> followed with a expression (logical or numeric, non-zero
+values being considered true) specifies which individuals are
+allowed to cross the transition</li>
+<li><code class="docutils literal notranslate"><span class="pre">escape</span></code> is a special condition for origin states endowed with a
+specific duration, which allows individuals that fulfil the
+expression to exit their state <em>before</em> the normal term. For
+instance, a gestating state has a duration before which individuals should
+not be able to leave the state, but if abortions are possible, the
+corresponding condition can be used as escape condition to permit a
+premature exit of gestation.</li>
+<li><code class="docutils literal notranslate"><span class="pre">when</span></code> is a special condition which refers to <em>events</em> from a
+<a class="reference internal" href="#regulate-time"><span class="std std-ref">calendar</span></a> (useful to handle seasonality)</li>
+<li><code class="docutils literal notranslate"><span class="pre">on_cross</span></code> is used to specify a list of actions that indivuals
+moving from origin state to destination state through this
+transition have to perform</li>
+</ul>
+</div>
+<div class="section" id="produce-new-individuals">
+<h3>Produce new individuals<a class="headerlink" href="#produce-new-individuals" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">Section <code class="docutils literal notranslate"><span class="pre">productions</span></code> in state machines allow to define how some
+states can produce new individuals. Production links are very
+similar to transitions in their syntax, except that:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">escape</span></code> conditions and <code class="docutils literal notranslate"><span class="pre">amount-all-but</span></code> quantifier are not allowed</li>
+<li>in IBM/hybrid models, a <code class="docutils literal notranslate"><span class="pre">prototype</span></code> must be specified for the new
+individuals</li>
+</ul>
+<p>Besides, the computation of actual flows uses sampling in Poisson
+distribution rather than binomial/multinomial sampling.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-basic-demography-births-deaths"><span class="std std-ref">SIR model with basic demography (births/deaths)</span></a>, <a class="reference internal" href="Feature_examples.html#sir-model-with-age-groups"><span class="std std-ref">SIR model with age groups</span></a>, <a class="reference internal" href="#design-prototypes-for-typical-individuals-or-populations"><span class="std std-ref">Design prototypes for typical individuals or populations</span></a></p>
+</div>
+</li>
+<li><p class="first">Another way to produce new individuals is using an action: <code class="docutils literal notranslate"><span class="pre">clone</span></code>
+(aka <code class="docutils literal notranslate"><span class="pre">produce_offspring</span></code>) associated with a transition or
+with a state (see <a class="reference internal" href="#set-states-attributes"><span class="std std-ref">Set states attributes</span></a> and <a class="reference internal" href="#built-in-actions"><span class="std std-ref">Built-in actions</span></a>).</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-explicit-gestation"><span class="std std-ref">SIR model with explicit gestation</span></a></p>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="state-machines-without-transitions">
+<h3>State machines without transitions<a class="headerlink" href="#state-machines-without-transitions" title="Permalink to this headline">¶</a></h3>
+<p>State machines can also be used only for defining states, e.g. to
+differentiate discrete values such as categories (male/female
+individuals) or enumerations (e.g. female parities). In that case, the
+state machine does not require any transition at all.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-explicit-gestation"><span class="std std-ref">SIR model with explicit gestation</span></a></p>
+</div>
+</div>
+</div>
+<div class="section" id="design-prototypes-for-typical-individuals-or-populations">
+<h2>6.3. Design prototypes for typical individuals or populations<a class="headerlink" href="#design-prototypes-for-typical-individuals-or-populations" title="Permalink to this headline">¶</a></h2>
+<p>In EMULSION hybrid and IBM models, prototypes are meant to represent
+typical individuals (within populations) or populations (within
+metapopulations), characterized by their state variables, either
+regarding the state of a state machine (e.g. health state, age
+group…), or specific features (e.g. age, temperature… of an
+individual; initial health status, location, carrying capacity… of a
+population).</p>
+<div class="section" id="define-prototypes">
+<h3>Define prototypes<a class="headerlink" href="#define-prototypes" title="Permalink to this headline">¶</a></h3>
+<p>Prototypes are defined in the section named <code class="docutils literal notranslate"><span class="pre">prototypes</span></code> (see
+<a class="reference internal" href="Modelling_language_basics.html#model-structure"><span class="std std-ref">Model structure</span></a>).</p>
+<ul>
+<li><p class="first">Variables corresponding to regular values can be set using any valid expression:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">newborn</span><span class="p">:</span>
+  <span class="n">age</span><span class="p">:</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Variables corresponding to state machines can be set using:</p>
+<ul>
+<li><p class="first">the name of a state:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">healthy_individual</span><span class="p">:</span>
+  <span class="n">health_state</span><span class="p">:</span> <span class="n">S</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">keyword <code class="docutils literal notranslate"><span class="pre">default</span></code> if a state was marked as default state in the
+state machine:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">healthy_individual</span><span class="p">:</span>
+  <span class="n">health_state</span><span class="p">:</span> <span class="n">S</span>
+  <span class="n">age_group</span><span class="p">:</span> <span class="n">default</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">keywords <code class="docutils literal notranslate"><span class="pre">next_state</span></code> or <code class="docutils literal notranslate"><span class="pre">previous_state</span></code> to select the
+“successor” or “predecessor” state of the current value (see
+<span class="xref std std-ref">Set state attributes</span> on how to specify
+predecessor/successor relations between states - by default, they
+correspond to the order in which states are defined):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">next_parity</span><span class="p">:</span>
+  <span class="n">parity</span><span class="p">:</span> <span class="n">next_state</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">keyword <code class="docutils literal notranslate"><span class="pre">random</span></code> possibly with parameters. Without parameters,
+one state is chosen randomly with equal probability among the
+states of the state machine (except for those marked as
+<code class="docutils literal notranslate"><span class="pre">autoremove</span></code>). To provide parameters:</p>
+<ul>
+<li><p class="first">if <em>N</em> (non-autoremove) states are defined in the state machine,
+either <em>N</em> or <em>N-1</em> values can be provided</p>
+</li>
+<li><p class="first">values are interpreted in the same order as the definition of
+states in the state machine</p>
+</li>
+<li><p class="first">if <em>N-1</em> values <span class="math notranslate nohighlight">\(p_i\)</span> are given, they are interpreted as
+probabilities, the probability for the last state being:</p>
+<div class="math notranslate nohighlight">
+\[p_N = 1 - \sum_{i=1}^{N-1} p_i\]</div>
+</li>
+<li><p class="first">if <em>N</em> values <span class="math notranslate nohighlight">\(v_i\)</span> are given, they are interpreted as
+weights and normalized to compute probabilities as follows:</p>
+<div class="math notranslate nohighlight">
+\[\forall i=1..N,  p_i = \frac{v_i}{\sum_{j=1}^N v_j}\]</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-age-groups"><span class="std std-ref">SIR model with age groups</span></a>, <a class="reference internal" href="Feature_examples.html#sir-model-with-basic-demography-births-deaths"><span class="std std-ref">SIR model with basic demography (births/deaths)</span></a>,
+<a class="reference internal" href="Feature_examples.html#sir-model-with-age-groups-and-random-initialization"><span class="std std-ref">SIR model with age groups and random initialization</span></a>, <a class="reference internal" href="Feature_examples.html#sir-model-with-metapopulation"><span class="std std-ref">SIR model with metapopulation</span></a>,
+<a class="reference internal" href="Feature_examples.html#sir-model-with-explicit-gestation"><span class="std std-ref">SIR model with explicit gestation</span></a></p>
+</div>
+</div>
+<div class="section" id="default-prototypes">
+<h3>Default prototypes<a class="headerlink" href="#default-prototypes" title="Permalink to this headline">¶</a></h3>
+<p>Each level can be associated with a default prototype, defined in the
+<code class="docutils literal notranslate"><span class="pre">prototypes</span></code> section. This ensures for instance that agents created
+for a level have some variables initialized properly, or avoids
+redundancy in other prototypes.</p>
+<p>Default prototypes are applied when agents are created, before all
+other possible prototypes.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">levels</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">individuals</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;...&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">default_prototype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">default_individual</span>
+<span class=" -Error"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+ <span class="l l-Scalar l-Scalar-Plain">prototypes</span><span class="p p-Indicator">:</span>
+   <span class="l l-Scalar l-Scalar-Plain">individuals</span><span class="p p-Indicator">:</span>
+     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">default_individual</span><span class="p p-Indicator">:</span>
+         <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;default</span><span class="nv"> </span><span class="s">values</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">individual</span><span class="nv"> </span><span class="s">variables&#39;</span>
+            <span class="l l-Scalar l-Scalar-Plain">age</span><span class="p p-Indicator">:</span> <span class="s">&#39;random(20,</span><span class="nv"> </span><span class="s">100)&#39;</span>
+            <span class="l l-Scalar l-Scalar-Plain">nb_abortions</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="data-based-prototype-collections">
+<h3>Data-based prototype collections<a class="headerlink" href="#data-based-prototype-collections" title="Permalink to this headline">¶</a></h3>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This feature is experimental and likely to evolve in further versions.</p>
+</div>
+<p>Prototype collections can also be defined using CSV files, for
+instance, to initialize individuals within a population or populations
+within metapopulations according to an existing structure.</p>
+<p>To do so, a CSV file must be put in the input directory (by default,
+<code class="docutils literal notranslate"><span class="pre">data/</span></code> in the working directory), each column corresponding to a
+variable (including a <code class="docutils literal notranslate"><span class="pre">desc</span></code> field), and each line represents a
+concrete prototype to be used in the simulation. An optional column
+named <code class="docutils literal notranslate"><span class="pre">prototype_name</span></code> can specify names for each concrete prototype
+(otherwise concrete prototypes will be named automatically after the
+collection name, the filename and the line number).</p>
+<p>Then, at prototype definition, the keyword <code class="docutils literal notranslate"><span class="pre">file</span></code> creates a link
+between the collection name and the list of concrete prototypes (each
+line of the CSV file).</p>
+<p>To determine how concrete prototypes defined in the CSV file are
+chosen when refering to the collection name, a selection method must
+be specified using keyword <code class="docutils literal notranslate"><span class="pre">select</span></code>. Available selection methods are
+the following:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">ordered</span></code>: the first prototype of the file is chosen when the
+collection name is used at first time (per run), then the next one,
+etc. Ordering can apply to a specific (numeric) column,
+e.g. <code class="docutils literal notranslate"><span class="pre">ordered(size)</span></code>. Beware: the number of concrete prototypes
+used must be less than the number of lines in the file.</li>
+<li><code class="docutils literal notranslate"><span class="pre">ordered_cycle</span></code>: same as previous, except that when reaching the
+end of the file, the selection restarts at the fist line</li>
+<li><code class="docutils literal notranslate"><span class="pre">random_noreplace</span></code>: concrete prototypes are sampled randomly in
+the file, without replacement (hence, the number of concrete
+prototypes used must be less than the number of lines in the
+file). By default, a uniform sampling is performed. If necessary,
+a specific (numeric, positive) column can be used to weight the
+samlping probability of concrete prototypes,
+e.g. <code class="docutils literal notranslate"><span class="pre">random_noreplace(nb_observed)</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">random_replace</span></code>: same as previous, except that sampling is done
+with replacement (hence, no constraint on number of samplings).</li>
+</ul>
+<p>Besides, CSV lines can be filterd before selection, using the
+following keywords:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">include_values:</span> <span class="pre">list_of_values</span></code>: only lines where any field contains
+exactly one of the values are kept</li>
+<li><code class="docutils literal notranslate"><span class="pre">exclude_values:</span> <span class="pre">list_of_values</span></code>: lines where any field contains exactly
+one of the values are discarded</li>
+<li><code class="docutils literal notranslate"><span class="pre">filter:</span> <span class="pre">condition</span></code>: only lines fulfilling the specified condition are
+kept (e.g. <code class="docutils literal notranslate"><span class="pre">filter:</span> <span class="pre">'initial_prevalence</span> <span class="pre">&gt;</span> <span class="pre">min_initial_prevalence'</span></code>
+where <code class="docutils literal notranslate"><span class="pre">initial_prevalence</span></code> is a column of the CSV file and
+<code class="docutils literal notranslate"><span class="pre">min_initial_prevalence</span></code> a model parameter).</li>
+</ul>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>First, a CSV file <code class="docutils literal notranslate"><span class="pre">data/initial_individuals.csv</span></code> which specifies a
+population structure:</p>
+<div class="highlight-csv notranslate"><div class="highlight"><pre><span></span>health_state,age_group,weight,desc
+S,J,10,&quot;healthy juvenile individuals&quot;
+I,J,40,&quot;infected juvenile individuals&quot;
+S,A,90,&quot;healthy adult individuals&quot;
+I,A,10,&quot;infected adult individuals&quot;
+</pre></div>
+</div>
+<p>and another one <code class="docutils literal notranslate"><span class="pre">data/population_size.csv</span></code> which specifies the
+initial size of populations:</p>
+<div class="highlight-csv notranslate"><div class="highlight"><pre><span></span>prototype_name,initial_population_size,proportion,desc
+huge_pop,500,.05,&quot;a huge population&quot;
+large_pop,100,.35,&quot;a large population&quot;
+medium_pop,50,.5,&quot;a medium population&quot;
+small_pop,10,.1,&quot;a small population&quot;
+</pre></div>
+</div>
+<p>Then the declaration of the collection in the <code class="docutils literal notranslate"><span class="pre">prototypes</span></code>
+section and its use in <code class="docutils literal notranslate"><span class="pre">initial_conditions</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">prototypes</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">data_based_population</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;collection</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">prototypes</span><span class="nv"> </span><span class="s">specifying</span><span class="nv"> </span><span class="s">several</span><span class="nv"> </span><span class="s">initial</span><span class="nv"> </span><span class="s">population</span><span class="nv"> </span><span class="s">sizes&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="s">&#39;population_size.csv&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">select</span><span class="p p-Indicator">:</span> <span class="s">&#39;ordered_cycle(initial_population_size)&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">exclude_values</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="s">&#39;huge_pop&#39;</span><span class="p p-Indicator">]</span>
+  <span class="l l-Scalar l-Scalar-Plain">individuals</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">data_based_individual</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;collection</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">prototypes</span><span class="nv"> </span><span class="s">describing</span><span class="nv"> </span><span class="s">typical</span><span class="nv"> </span><span class="s">distributions</span>
+               <span class="s">of</span><span class="nv"> </span><span class="s">individuals</span><span class="nv"> </span><span class="s">based</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">CSV</span><span class="nv"> </span><span class="s">data</span><span class="nv"> </span><span class="s">file&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="s">&#39;initial_individuals.csv&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">select</span><span class="p p-Indicator">:</span> <span class="s">&#39;random_replace(weight)&#39;</span>
+<span class="nn">...</span>
+<span class="l l-Scalar l-Scalar-Plain">initial_conditions</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">metapop</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">prototype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">data_based_population</span>
+      <span class="l l-Scalar l-Scalar-Plain">amount</span><span class="p p-Indicator">:</span> <span class="s">&#39;nb_populations&#39;</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">prototype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">data_based_individual</span>
+      <span class="l l-Scalar l-Scalar-Plain">amount</span><span class="p p-Indicator">:</span> <span class="s">&#39;initial_population_size&#39;</span>
+</pre></div>
+</div>
+<p>In this example, the line <code class="docutils literal notranslate"><span class="pre">huge_pop</span></code> is discarded, then
+population sizes are taken in order based on the
+<code class="docutils literal notranslate"><span class="pre">initial_population_size</span></code> value: 10, 50, 100, starting again at
+10 for the 4th population.</p>
+<p class="last">In each population, individuals are sampled randomly (with
+replacement) using column <code class="docutils literal notranslate"><span class="pre">weight</span></code> to calculate the probabilities
+of each line.</p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-age-groups-and-data-based-prototypes"><span class="std std-ref">SIR model with age groups and data-based prototypes</span></a></p>
+</div>
+</div>
+<div class="section" id="order-of-variables-assignment-in-prototypes">
+<h3>Order of variables assignment in prototypes<a class="headerlink" href="#order-of-variables-assignment-in-prototypes" title="Permalink to this headline">¶</a></h3>
+<p>By default, in prototype definition, the only order that applies in
+setting the value of variables is the following:</p>
+<ul class="simple">
+<li>if a default prototype is defined in the <code class="docutils literal notranslate"><span class="pre">levels</span></code> section, this
+prototype is fully applied before any other prototype</li>
+<li>within a prototype, variables containing the state of a state
+machine are assigned first, then all other variables</li>
+</ul>
+<p>However, in some cases it may be convenient to specify a precise order
+in variable assignement, for instance when some variables depend on
+others. To do so, use keywords <code class="docutils literal notranslate"><span class="pre">begin_with</span></code> or <code class="docutils literal notranslate"><span class="pre">end_with</span></code> instead
+of a variable name, followed by the list of variable assignments,
+e.g.:</p>
+<blockquote>
+<div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">prototypes</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">individuals</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">infectious</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;infectious</span><span class="nv"> </span><span class="s">individual,</span><span class="nv"> </span><span class="s">which</span><span class="nv"> </span><span class="s">induces</span><span class="nv"> </span><span class="s">hyperthermia&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">begin_with</span><span class="p p-Indicator">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">health_state</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">I</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">hyperthermia_state</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">H</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">_time_to_exit_hyperthermia_state</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">_time_to_exit_health_state</span>
+        <span class="l l-Scalar l-Scalar-Plain">life_cycle</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">default</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Variables listed in the <code class="docutils literal notranslate"><span class="pre">begin_with</span></code> section are assigned in the
+specified order, and before all other variables, which then follow the
+default prototype order (state machines, then others). Finally,
+variables listed in the <code class="docutils literal notranslate"><span class="pre">end_with</span></code> section are assigner in the
+specific order after all other variables.</p>
+<p>In the example above, the <code class="docutils literal notranslate"><span class="pre">health_state</span></code> is first defined as
+infectious, then the <code class="docutils literal notranslate"><span class="pre">hyperthermia_state</span></code> is set to hyperthermic,
+and finally the durations in both state machines are
+synchronized. After that, the <code class="docutils literal notranslate"><span class="pre">life_cycle</span></code> is defined.</p>
+</div>
+</div>
+<div class="section" id="regulate-time">
+<h2>6.4. Regulate time<a class="headerlink" href="#regulate-time" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">The simulation time step can be changed either in the model file
+(section <code class="docutils literal notranslate"><span class="pre">time_info</span></code>), or at runtime with option <code class="docutils literal notranslate"><span class="pre">-p</span>
+<span class="pre">delta_t=value</span></code></p>
+</li>
+<li><p class="first">Section <code class="docutils literal notranslate"><span class="pre">time_info</span></code> allows the definition of calendars with
+events, for instance a pasture period:</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<blockquote>
+<div><div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">calendars</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">pasture</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">period</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">days</span><span class="p p-Indicator">:</span> <span class="nv">365</span><span class="p p-Indicator">}</span>
+    <span class="l l-Scalar l-Scalar-Plain">events</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">pasture_period</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">begin</span><span class="p p-Indicator">:</span> <span class="s">&#39;April</span><span class="nv"> </span><span class="s">1&#39;</span><span class="p p-Indicator">,</span> <span class="nv">end</span><span class="p p-Indicator">:</span> <span class="s">&#39;October</span><span class="nv"> </span><span class="s">1&#39;</span><span class="p p-Indicator">}</span>
+      <span class="l l-Scalar l-Scalar-Plain">open_days</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">date</span><span class="p p-Indicator">:</span> <span class="s">&#39;May</span><span class="nv"> </span><span class="s">1&#39;</span><span class="p p-Indicator">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>A calendar can be periodic or not, and define events that span from
+a <code class="docutils literal notranslate"><span class="pre">begin</span></code> date to and <code class="docutils literal notranslate"><span class="pre">end</span></code> date, or that take place at a
+specific <code class="docutils literal notranslate"><span class="pre">date</span></code>. Each event (here <code class="docutils literal notranslate"><span class="pre">pasture_period</span></code> and
+<code class="docutils literal notranslate"><span class="pre">open_days</span></code>) can be used in conditions, especially in the
+<code class="docutils literal notranslate"><span class="pre">when</span></code> clause of transition or productions. A transition with
+e.g. <code class="docutils literal notranslate"><span class="pre">Not(pasture_period)</span></code> will not be considered at all when the
+condition is not fulfilled.</p>
+<p>Besides, events with a begin and an end date automatically generate
+two other events, here for instance <code class="docutils literal notranslate"><span class="pre">begin_pasture_period</span></code> and
+<code class="docutils literal notranslate"><span class="pre">end_pasture_period</span></code>.</p>
+<p>Finally, the duration of an event is given by the keyword
+<code class="docutils literal notranslate"><span class="pre">duration_of_EVENT</span></code>, e.g. <code class="docutils literal notranslate"><span class="pre">duration_of_pasture_period</span></code></p>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">model <a class="reference internal" href="Install.html#test-your-installation"><span class="std std-ref">Quickstart</span></a> provided to test
+EMULSION installation</p>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="complexify-grouping">
+<h2>6.5. Complexify grouping<a class="headerlink" href="#complexify-grouping" title="Permalink to this headline">¶</a></h2>
+<p>Grouping can be based on several variables, especially when the
+dynamics of one process is affected by another one. For instance, if
+infection is driven by age groups, the grouping section should be
+rewritten as follows:</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">grouping</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">infection</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">state_machine</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">health_state</span>
+      <span class="l l-Scalar l-Scalar-Plain">key_variables</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">health_state</span><span class="p p-Indicator">,</span> <span class="nv">age_group</span><span class="p p-Indicator">]</span>
+    <span class="l l-Scalar l-Scalar-Plain">age_group</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">state_machine</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">age_group</span>
+      <span class="l l-Scalar l-Scalar-Plain">key_variables</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">age_group</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-structured-population"><span class="std std-ref">SIR model with structured population</span></a></p>
+</div>
+<p>Grouping are especially useful in hybrid models, either to accelerate
+simulation time, or to benefit from <a class="reference internal" href="#automatic-variables"><span class="std std-ref">automatic variables</span></a>.</p>
+<p>A grouping can also be designed just to have access to specific
+subgroups in the population, and thus indicate no state machine, nor
+rely on variables related to state machines.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">In any case, the name of the grouping must appear in the list of
+processes: otherwise the grouping is not updated at each time step
+(individuals are not distributed in the proper groups).</p>
+</div>
+</div>
+<div class="section" id="aggregate-variables">
+<h2>6.6. Aggregate variables<a class="headerlink" href="#aggregate-variables" title="Permalink to this headline">¶</a></h2>
+<p>When defining levels, variables that aggregate other variables from a
+sublevel can be defined, for instance:</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">levels</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">...</span>
+    <span class="l l-Scalar l-Scalar-Plain">aggregate_vars</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pop_affected_over_time</span>
+        <span class="l l-Scalar l-Scalar-Plain">collect</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">nb_episodes</span>
+        <span class="l l-Scalar l-Scalar-Plain">operator</span><span class="p p-Indicator">:</span> <span class="s">&#39;sum&#39;</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;avg_inf_duration&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">collect</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">duration_infected</span>
+        <span class="l l-Scalar l-Scalar-Plain">operator</span><span class="p p-Indicator">:</span> <span class="s">&#39;mean&#39;</span>
+</pre></div>
+</div>
+</div>
+<p>Aggregated variables (here, <code class="docutils literal notranslate"><span class="pre">pop_affected_over_time</span></code> and
+<code class="docutils literal notranslate"><span class="pre">avg_inf_duration</span></code>) defined by a level (here, <code class="docutils literal notranslate"><span class="pre">population</span></code>) consist in
+collecting the values of other variables (<code class="docutils literal notranslate"><span class="pre">nb_episodes</span></code>,
+<code class="docutils literal notranslate"><span class="pre">duration_infected</span></code>) in the sublevels (<code class="docutils literal notranslate"><span class="pre">individuals</span></code>) and applying
+an operator (<code class="docutils literal notranslate"><span class="pre">sum</span></code>, <code class="docutils literal notranslate"><span class="pre">mean</span></code>) to compute the resulting value.</p>
+<p>Operators can be any classical usual operation operating on lists:
+sum, prod, min, max, mean, var, std, median, all, any. Shortcuts have
+been defined so that e.g. <code class="docutils literal notranslate"><span class="pre">percentile20</span></code> computes the 20th
+percentile.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-individual-actions-and-variable-aggregation"><span class="std std-ref">SIR model with individual actions and variable aggregation</span></a></p>
+</div>
+</div>
+<div class="section" id="automatic-variables">
+<h2>6.7. Automatic variables<a class="headerlink" href="#automatic-variables" title="Permalink to this headline">¶</a></h2>
+<p>EMULSION automatically provides variables in relation to model
+components.</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">step</span></code> represents the current time step, <code class="docutils literal notranslate"><span class="pre">delta_t</span></code> the duration
+of one time step (in time units), and <code class="docutils literal notranslate"><span class="pre">time</span></code> the time elapsed
+since the beginning of simulation (in time units)</li>
+<li>When defining a level, e.g. <code class="docutils literal notranslate"><span class="pre">population</span></code>: <code class="docutils literal notranslate"><span class="pre">total_population</span></code> gives the total
+population of this level.</li>
+<li>When defining a state machine, e.g. <code class="docutils literal notranslate"><span class="pre">health_state</span></code>, and its
+states, e.g. <code class="docutils literal notranslate"><span class="pre">S</span></code>:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">is_S</span></code> tests whether or not an individual is in state <code class="docutils literal notranslate"><span class="pre">S</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">duration_in_health_state</span></code> contains the duration elapsed since
+the individual entered the current state of state machine
+<code class="docutils literal notranslate"><span class="pre">health_state</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">total_S</span></code> is the number of individuals in state <code class="docutils literal notranslate"><span class="pre">S</span></code></li>
+</ul>
+</li>
+<li>When defining complex groupings, e.g. <code class="docutils literal notranslate"><span class="pre">[age_group,</span> <span class="pre">health_state]</span></code>:<ul>
+<li><code class="docutils literal notranslate"><span class="pre">total_J_I</span></code> is the number of individuals in age group <code class="docutils literal notranslate"><span class="pre">J</span></code> and
+in health state <code class="docutils literal notranslate"><span class="pre">I</span></code></li>
+<li>if aggregated variables (e.g. <code class="docutils literal notranslate"><span class="pre">mean_age</span></code>) were also defined,
+their counterpart is automatically defined for the grouping
+(e.g. <code class="docutils literal notranslate"><span class="pre">mean_age_J_I</span></code> etc.)</li>
+</ul>
+</li>
+</ul>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sirs-model-with-periodic-external-risk"><span class="std std-ref">SIRS model with periodic external risk</span></a>,
+<a class="reference internal" href="Feature_examples.html#sir-model-with-structured-population"><span class="std std-ref">SIR model with structured population</span></a></p>
+</div>
+</div>
+<div class="section" id="built-in-functions">
+<h2>6.8. Built-in functions<a class="headerlink" href="#built-in-functions" title="Permalink to this headline">¶</a></h2>
+<p>Expressions used in EMULSION models can refer to classical Python
+mathematical operators (<code class="docutils literal notranslate"><span class="pre">+</span></code>, <code class="docutils literal notranslate"><span class="pre">-</span></code>, <code class="docutils literal notranslate"><span class="pre">*</span></code>, <code class="docutils literal notranslate"><span class="pre">/</span></code>, <code class="docutils literal notranslate"><span class="pre">**</span></code> for
+exponentiation, etc. ) and functions (e.g. <code class="docutils literal notranslate"><span class="pre">sqrt</span></code>, <code class="docutils literal notranslate"><span class="pre">cos</span></code>, <code class="docutils literal notranslate"><span class="pre">sin</span></code>,
+<code class="docutils literal notranslate"><span class="pre">exp</span></code>, <code class="docutils literal notranslate"><span class="pre">log</span></code>, <code class="docutils literal notranslate"><span class="pre">log10</span></code>, etc.).</p>
+<p>The following functions are also available:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">AND(cond1,</span> <span class="pre">cond2)</span></code></dt>
+<dd>Logical conjunction: return true (1) if <code class="docutils literal notranslate"><span class="pre">cond1</span></code> and <code class="docutils literal notranslate"><span class="pre">cond2</span></code> are
+both true, false (0) otherwise</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">OR(cond1,</span> <span class="pre">cond2)</span></code></dt>
+<dd>Logical disjunction: return true (1) if <code class="docutils literal notranslate"><span class="pre">cond1</span></code> is true or
+<code class="docutils literal notranslate"><span class="pre">cond2</span></code> is true, false (0) otherwise</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Not(cond)</span></code></dt>
+<dd>Logical negation: return true (1) if <code class="docutils literal notranslate"><span class="pre">cond1</span></code> and <code class="docutils literal notranslate"><span class="pre">cond2</span></code> are
+both true, false (0) otherwise</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">IfThenElse(condition,</span> <span class="pre">val_if_true,</span> <span class="pre">val_if_false)</span></code></dt>
+<dd>Ternary conditional function: return either <code class="docutils literal notranslate"><span class="pre">val_if_true</span></code> or
+<code class="docutils literal notranslate"><span class="pre">val_if_false</span></code> depending on <code class="docutils literal notranslate"><span class="pre">condition</span></code>.</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">random_bool(proba_success)</span></code></dt>
+<dd>Return a random boolean value (0 or 1) depending on
+<code class="docutils literal notranslate"><span class="pre">proba_success</span></code></dd>
+</dl>
+<p>Shortcuts to distributions from package <code class="docutils literal notranslate"><span class="pre">numpy.random</span></code> are also
+available:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">random_uniform</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">random_integers</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">random_exponential</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">random_poisson</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">random_beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">random_normal</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">sd</span><span class="p">)</span>
+<span class="n">random_gamma</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#custom-state-durations"><span class="std std-ref">Custom state durations</span></a>,
+<a class="reference internal" href="Feature_examples.html#sirs-model-with-periodic-external-risk"><span class="std std-ref">SIRS model with periodic external risk</span></a></p>
+</div>
+</div>
+<div class="section" id="built-in-actions">
+<h2>6.9. Built-in actions<a class="headerlink" href="#built-in-actions" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils" id="generic-action">
+<dt><code class="docutils literal notranslate"><span class="pre">{action:</span> <span class="pre">action_name,</span> <span class="pre">d_params:</span> <span class="pre">dict_of_parameters}</span></code></dt>
+<dd><p class="first">The generic keyword to call an external actions, requires Python code.</p>
+<ul>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">action_name</span></code> has to be described (<code class="docutils literal notranslate"><span class="pre">desc:</span> <span class="pre">...</span></code>) explicitly in
+main section <code class="docutils literal notranslate"><span class="pre">actions</span></code></p>
+</li>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">action_name</span></code> must be provided in a separate Python file, as a
+<em>method</em> in a class associated with the level at which the action
+will be performed. This method will look as (assuming that
+<code class="docutils literal notranslate"><span class="pre">d_params</span></code> contains two keys, <code class="docutils literal notranslate"><span class="pre">param1</span></code> and <code class="docutils literal notranslate"><span class="pre">param2</span></code>):</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">action_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Do something with *param1* and *param2* as specified in</span>
+<span class="sd">    section ``actions``&quot;&quot;&quot;</span>
+    <span class="c1"># here the Python code for the action</span>
+</pre></div>
+</div>
+</div>
+</li>
+</ul>
+<p class="last">Whenever possible, prefer other built-in actions described below.</p>
+</dd>
+</dl>
+<dl class="docutils" id="message-action">
+<dt><code class="docutils literal notranslate"><span class="pre">{message:</span> <span class="pre">'Some</span> <span class="pre">important</span> <span class="pre">information'}</span></code></dt>
+<dd><p class="first">Print the specified character string on the standard output while
+running the model, preceded by the simulation ID, the time step
+and the identifier of the individual.</p>
+<div class="admonition-example last admonition">
+<p class="first admonition-title">Example</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">states</span><span class="p p-Indicator">:</span>
+<span class="nn">...</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">I</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">...</span>
+    <span class="l l-Scalar l-Scalar-Plain">on_enter</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">message</span><span class="p p-Indicator">:</span> <span class="s">&#39;now</span><span class="nv"> </span><span class="s">infected</span><span class="nv"> </span><span class="s">!&#39;</span>
+</pre></div>
+</div>
+<p>will produce outputs like this:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span>$0,@2,AtomAgent #55,now infected !
+$0,@5,AtomAgent #49,now infected !
+</pre></div>
+</div>
+</div>
+</dd>
+</dl>
+<p id="log-vars-action"><code class="docutils literal notranslate"><span class="pre">{log_vars:</span> <span class="pre">list_of_variables_or_expressions}</span></code></p>
+<blockquote>
+<div><p>Store the specified list of variable to a log file named
+<code class="docutils literal notranslate"><span class="pre">log.txt</span></code> in the output directory (by default, <code class="docutils literal notranslate"><span class="pre">outputs/</span></code>).
+Each line starts with the simulation ID, the time step, the class and
+identifier of the individual, then each variable is associated
+with its value (variable/value pairs are separated by <code class="docutils literal notranslate"><span class="pre">;</span></code> to
+facilitate sub-field parsing).</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">states</span><span class="p p-Indicator">:</span>
+<span class="nn">...</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">I</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">...</span>
+    <span class="l l-Scalar l-Scalar-Plain">on_enter</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">log_vars</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">is_S</span><span class="p p-Indicator">,</span> <span class="nv">is_I</span><span class="p p-Indicator">,</span> <span class="nv">is_R</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>will produce a log file <code class="docutils literal notranslate"><span class="pre">outputs/log.txt</span></code> containing something like this:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">AtomAgent</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="n">is_S</span><span class="o">=</span><span class="kc">False</span><span class="p">;</span><span class="n">is_I</span><span class="o">=</span><span class="kc">True</span><span class="p">;</span><span class="n">is_R</span><span class="o">=</span><span class="kc">False</span>
+<span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="n">AtomAgent</span><span class="p">,</span><span class="mi">57</span><span class="p">,</span><span class="n">is_S</span><span class="o">=</span><span class="kc">False</span><span class="p">;</span><span class="n">is_I</span><span class="o">=</span><span class="kc">True</span><span class="p">;</span><span class="n">is_R</span><span class="o">=</span><span class="kc">False</span>
+<span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="n">AtomAgent</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="n">is_S</span><span class="o">=</span><span class="kc">False</span><span class="p">;</span><span class="n">is_I</span><span class="o">=</span><span class="kc">True</span><span class="p">;</span><span class="n">is_R</span><span class="o">=</span><span class="kc">False</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+<dl class="docutils" id="set-var-action">
+<dt><code class="docutils literal notranslate"><span class="pre">{set_var:</span> <span class="pre">varname,</span> <span class="pre">value:</span> <span class="pre">expression}</span></code></dt>
+<dd><p class="first">Change the value of <code class="docutils literal notranslate"><span class="pre">varname</span></code> according to what is calculated in
+<code class="docutils literal notranslate"><span class="pre">expression</span></code>.</p>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-individual-actions-and-variable-aggregation"><span class="std std-ref">SIR model with individual actions and variable aggregation</span></a></p>
+</div>
+</dd>
+</dl>
+<dl class="docutils" id="set-upper-var-action">
+<dt><code class="docutils literal notranslate"><span class="pre">{set_upper_var:</span> <span class="pre">varname,</span> <span class="pre">value:</span> <span class="pre">expression}</span></code> Change the value of</dt>
+<dd><code class="docutils literal notranslate"><span class="pre">varname</span></code> according to what is calculated in
+<code class="docutils literal notranslate"><span class="pre">expression</span></code>. <code class="docutils literal notranslate"><span class="pre">varname</span></code> is expected to be a variable owned by
+the level above the agent performing the action (e.g. a population
+variable if the action is performed by an individual)</dd>
+</dl>
+<dl class="docutils" id="record-change-action">
+<dt><code class="docutils literal notranslate"><span class="pre">{record_change:</span> <span class="pre">varname}</span></code></dt>
+<dd><p class="first">Add the number of individuals performing the action to the
+specified state variable, assumed to be defined at population
+level. This can be used for instance to calculate the cumulative
+incidence (e.g. as an action <code class="docutils literal notranslate"><span class="pre">on_enter</span></code> for the infectious
+state).</p>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-cumulative-incidence"><span class="std std-ref">SIR model with cumulative incidence</span></a></p>
+</div>
+</dd>
+</dl>
+<dl class="docutils" id="clone-action">
+<dt><code class="docutils literal notranslate"><span class="pre">{clone:</span> <span class="pre">a_prototype_or_list,</span> <span class="pre">amount:</span> <span class="pre">value,</span> <span class="pre">proba:</span> <span class="pre">value_or_list}</span></code></dt>
+<dd><p class="first">Clone the individual into new ones. The newly produced individuals
+follow the specified prototypes, according the given amount and
+probabilities.</p>
+<ul class="simple">
+<li>default amount is 1</li>
+<li>if no probabilities are given, prototypes are considered
+equiprobable</li>
+<li>a single prototype can be given as a single value instead of a
+list</li>
+<li>the list or probabilites must be of same size of prototypes
+list, only the last value may be omitted to ensure that the sum
+of probabilities is 1. When N prototypes are associated with N
+probability values which sum to S &lt; 1, then there is a
+probability 1-S to produce no offspring. Once probabilies are
+actualized, a multinomial sampling is performed to determine the
+number of new individuals in each category</li>
+</ul>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>A model with explicit gestation states and possibly vertical disease
+transmission:</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">from</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">G</span>
+  <span class="l l-Scalar l-Scalar-Plain">to</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">NG</span>
+  <span class="l l-Scalar l-Scalar-Plain">proba</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+  <span class="l l-Scalar l-Scalar-Plain">on_cross</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">clone</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">infected</span><span class="p p-Indicator">,</span> <span class="nv">healthy</span><span class="p p-Indicator">]</span>
+      <span class="l l-Scalar l-Scalar-Plain">amount</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+      <span class="l l-Scalar l-Scalar-Plain">proba</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">proba_vertical_transmission</span><span class="p p-Indicator">]</span>
+      <span class="c1"># prototype &#39;healthy&#39; has proba: 1-proba_vertical_transmission</span>
+</pre></div>
+</div>
+</div>
+<div class="last admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-explicit-gestation"><span class="std std-ref">SIR model with explicit gestation</span></a>, <a class="reference internal" href="#design-prototypes-for-typical-individuals-or-populations"><span class="std std-ref">Design prototypes for typical individuals or populations</span></a></p>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">{produce_offspring:</span> <span class="pre">a_prototype_or_list,</span> <span class="pre">amount:</span> <span class="pre">value,</span> <span class="pre">proba:</span> <span class="pre">value_or_list}</span></code></dt>
+<dd>Synonym of <code class="docutils literal notranslate"><span class="pre">clone</span></code>.</dd>
+</dl>
+<dl class="docutils" id="become-action">
+<dt><code class="docutils literal notranslate"><span class="pre">{become:</span> <span class="pre">a_prototype_or_list,</span> <span class="pre">proba:</span> <span class="pre">value_or_list}</span></code></dt>
+<dd>Force the individual to adopt the specified prototype(s), possibly
+with probabilities (works like <code class="docutils literal notranslate"><span class="pre">clone</span></code> above). Useful to couple states
+from distinct state machines.</dd>
+</dl>
+</div>
+<div class="section" id="changing-scale-metapopulations">
+<h2>6.10. Changing scale: metapopulations<a class="headerlink" href="#changing-scale-metapopulations" title="Permalink to this headline">¶</a></h2>
+<p>In EMULSION, <code class="docutils literal notranslate"><span class="pre">metapopulation</span></code> is an aggregation type which allows to
+handle multiple populations without regard to how this population is
+built (compartment-based/hybrid/IBM).</p>
+<p>It consists in defining a new level and completing initial conditions
+through new population prototypes.</p>
+<p>It may be also necessary to transform within-population parameters
+into variables to allow for heterogeneous populations.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-metapopulation"><span class="std std-ref">SIR model with metapopulation</span></a></p>
+</div>
+</div>
+<div class="section" id="connecting-to-python-code-add-ons">
+<h2>6.11. Connecting to Python code add-ons<a class="headerlink" href="#connecting-to-python-code-add-ons" title="Permalink to this headline">¶</a></h2>
+<p>EMULSION is aimed at providing <em>generic</em> features required for
+designing epidemiological models. Thus, some very specific operations
+are not available in the generic engine. In such cases, a small code
+add-on is required to provide additional functionalities.</p>
+<p>Code add-ons are mainly used for specific requirements regarding:</p>
+<ul class="simple">
+<li>variables which are complicated to change through expressions and
+actions</li>
+<li>actions which are not realizable through built-in ones</li>
+<li>processes which are not realizable through state machines</li>
+<li>complex intial conditions</li>
+<li>data loading</li>
+</ul>
+<p>To link a level with a code add-on, two elements are required:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">file:</span> <span class="pre">my_code_add_on.py</span></code> which specified the Python source code to use</li>
+<li><code class="docutils literal notranslate"><span class="pre">class_name:</span> <span class="pre">AClassName</span></code> which defines the name of the Python
+class associated with the level</li>
+</ul>
+<p>EMULSION provides an (experimental) code generator (<code class="docutils literal notranslate"><span class="pre">emulsion</span>
+<span class="pre">generate</span> <span class="pre">MODEL.yaml</span></code>) which builds a code skeletton for files and
+classes mentioned in the level definition. All actions and variables
+listed respectively in <code class="docutils literal notranslate"><span class="pre">actions</span></code> and <code class="docutils literal notranslate"><span class="pre">statevars</span></code> sections, as well
+as processes not associated with state machines or groupings, are
+assumed to be defined in the Python file. All you need then is to fill
+the relevant methods with the corresponding code, or remove
+unnecessary parts.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-metapopulation-data-driven-movements-and-data-pre-processing"><span class="std std-ref">SIR model with metapopulation, data-driven movements and data pre-processing</span></a></p>
+</div>
+</div>
+<div class="section" id="using-pre-processors">
+<h2>6.12. Using pre-processors<a class="headerlink" href="#using-pre-processors" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">TODO</p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Feature_examples.html#sir-model-with-metapopulation-data-driven-movements-and-data-pre-processing"><span class="std std-ref">SIR model with metapopulation, data-driven movements and data pre-processing</span></a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">6. Modelling language (advanced)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#compartments-ibm-or-hybrid-models">6.1. Compartments, IBM or hybrid models?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#master-state-machines">6.2. Master state machines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#set-states-attributes">Set states attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#customize-transitions">Customize transitions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#produce-new-individuals">Produce new individuals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#state-machines-without-transitions">State machines without transitions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#design-prototypes-for-typical-individuals-or-populations">6.3. Design prototypes for typical individuals or populations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#define-prototypes">Define prototypes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#default-prototypes">Default prototypes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-based-prototype-collections">Data-based prototype collections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#order-of-variables-assignment-in-prototypes">Order of variables assignment in prototypes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#regulate-time">6.4. Regulate time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#complexify-grouping">6.5. Complexify grouping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#aggregate-variables">6.6. Aggregate variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#automatic-variables">6.7. Automatic variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#built-in-functions">6.8. Built-in functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#built-in-actions">6.9. Built-in actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#changing-scale-metapopulations">6.10. Changing scale: metapopulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#connecting-to-python-code-add-ons">6.11. Connecting to Python code add-ons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-pre-processors">6.12. Using pre-processors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="Modelling_language_basics.html" title="previous chapter">5. Modelling language (basics)</a></li>
+      <li>Next: <a href="Feature_examples.html" title="next chapter">7. Feature examples</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/pages/Modelling_language_advanced.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,22 @@
+********************
+Benchmark: exercises
+********************
+
+
+Table of contents
+*****************
+
+.. toctree::
+   :maxdepth: 2
+   :numbered: 0
+
+   Model1
+   Model2
+   Model2b
+   Model3
+   Model3b
+   Model4
+   Model5
+   Model6
+   Model6b
+   Model7

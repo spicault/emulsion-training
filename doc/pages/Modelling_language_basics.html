@@ -1,0 +1,536 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>5. Modelling language (basics) &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="6. Modelling language (advanced)" href="Modelling_language_advanced.html" />
+    <link rel="prev" title="4. Modelling principles" href="Modelling_principles.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="modelling-language-basics">
+<h1>5. Modelling language (basics)<a class="headerlink" href="#modelling-language-basics" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="yaml-syntax-in-a-nutshell">
+<h2>5.1. YAML Syntax in a nutshell<a class="headerlink" href="#yaml-syntax-in-a-nutshell" title="Permalink to this headline">¶</a></h2>
+<p>EMULSION models must respect the <a class="reference external" href="https://en.wikipedia.org/wiki/YAML">YAML</a> format, which is based
+on lists and key-value mappings. Data structures are delimited by
+2-space indentation.</p>
+<dl class="docutils">
+<dt>Comments</dt>
+<dd>Whatever is put after <code class="docutils literal notranslate"><span class="pre">#</span></code> is not interpreted.</dd>
+<dt>Values</dt>
+<dd>Numbers (<code class="docutils literal notranslate"><span class="pre">3</span></code>, <code class="docutils literal notranslate"><span class="pre">3.14</span></code>), strings (<code class="docutils literal notranslate"><span class="pre">'some</span> <span class="pre">text'</span></code>), booleans
+(<code class="docutils literal notranslate"><span class="pre">yes</span></code>/<code class="docutils literal notranslate"><span class="pre">no</span></code>), lists or key-value mappings.</dd>
+<dt>Lists</dt>
+<dd><p class="first">A succession of values, e.g.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">[</span><span class="nv">value1</span><span class="p p-Indicator">,</span> <span class="nv">value2</span><span class="p p-Indicator">,</span> <span class="nv">value3</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p>which is equivalent to:</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">value1</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">value2</span>
+<span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">value3</span>
+</pre></div>
+</div>
+</dd>
+<dt>Key-value mappings</dt>
+<dd><p class="first">An (unordered) set of associations between unique indentifiers
+(keys) and any value, e.g.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">{</span><span class="nv">key1</span><span class="p p-Indicator">:</span> <span class="nv">value1</span><span class="p p-Indicator">,</span> <span class="nv">key2</span><span class="p p-Indicator">:</span> <span class="nv">value2</span><span class="p p-Indicator">,</span> <span class="nv">key3</span><span class="p p-Indicator">:</span> <span class="nv">value3</span><span class="p p-Indicator">}</span>
+</pre></div>
+</div>
+<p>which is equivalent to:</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">key1</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">value1</span>
+<span class="l l-Scalar l-Scalar-Plain">key2</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">value2</span>
+<span class="l l-Scalar l-Scalar-Plain">key3</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">value3</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>All elements above can be combined and nested to build complex
+structures, for instance:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here a key mapped to a list</span>
+<span class="l l-Scalar l-Scalar-Plain">key1</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">v1</span><span class="p p-Indicator">,</span> <span class="nv">v2</span><span class="p p-Indicator">,</span> <span class="nv">v3</span><span class="p p-Indicator">]</span>
+
+<span class="c1"># Here a key mapped to another mapping</span>
+<span class="l l-Scalar l-Scalar-Plain">key2</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">subkey1</span><span class="p p-Indicator">:</span>
+    <span class="c1"># the value associated with subkey1 is a list</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">item1</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">item2</span>
+  <span class="l l-Scalar l-Scalar-Plain">subkey2</span><span class="p p-Indicator">:</span> <span class="s">&#39;an</span><span class="nv"> </span><span class="s">important</span><span class="nv"> </span><span class="s">message&#39;</span>
+  <span class="l l-Scalar l-Scalar-Plain">subkey3</span><span class="p p-Indicator">:</span>
+    <span class="c1"># and each element of the list below is a mapping</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">another</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">value1</span>
+      <span class="l l-Scalar l-Scalar-Plain">withother</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">value2</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">another</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">value3</span>
+      <span class="l l-Scalar l-Scalar-Plain">withother</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">value4</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="model-structure">
+<h2>5.2. Model structure<a class="headerlink" href="#model-structure" title="Permalink to this headline">¶</a></h2>
+<p>An EMULSION model is divided in several “sections”, corresponding to
+the main components of a model. Each section corresponds to a
+first-level key (i.e. put directly at the beginning of a line without
+any indentation).</p>
+<p>Below is a short description of their nature. This is just an overview
+of what can be found in a typical EMULSION model. To go further, dive
+into <a class="reference internal" href="Modelling_language_advanced.html#modelling-language-advanced"><span class="std std-ref">the next chapter</span></a>!</p>
+<div class="section" id="model-name">
+<span id="id1"></span><h3><code class="docutils literal notranslate"><span class="pre">model_name</span></code><a class="headerlink" href="#model-name" title="Permalink to this headline">¶</a></h3>
+<p>The name of the model. Used to name figures and diagrams.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">model_name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">compart_SIR</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="model-info">
+<span id="id2"></span><h3><code class="docutils literal notranslate"><span class="pre">model_info</span></code><a class="headerlink" href="#model-info" title="Permalink to this headline">¶</a></h3>
+<p>Several optional information on the model, such as an abstract to
+describe the model principles and purpose, the authors, references, a
+license if any, etc.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">model_info</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">abstract</span><span class="p p-Indicator">:</span> <span class="s">&#39;A</span><span class="nv"> </span><span class="s">very</span><span class="nv"> </span><span class="s">long</span><span class="nv"> </span><span class="s">description</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">model&#39;</span>
+  <span class="l l-Scalar l-Scalar-Plain">authors</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">First Author</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">Another Colleague</span>
+  <span class="l l-Scalar l-Scalar-Plain">DOI</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">my_doi/10.10.10.</span>
+</pre></div>
+</div>
+</div>
+<p>This part is only intended to provide information to the reader. All
+subsections can be freely defined according to the modeller’s needs.</p>
+</div>
+<div class="section" id="time-info">
+<span id="id3"></span><h3><code class="docutils literal notranslate"><span class="pre">time_info</span></code><a class="headerlink" href="#time-info" title="Permalink to this headline">¶</a></h3>
+<p>This section defines the <strong>time unit</strong> used in the whole model for
+parameter values (e.g. hours, days, weeks) and the <strong>duration of one time
+step</strong> in the simulation. Optionally, it can specify:</p>
+<ul class="simple">
+<li>the date where the simulation starts (<code class="docutils literal notranslate"><span class="pre">origin_date</span></code>)</li>
+<li>the total duration of the simulation (<code class="docutils literal notranslate"><span class="pre">total_duration</span></code>)</li>
+<li>calendars with events (see <a class="reference internal" href="Modelling_language_advanced.html#regulate-time"><span class="std std-ref">Regulate time</span></a>)</li>
+</ul>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">time_info</span><span class="p p-Indicator">:</span>
+  <span class="c1"># all paramter values are expressed in days/per day</span>
+  <span class="l l-Scalar l-Scalar-Plain">time_unit</span><span class="p p-Indicator">:</span> <span class="s">&#39;days&#39;</span>
+  <span class="c1"># the simulation step is 1 day</span>
+      <span class="l l-Scalar l-Scalar-Plain">delta_t</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+  <span class="c1"># simulations start on 01/01 (default: current year)</span>
+  <span class="l l-Scalar l-Scalar-Plain">origin</span><span class="p p-Indicator">:</span> <span class="s">&#39;January</span><span class="nv"> </span><span class="s">1&#39;</span>
+  <span class="c1"># simulations run for 100 days</span>
+  <span class="l l-Scalar l-Scalar-Plain">total_duration</span><span class="p p-Indicator">:</span> <span class="s">&#39;100&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="state-machines">
+<span id="id4"></span><h3><code class="docutils literal notranslate"><span class="pre">state_machines</span></code><a class="headerlink" href="#state-machines" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="Modelling_principles.html#state-machines"><span class="std std-ref">State machines</span></a> are the main way to define processes involved in
+an EMULSION model. A state machine is defined by a list of states and
+a list of transitions between the states. It can also define a list of
+productions links between states, to specify which states can produce
+new individuals.</p>
+<p>An EMULSION model can contain several state machines, the only
+constraint being that all state names must be different.</p>
+<div class="admonition-example-of-a-typical-state-machine admonition">
+<p class="first admonition-title">Example of a typical state machine</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">state_machines</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">health_state</span><span class="p p-Indicator">:</span>  <span class="c1"># the name of the state machine</span>
+        <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;The</span><span class="nv"> </span><span class="s">state</span><span class="nv"> </span><span class="s">machine</span><span class="nv"> </span><span class="s">which</span><span class="nv"> </span><span class="s">defines</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">evolution</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">health</span>
+        <span class="s">states&#39;</span>
+        <span class="c1"># Below, the list of states with their attributes.</span>
+        <span class="l l-Scalar l-Scalar-Plain">states</span><span class="p p-Indicator">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">S</span><span class="p p-Indicator">:</span>
+              <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;Susceptible&#39;</span>
+              <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;suceptible</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">becoming</span><span class="nv"> </span><span class="s">infected&#39;</span>
+              <span class="l l-Scalar l-Scalar-Plain">fillcolor</span><span class="p p-Indicator">:</span> <span class="s">&#39;deepskyblue&#39;</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">I</span><span class="p p-Indicator">:</span>
+              <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;Infectious&#39;</span>
+              <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;infected</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">able</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">transmit</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">disease&#39;</span>
+              <span class="l l-Scalar l-Scalar-Plain">fillcolor</span><span class="p p-Indicator">:</span> <span class="s">&#39;red&#39;</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">R</span><span class="p p-Indicator">:</span>
+              <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;Resistant&#39;</span>
+              <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;healthy</span><span class="nv"> </span><span class="s">again</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">resistant</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">infection&#39;</span>
+              <span class="l l-Scalar l-Scalar-Plain">fillcolor</span><span class="p p-Indicator">:</span> <span class="s">&#39;limegreen&#39;</span>
+        <span class="c1"># Below, a list of transitions between states</span>
+        <span class="l l-Scalar l-Scalar-Plain">transitions</span><span class="p p-Indicator">:</span>
+          <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">from</span><span class="p p-Indicator">:</span> <span class="nv">S</span><span class="p p-Indicator">,</span> <span class="nv">to</span><span class="p p-Indicator">:</span> <span class="nv">I</span><span class="p p-Indicator">,</span> <span class="nv">rate</span><span class="p p-Indicator">:</span> <span class="s">&#39;force_of_infection&#39;</span><span class="p p-Indicator">}</span>
+          <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">from</span><span class="p p-Indicator">:</span> <span class="nv">I</span><span class="p p-Indicator">,</span> <span class="nv">to</span><span class="p p-Indicator">:</span> <span class="nv">R</span><span class="p p-Indicator">,</span> <span class="nv">rate</span><span class="p p-Indicator">:</span> <span class="s">&#39;recovery&#39;</span><span class="p p-Indicator">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="levels">
+<span id="id5"></span><h3><code class="docutils literal notranslate"><span class="pre">levels</span></code><a class="headerlink" href="#levels" title="Permalink to this headline">¶</a></h3>
+<p>In EMULSION, a <strong>level</strong> is a name associated with an entity of a given scale. At least two levels are expected in a model (e.g. individuals and the population).  A level can contain other sub-levels, base on a specific aggregation type (<code class="docutils literal notranslate"><span class="pre">compartment</span></code>, <code class="docutils literal notranslate"><span class="pre">IBM</span></code>, <code class="docutils literal notranslate"><span class="pre">hybrid</span></code> or <code class="docutils literal notranslate"><span class="pre">metapopulation</span></code>). A level is essentially a concept, hence not necessarily simulated explicitly by EMULSION: for instance, the notion of individuals exist in compartmental models, though calculations only involve populations. A level can also define aggregated variables calculated from the values of another variable at the sublevel.
+Level names can be chosen arbitrarily, to identify entities with the most relevant terms.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>A typical level specification at the population scale (here in a compartment-based model):</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">levels</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>  <span class="c1"># arbitrary  name</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;level</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">population&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">aggregation_type</span><span class="p p-Indicator">:</span> <span class="s">&#39;compartment&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">contains</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">individuals</span>  <span class="c1"># the sublevel</span>
+  <span class="l l-Scalar l-Scalar-Plain">individuals</span><span class="p p-Indicator">:</span>  <span class="c1"># arbitrary name</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;level</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">individuals&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="grouping">
+<span id="id6"></span><h3><code class="docutils literal notranslate"><span class="pre">grouping</span></code><a class="headerlink" href="#grouping" title="Permalink to this headline">¶</a></h3>
+<p>This section is <strong>mandatory in hybrid models</strong>, to describe explicitly how entities from a sublevel are grouped for optimizing the calculations.</p>
+<p>In compartmental models and IBM, a <strong>grouping</strong> section can be introduced to provide automatic variables of the form e.g. <code class="docutils literal notranslate"><span class="pre">total_X_Y_Z</span></code> where X, Y, and Z can be any states of three different state machines. The <code class="docutils literal notranslate"><span class="pre">grouping</span></code> section specifies upon which state machines a population is partitioned.</p>
+<p>For instance, in a hybrid model, the operation in the <code class="docutils literal notranslate"><span class="pre">health_state</span></code> state machine are likely to depend only on the actual <code class="docutils literal notranslate"><span class="pre">health_state</span></code> value in each individual. Thus, individuals must be grouped by health state (all S together, all I together, etc.). Assuming for instance that we also have a state machine for defining several species and one for specifying age groups, grouping individuals by <code class="docutils literal notranslate"><span class="pre">age_group</span></code> and <code class="docutils literal notranslate"><span class="pre">species</span></code> automatically provides variables of the form <code class="docutils literal notranslate"><span class="pre">total_Juvenile_Vector</span></code> or <code class="docutils literal notranslate"><span class="pre">total_Adult_Host</span></code>.
+Grouping names can be chosen arbitrarily.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">grouping</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>  <span class="c1"># a level name with sublevel</span>
+    <span class="l l-Scalar l-Scalar-Plain">infection</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">health_state</span><span class="p p-Indicator">]</span>
+    <span class="l l-Scalar l-Scalar-Plain">pop_structure</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">age_group</span><span class="p p-Indicator">,</span> <span class="nv">species</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="processes">
+<span id="id7"></span><h3><code class="docutils literal notranslate"><span class="pre">processes</span></code><a class="headerlink" href="#processes" title="Permalink to this headline">¶</a></h3>
+<p>This section specifies the list of major processes that take place at
+each level during the simulation. A process name can be:</p>
+<ul class="simple">
+<li>the name of a grouping in compartment-based or hybrid models (hence
+taking place at the population level)</li>
+<li>the name of a state machine in individual-based models (hence taking
+place at the individual level)</li>
+<li>the name of a Python method developed specifically in a code add-on</li>
+</ul>
+<div class="admonition-examples admonition">
+<p class="first admonition-title">Examples</p>
+<p>A typical processes specification in a compartment-based/hybrid
+model:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">processes</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">infection</span>
+</pre></div>
+</div>
+<p>A typical processes specification in an individual-based model:</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">processes</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">individuals</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">health_state</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="parameters">
+<span id="id8"></span><h3><code class="docutils literal notranslate"><span class="pre">parameters</span></code><a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<p>This section is intended to define:</p>
+<ul class="simple">
+<li>model parameters (<em>stricto sensu</em>), i.e. numerical values coming
+from experts, data or assumptions and driving the dynamics of the
+model</li>
+<li>configuration parameters, i.e. numerical values used in initial
+conditions or scenario definition</li>
+<li>distributions expressed by functions and returning a new sample each
+time they are “used” in a computation</li>
+<li>expressions which can combine other parameters or variables</li>
+</ul>
+<p>Each entry must be endowed with a full description of its role
+(<code class="docutils literal notranslate"><span class="pre">desc:</span></code>) and can also provide information on where the value (or
+expression) comes from (<code class="docutils literal notranslate"><span class="pre">source:</span></code>).</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">parameters</span><span class="p p-Indicator">:</span>
+  <span class="c1"># a model parameter</span>
+  <span class="l l-Scalar l-Scalar-Plain">transmission_I</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;transmission</span><span class="nv"> </span><span class="s">rate</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">infectious</span><span class="nv"> </span><span class="s">individuals</span><span class="nv"> </span><span class="s">(/day)&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.5</span>
+  <span class="c1"># an expression (of another parameter and variables)</span>
+  <span class="l l-Scalar l-Scalar-Plain">force_of_infection</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;infection</span><span class="nv"> </span><span class="s">function&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;transmission_I</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">total_I</span><span class="nv"> </span><span class="s">/</span><span class="nv"> </span><span class="s">total_population&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">source</span><span class="p p-Indicator">:</span> <span class="s">&#39;classical</span><span class="nv"> </span><span class="s">function</span><span class="nv"> </span><span class="s">assuming</span><span class="nv"> </span><span class="s">frequency</span><span class="nv"> </span><span class="s">dependence&#39;</span>
+  <span class="c1"># a distribution</span>
+  <span class="l l-Scalar l-Scalar-Plain">initial_age</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;distribution</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">ages</span><span class="nv"> </span><span class="s">when</span><span class="nv"> </span><span class="s">initializing</span><span class="nv"> </span><span class="s">individuals&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;random_integers(0,</span><span class="nv"> </span><span class="s">20)&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="prototypes">
+<span id="id9"></span><h3><code class="docutils literal notranslate"><span class="pre">prototypes</span></code><a class="headerlink" href="#prototypes" title="Permalink to this headline">¶</a></h3>
+<p>Prototypes are used for IBM/hybrid models and for
+metapopulations. They are intended to specify typical individuals or
+populations which are characterized by specific values of their
+variables.</p>
+<p>Prototypes are used mainly in two occasions:</p>
+<ul class="simple">
+<li>in initial conditions (see below), to specify how many individuals
+of each kind must be created</li>
+<li>in production links of state machines, to indicate the nature of
+individuals produced</li>
+<li>in the built-in action <code class="docutils literal notranslate"><span class="pre">become</span></code>, to make a state machine induce
+changes in another state machine</li>
+</ul>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">prototypes</span><span class="p p-Indicator">:</span>
+  <span class="c1"># here the level for which the prototypes are defined</span>
+  <span class="l l-Scalar l-Scalar-Plain">individuals</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">healthy</span><span class="p p-Indicator">:</span>  <span class="c1"># the name of the prototype</span>
+        <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;healthy</span><span class="nv"> </span><span class="s">individuals&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">health_state</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">S</span>
+        <span class="c1"># variable age_group is one of the existing states</span>
+        <span class="l l-Scalar l-Scalar-Plain">age_group</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">random</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">infected</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;infected</span><span class="nv"> </span><span class="s">individuals&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">health_state</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">I</span>
+        <span class="c1"># here we intend to start with infected juveniles</span>
+        <span class="l l-Scalar l-Scalar-Plain">age_group</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">J</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">To go further: <a class="reference internal" href="Modelling_language_advanced.html#design-prototypes-for-typical-individuals-or-populations"><span class="std std-ref">Design prototypes for typical individuals or populations</span></a></p>
+</div>
+</div>
+<div class="section" id="initial-conditions">
+<span id="id10"></span><h3><code class="docutils literal notranslate"><span class="pre">initial_conditions</span></code><a class="headerlink" href="#initial-conditions" title="Permalink to this headline">¶</a></h3>
+<p>Initial conditions specify how to initialize each level.</p>
+<p>In compartment-based models, initial conditions give the total
+population and the repartition in each compartment.</p>
+<p>In IBM, hybrid models and metapopulations, initial conditions rely on
+prototypes.</p>
+<div class="admonition-examples admonition">
+<p class="first admonition-title">Examples</p>
+<p>A typical specification of initial conditions in a
+compartment-based model:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">initial_conditions</span><span class="p p-Indicator">:</span>
+  <span class="c1"># the level for which the initial conditions are defined</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">total</span><span class="p p-Indicator">:</span> <span class="s">&#39;initial_population_size&#39;</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">vars</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">S</span><span class="p p-Indicator">]</span>  <span class="c1"># amount of individuals in state S</span>
+          <span class="l l-Scalar l-Scalar-Plain">amount</span><span class="p p-Indicator">:</span> <span class="s">&#39;initial_population_size</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">initial_infected&#39;</span>
+        <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">vars</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">I</span><span class="p p-Indicator">]</span> <span class="c1"># amount of individuals in state I</span>
+          <span class="l l-Scalar l-Scalar-Plain">amount</span><span class="p p-Indicator">:</span> <span class="s">&#39;initial_infected&#39;</span>
+        <span class="c1"># the amount of individuals in state R is computed as:</span>
+        <span class="c1"># (total - S - I)</span>
+</pre></div>
+</div>
+<p>A typical specification of initial conditions in an IBM:</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">initial_conditions</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+    <span class="c1"># a list of prototypes with the number of individuals</span>
+    <span class="c1"># to create with each prototype</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">prototype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">healthy</span>
+      <span class="l l-Scalar l-Scalar-Plain">amount</span><span class="p p-Indicator">:</span> <span class="s">&#39;initial_population_size</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">initial_infected&#39;</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">prototype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">infected</span>
+      <span class="l l-Scalar l-Scalar-Plain">amount</span><span class="p p-Indicator">:</span> <span class="s">&#39;initial_infected&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="outputs">
+<span id="id11"></span><h3><code class="docutils literal notranslate"><span class="pre">outputs</span></code><a class="headerlink" href="#outputs" title="Permalink to this headline">¶</a></h3>
+<p>When running an EMULSION model, the amounts of individuals in each
+state for all state machines are computed automatically at each time
+step. The outputs section specifies how the output data are stored
+(CSV file, database…) and at which period (in time steps).
+Additional variables can also be logged (<code class="docutils literal notranslate"><span class="pre">extra_vars</span></code>).</p>
+<p>Using command-line option <code class="docutils literal notranslate"><span class="pre">--plot</span></code>, one plot per state machine is
+automatically produced, as well as one plot for all extra variables.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">csv</span>  <span class="c1"># produces counts.csv in output directory</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>      <span class="c1"># outputs for level population</span>
+    <span class="l l-Scalar l-Scalar-Plain">period</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>  <span class="c1"># at each time step</span>
+    <span class="l l-Scalar l-Scalar-Plain">extra_vars</span><span class="p p-Indicator">:</span>
+      <span class="c1"># add an expression (from &#39;parameters&#39;)</span>
+      <span class="p p-Indicator">-</span> <span class="s">&#39;prevalence</span><span class="nv"> </span><span class="s">(%)&#39;</span>
+      <span class="c1"># add a population variable</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">total_population</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="actions">
+<span id="id12"></span><h3><code class="docutils literal notranslate"><span class="pre">actions</span></code><a class="headerlink" href="#actions" title="Permalink to this headline">¶</a></h3>
+<p>This section appears when a level requires actions which are not
+provided in EMULSION generic engine. In that case, the section
+contains a simple description of the meaning of the action, which has
+to be defined in a separate Python file.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">actions</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">read_mailbox</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;Check</span><span class="nv"> </span><span class="s">if</span><span class="nv"> </span><span class="s">messages</span><span class="nv"> </span><span class="s">were</span><span class="nv"> </span><span class="s">received</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">other</span>
+    <span class="s">individuals</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">modify</span><span class="nv"> </span><span class="s">contact</span><span class="nv"> </span><span class="s">network</span><span class="nv"> </span><span class="s">accordingly.&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="statevars">
+<span id="id13"></span><h3><code class="docutils literal notranslate"><span class="pre">statevars</span></code><a class="headerlink" href="#statevars" title="Permalink to this headline">¶</a></h3>
+<p>This section appears when a level requires variables which are not
+defined automatically by their state machines, nor defined as
+expressions in the parameters section, nor computed by aggregating
+variables from a sublevel. In that case, the section contains a simple
+description of the meaning of the variable, which has to be defined in
+a separate Python file.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">statevars</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">nb_mothers_of_infected_calf</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;identify</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">counts</span><span class="nv"> </span><span class="s">cows</span><span class="nv"> </span><span class="s">which</span><span class="nv"> </span><span class="s">gave</span><span class="nv"> </span><span class="s">birth</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">an</span>
+    <span class="s">infected</span><span class="nv"> </span><span class="s">calf&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">5. Modelling language (basics)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#yaml-syntax-in-a-nutshell">5.1. YAML Syntax in a nutshell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-structure">5.2. Model structure</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#model-name"><code class="docutils literal notranslate"><span class="pre">model_name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#model-info"><code class="docutils literal notranslate"><span class="pre">model_info</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#time-info"><code class="docutils literal notranslate"><span class="pre">time_info</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#state-machines"><code class="docutils literal notranslate"><span class="pre">state_machines</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#levels"><code class="docutils literal notranslate"><span class="pre">levels</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#grouping"><code class="docutils literal notranslate"><span class="pre">grouping</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#processes"><code class="docutils literal notranslate"><span class="pre">processes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parameters"><code class="docutils literal notranslate"><span class="pre">parameters</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#prototypes"><code class="docutils literal notranslate"><span class="pre">prototypes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#initial-conditions"><code class="docutils literal notranslate"><span class="pre">initial_conditions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#outputs"><code class="docutils literal notranslate"><span class="pre">outputs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#actions"><code class="docutils literal notranslate"><span class="pre">actions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#statevars"><code class="docutils literal notranslate"><span class="pre">statevars</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="Modelling_principles.html" title="previous chapter">4. Modelling principles</a></li>
+      <li>Next: <a href="Modelling_language_advanced.html" title="next chapter">6. Modelling language (advanced)</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/pages/Modelling_language_basics.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

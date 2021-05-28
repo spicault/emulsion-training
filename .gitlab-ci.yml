@@ -1,0 +1,10 @@
+pages:
+  stage: deploy
+  script:
+  - cp -rf doc .public
+  - mv .public public
+  artifacts:
+    paths:
+    - public
+  only:
+  - testdoc

@@ -1,0 +1,45 @@
+Model 2 (Model 1 + demography)
+******************************
+
+File with full comments: `model2.yaml <../_static/benchmark/model2.yaml>`_
+
+.. literalinclude:: ../_static/benchmark/model2-short.yaml
+
+
+To run the model for 100 stochastic repetitions:
+
+.. code-block:: bash
+
+  emulsion run --plot model2.yaml -r 100 --silent
+
+Which produces the following outputs:
+
+.. image:: ../_images/benchmark/model2-output1.png
+   :width: 75%
+
+.. image:: ../_images/benchmark/model2-output2.png
+   :width: 75%
+
+To produce the diagrams of the state machines which control health
+states and age groups:
+
+.. code-block:: bash
+
+   emulsion diagrams model2.yaml
+
+Which gives:
+
+.. graphviz:: ../_images/benchmark/model2-SIR.dot
+
+.. graphviz:: ../_images/benchmark/model2-JA.dot
+
+
+To view model parameters:
+
+.. code-block:: bash
+
+   emulsion show model2.yaml
+
+which produces:
+
+.. literalinclude:: ../_images/benchmark/model2.txt

@@ -1,0 +1,253 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>4. Modelling principles &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="5. Modelling language (basics)" href="Modelling_language_basics.html" />
+    <link rel="prev" title="3. Getting started with EMULSION" href="Getting_started.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="modelling-principles">
+<h1>4. Modelling principles<a class="headerlink" href="#modelling-principles" title="Permalink to this headline">¶</a></h1>
+<p>First, a few words on key concepts used in EMULSION.</p>
+<div class="section" id="individuals-populations-metapopulations">
+<h2>4.1. Individuals, populations, metapopulations<a class="headerlink" href="#individuals-populations-metapopulations" title="Permalink to this headline">¶</a></h2>
+<p>EMULSION models can represent the dynamics of several organization
+levels (or scales), through classical paradigms used in epidemiological modelling:</p>
+<ul>
+<li><p class="first"><strong>Compartment-based models</strong> represent aggregate populations sharing a
+same state (e.g. same health state, same age group…). Individuals,
+thus, are not represented explicitly. The population is the mapping
+between states and the amount of individuals in those states
+(<a class="reference internal" href="#multiscale"><span class="std std-numref">Fig. 4.1</span></a>, right).</p>
+</li>
+<li><p class="first"><strong>Individual-based models (IBM)</strong>, on the contrary, focus on an
+explicit depiction of individual specificities (in states, actions,
+processes…) to account for finer grained assumptions, or represent
+specific control measures. The population is a collection of
+individuals (<a class="reference internal" href="#multiscale"><span class="std std-numref">Fig. 4.1</span></a>, left).</p>
+</li>
+<li><p class="first">EMULSION also provides <strong>hybrid models</strong>, which combine the
+capability of representing detailed information through individuals,
+with an adaptive grouping of individuals based on their state, to
+optimize computation (<a class="reference internal" href="#multiscale"><span class="std std-numref">Fig. 4.1</span></a>, center).</p>
+<p>In addition, EMULSION can handle <strong>metapopulations</strong>, i.e. a
+collection of interconnected populations (for instance through
+movements of individuals, airborne diffusion of pathogens,
+etc.). Metapopulations can aggregate populations built on
+compartment-based, individual-based or hybrid modelling paradigms.</p>
+</li>
+</ul>
+<div class="figure align-center" id="id1">
+<span id="multiscale"></span><img alt="From individuals to aggregate populations in EMULSION" src="../_images/multiscale.jpg" />
+<p class="caption"><span class="caption-number">Fig. 4.1 </span><span class="caption-text">From individuals to aggregate populations in EMULSION</span></p>
+</div>
+</div>
+<div class="section" id="from-flow-diagrams-to-state-machines">
+<h2>4.2. From flow diagrams to state machines<a class="headerlink" href="#from-flow-diagrams-to-state-machines" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="flow-diagrams">
+<h3>Flow diagrams<a class="headerlink" href="#flow-diagrams" title="Permalink to this headline">¶</a></h3>
+<p>Flow diagrams are a broadly adopted representation in epidemiological
+modelling. Possible states are represented as boxes. Plain arrows
+specify at which rate individuals move from one state to another. For
+instance, a classical flow diagram to represent a SIR model (assuming
+frequency-dependent force of infection) will look as:</p>
+<div align="center" class="align-center"><div class="graphviz"><object data="../_images/graphviz-92d4d3470d9539558bd374e8b47faf675dd83885.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        rankdir=LR;
+        node[fontsize=16, fontname=&quot;Arial&quot;, shape=&quot;box&quot;, style=&quot;bold&quot;];
+        edge[penwidth=1.5];
+
+        &quot;S&quot; [shape=&quot;box&quot;, label=&quot;S&quot;, tooltip=&quot;S (Susceptible): not infected&quot;] ;
+	&quot;I&quot; [shape=&quot;box&quot;, label=&quot;I&quot;, tooltip=&quot;I (Infectious):
+	infected and able to transmit the disease&quot;] ;
+	&quot;R&quot; [shape=&quot;box&quot;, label=&quot;R&quot;, tooltip=&quot;R (Resistant):
+	healthy again and resistant to infection&quot;] ;
+	&quot;I&quot; -&gt; &quot;R&quot; [label=&quot;γ&quot;, labeltooltip=&quot;rate: γ&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;I individuals become R at rate γ&quot;, minlen=2, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;I&quot; [label=&quot;βI/N&quot;, labeltooltip=&quot;rate: βI/N&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;S individuals become I at rate βI/N&quot;, minlen=2, style=&quot;solid&quot;];
+}</p></object></div>
+</div>
+<p>Under the classical assumption that durations in each state follow an
+exponential distribution, this graphical representation can be easily
+translated into either an ODE system which provides a mathematical
+representation of a deterministic SIR model, or a system of stochastic
+difference equations.</p>
+<p>However, flow diagrams have two main drawbacks:</p>
+<ol class="arabic simple">
+<li>Dealing with several concerns at the same time (e.g. infectious
+process and age groups) implies that all states must be subdivided
+according to each concern (e.g. infected juveniles vs. infected
+adults), hence a multiplication of boxes and arrows;</li>
+<li>With more complex models which do not stand classical assumptions
+or intend to represent individual-based conditions or actions ,
+many model features cannot be represented explicitly.</li>
+</ol>
+</div>
+<div class="section" id="state-machines">
+<h3>State machines<a class="headerlink" href="#state-machines" title="Permalink to this headline">¶</a></h3>
+<p>State machines (<a class="reference internal" href="#state-machine"><span class="std std-numref">Fig. 4.2</span></a>) is a formalism which
+completely encompasses flow diagrams but can also support more complex
+features while making them appear explicitly. Especially:</p>
+<ul class="simple">
+<li>each process involved in the system dynamics (e.g. infection, age
+groups, demography, treatment protocol, etc.) has to be
+represented by its own state machine: hence, instead of a large,
+complicated diagram, EMULSION fosters a separation between concerns
+through several smaller diagrams</li>
+<li>state machines represent the dynamics of individual situations
+instead of the evolution of populations</li>
+<li>each state can be endowed with additional properties:<ul>
+<li>an explicit duration</li>
+<li>actions to perform when entering, staying in, or leaving the state</li>
+</ul>
+</li>
+<li>each transition is labelled with either a <strong>rate</strong>, or a
+<strong>probability</strong>, or an absolute <strong>amount</strong> to better control the
+flow from one state to the other, and can also be associated with:<ul>
+<li>individual conditions to filter which individuals are allowed to
+cross the transition</li>
+<li>temporal conditions to enable/disable transitions at targeted
+periods of time</li>
+<li>escape conditions to allow some individuals to leave their state
+before the expected duration</li>
+<li>actions to perform for individuals crossing the transition</li>
+</ul>
+</li>
+</ul>
+<div class="figure align-center" id="id2">
+<span id="state-machine"></span><img alt="principles of a state machine" src="../_images/state_machine.jpg" />
+<p class="caption"><span class="caption-number">Fig. 4.2 </span><span class="caption-text">State machines are similar to flow diagrams but can represent much
+more explicit details (here all features are represented at the
+same time)</span></p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In a state machine, each possible pathway from one state to another
+must be represented by one transition, with its own features
+(rate/proba/amount, conditions, actions).</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">4. Modelling principles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#individuals-populations-metapopulations">4.1. Individuals, populations, metapopulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#from-flow-diagrams-to-state-machines">4.2. From flow diagrams to state machines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#flow-diagrams">Flow diagrams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#state-machines">State machines</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="Getting_started.html" title="previous chapter">3. Getting started with EMULSION</a></li>
+      <li>Next: <a href="Modelling_language_basics.html" title="next chapter">5. Modelling language (basics)</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/pages/Modelling_principles.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

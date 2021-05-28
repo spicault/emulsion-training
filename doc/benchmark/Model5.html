@@ -1,0 +1,534 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Model 5 (M4 + scale change) &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="model-5-m4-scale-change">
+<h1>Model 5 (M4 + scale change)<a class="headerlink" href="#model-5-m4-scale-change" title="Permalink to this headline">¶</a></h1>
+<p>The scale change by itself is rather straight:</p>
+<ul class="simple">
+<li>the metapopulation is just another level with a specific aggregation
+type</li>
+<li>initialization relies on prototypes as previously, there are new
+prototypes for populations</li>
+<li>some parameters (e.g. initial prevalence) become variables attached
+to populations</li>
+</ul>
+<p>The main changes here are the use of Python add-ons to specify processes
+which are not yet provided by generic features in EMULSION: here,
+selection and movement of hosts from one population to another. The
+corresponding levels (<code class="docutils literal notranslate"><span class="pre">population</span></code> and <code class="docutils literal notranslate"><span class="pre">metapop</span></code>) are explicitly
+linked with a python file (<code class="docutils literal notranslate"><span class="pre">model5.py</span></code>) and with class names
+(<code class="docutils literal notranslate"><span class="pre">Population</span></code> and <code class="docutils literal notranslate"><span class="pre">Metapop</span></code> respectively).</p>
+<p>Processes which take place at a given level and do not relate to any
+grouping indentifier are assumed to be methods in the class linked to
+this level.</p>
+<p>File with full comments: <a class="reference external" href="../_static/benchmark/model5.yaml">model5.yaml</a></p>
+<p>YAML model file :</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">---</span>
+<span class="n">model_name</span><span class="p">:</span> <span class="n">stochastic_SIR_demo_structured_metapop</span>
+
+<span class="n">model_info</span><span class="p">:</span>
+  <span class="n">abstract</span><span class="p">:</span> <span class="s1">&#39;This model is a simple discrete-time, stochastic,</span>
+  <span class="n">hybrid</span> <span class="n">SIR</span> <span class="n">model</span> <span class="k">with</span> <span class="n">demography</span> <span class="ow">and</span> <span class="n">structured</span> <span class="n">population</span><span class="p">,</span>
+  <span class="n">at</span> <span class="n">the</span> <span class="n">metapopulation</span> <span class="n">scale</span><span class="o">.</span><span class="s1">&#39;</span>
+  <span class="n">author</span><span class="p">:</span> <span class="s1">&#39;Sebastien Picault (sebastien.picault@inra.fr)&#39;</span>
+
+<span class="n">time_info</span><span class="p">:</span>
+  <span class="n">time_unit</span><span class="p">:</span> <span class="n">days</span>
+  <span class="n">delta_t</span><span class="p">:</span> <span class="mi">1</span>
+  <span class="n">origin</span><span class="p">:</span> <span class="s1">&#39;January 1&#39;</span>
+  <span class="n">total_duration</span><span class="p">:</span> <span class="s1">&#39;365&#39;</span>
+
+<span class="n">levels</span><span class="p">:</span>
+<span class="hll">  <span class="n">metapop</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;level of the metapopulation&#39;</span>
+</span><span class="hll">    <span class="n">aggregation_type</span><span class="p">:</span> <span class="n">metapopulation</span>
+</span><span class="hll">    <span class="n">contains</span><span class="p">:</span>
+</span><span class="hll">      <span class="o">-</span> <span class="n">population</span>
+</span><span class="hll">    <span class="n">file</span><span class="p">:</span> <span class="s1">&#39;model5.py&#39;</span>
+</span><span class="hll">    <span class="n">class_name</span><span class="p">:</span> <span class="s1">&#39;Metapop&#39;</span>
+</span>  <span class="n">population</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;level of the population&#39;</span>
+    <span class="n">aggregation_type</span><span class="p">:</span> <span class="n">hybrid</span>
+    <span class="n">contains</span><span class="p">:</span>
+      <span class="o">-</span> <span class="n">individuals</span>
+<span class="hll">    <span class="n">file</span><span class="p">:</span> <span class="s1">&#39;model5.py&#39;</span>
+</span><span class="hll">    <span class="n">class_name</span><span class="p">:</span> <span class="s1">&#39;Population&#39;</span>
+</span>  <span class="n">individuals</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;level of the individuals&#39;</span>
+
+<span class="n">grouping</span><span class="p">:</span>
+  <span class="n">population</span><span class="p">:</span>
+    <span class="n">species_groups</span><span class="p">:</span>
+      <span class="n">machine_name</span><span class="p">:</span> <span class="n">species</span>
+      <span class="n">key_variables</span><span class="p">:</span> <span class="p">[</span><span class="n">species</span><span class="p">]</span>
+    <span class="n">infection</span><span class="p">:</span>
+      <span class="n">machine_name</span><span class="p">:</span> <span class="n">health_state</span>
+      <span class="n">key_variables</span><span class="p">:</span> <span class="p">[</span><span class="n">health_state</span><span class="p">,</span> <span class="n">age_group</span><span class="p">,</span> <span class="n">species</span><span class="p">]</span>
+    <span class="n">aging</span><span class="p">:</span>
+      <span class="n">machine_name</span><span class="p">:</span> <span class="n">age_group</span>
+      <span class="n">key_variables</span><span class="p">:</span> <span class="p">[</span><span class="n">age_group</span><span class="p">]</span>
+
+<span class="n">processes</span><span class="p">:</span>
+<span class="hll">  <span class="n">metapop</span><span class="p">:</span>
+</span><span class="hll">    <span class="o">-</span> <span class="n">host_trade</span>                <span class="c1"># name of a method in Python class</span>
+</span>  <span class="n">population</span><span class="p">:</span>
+<span class="hll">    <span class="o">-</span> <span class="n">integrate_purchased_hosts</span> <span class="c1"># name of a method in Python class</span>
+</span>    <span class="o">-</span> <span class="n">species_groups</span>
+    <span class="o">-</span> <span class="n">infection</span>
+    <span class="o">-</span> <span class="n">aging</span>
+<span class="hll">    <span class="o">-</span> <span class="n">select_sold_hosts</span>         <span class="c1"># name of a method in Python class</span>
+</span>
+<span class="n">state_machines</span><span class="p">:</span>
+  <span class="n">species</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;the species of the individuals&#39;</span>
+    <span class="n">states</span><span class="p">:</span>
+      <span class="o">-</span> <span class="n">H</span><span class="p">:</span>
+          <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;Host&#39;</span>
+          <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;host individual&#39;</span>
+          <span class="n">fillcolor</span><span class="p">:</span> <span class="s1">&#39;navy&#39;</span>
+      <span class="o">-</span> <span class="n">V</span><span class="p">:</span>
+          <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;Vector&#39;</span>
+          <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;vector animal&#39;</span>
+          <span class="n">fillcolor</span><span class="p">:</span> <span class="s1">&#39;orange&#39;</span>
+  <span class="n">health_state</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;The state machine which defines the evolution of health</span>
+    <span class="n">states</span><span class="s1">&#39;</span>
+    <span class="n">states</span><span class="p">:</span>
+      <span class="o">-</span> <span class="n">S</span><span class="p">:</span>
+          <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;Susceptible&#39;</span>
+          <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;suceptible of becoming infected&#39;</span>
+          <span class="n">fillcolor</span><span class="p">:</span> <span class="s1">&#39;deepskyblue&#39;</span>
+          <span class="n">default</span><span class="p">:</span> <span class="n">yes</span>
+      <span class="o">-</span> <span class="n">I</span><span class="p">:</span>
+          <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;Infectious&#39;</span>
+          <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;infected and able to transmit the disease&#39;</span>
+          <span class="n">fillcolor</span><span class="p">:</span> <span class="s1">&#39;red&#39;</span>
+      <span class="o">-</span> <span class="n">R</span><span class="p">:</span>
+          <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;Resistant&#39;</span>
+          <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;recovered and resistant to new infections&#39;</span>
+          <span class="n">fillcolor</span><span class="p">:</span> <span class="s1">&#39;limegreen&#39;</span>
+    <span class="n">transitions</span><span class="p">:</span>
+      <span class="o">-</span> <span class="n">from</span><span class="p">:</span> <span class="n">S</span>
+        <span class="n">to</span><span class="p">:</span> <span class="n">I</span>
+        <span class="n">rate</span><span class="p">:</span> <span class="s1">&#39;is_H * (is_J * force_infection_juveniles + is_A * force_infection_adults</span>
+        <span class="o">+</span> <span class="n">force_of_infection_due_to_vectors</span><span class="p">)</span>
+        <span class="o">+</span> <span class="n">is_V</span> <span class="o">*</span> <span class="n">force_of_infection_vectors</span><span class="s1">&#39;</span>
+      <span class="o">-</span> <span class="p">{</span><span class="n">from</span><span class="p">:</span> <span class="n">I</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="n">R</span><span class="p">,</span> <span class="n">rate</span><span class="p">:</span> <span class="s1">&#39;is_H * gamma_H + is_V * gamma_V&#39;</span><span class="p">}</span>
+  <span class="n">age_group</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;The state machine which defines the evolution of age</span>
+    <span class="n">groups</span><span class="o">.</span><span class="s1">&#39;</span>
+    <span class="n">states</span><span class="p">:</span>
+      <span class="o">-</span> <span class="n">J</span><span class="p">:</span>
+          <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;Juvenile&#39;</span>
+          <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;juvenile individuals&#39;</span>
+          <span class="n">fillcolor</span><span class="p">:</span> <span class="s1">&#39;orange&#39;</span>
+      <span class="o">-</span> <span class="n">A</span><span class="p">:</span>
+          <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;Adult&#39;</span>
+          <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;adult individuals (producing new juveniles)&#39;</span>
+          <span class="n">fillcolor</span><span class="p">:</span> <span class="s1">&#39;brown&#39;</span>
+      <span class="o">-</span> <span class="n">U</span><span class="p">:</span>
+          <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;Undefined&#39;</span>
+          <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;no age group is defined for vectors&#39;</span>
+      <span class="o">-</span> <span class="n">D</span><span class="p">:</span>
+          <span class="n">name</span><span class="p">:</span> <span class="s1">&#39;Dead&#39;</span>
+          <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;compartment to put dead individuals&#39;</span>
+          <span class="n">fillcolor</span><span class="p">:</span> <span class="n">white</span>
+          <span class="n">autoremove</span><span class="p">:</span> <span class="n">yes</span>
+    <span class="n">transitions</span><span class="p">:</span>
+      <span class="o">-</span> <span class="p">{</span><span class="n">from</span><span class="p">:</span> <span class="n">J</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="n">A</span><span class="p">,</span> <span class="n">rate</span><span class="p">:</span> <span class="s1">&#39;m&#39;</span><span class="p">}</span>
+      <span class="o">-</span> <span class="p">{</span><span class="n">from</span><span class="p">:</span> <span class="n">J</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="n">D</span><span class="p">,</span> <span class="n">rate</span><span class="p">:</span> <span class="s1">&#39;mu_J * total_H / K_H&#39;</span><span class="p">}</span>
+      <span class="o">-</span> <span class="p">{</span><span class="n">from</span><span class="p">:</span> <span class="n">A</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="n">D</span><span class="p">,</span> <span class="n">rate</span><span class="p">:</span> <span class="s1">&#39;mu_A * total_H / K_H&#39;</span><span class="p">}</span>
+      <span class="o">-</span> <span class="p">{</span><span class="n">from</span><span class="p">:</span> <span class="n">U</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="n">D</span><span class="p">,</span> <span class="n">rate</span><span class="p">:</span> <span class="s1">&#39;b_V * total_V / K_V&#39;</span><span class="p">}</span>
+    <span class="n">productions</span><span class="p">:</span>
+      <span class="o">-</span> <span class="p">{</span><span class="n">from</span><span class="p">:</span> <span class="n">A</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="n">J</span><span class="p">,</span> <span class="n">rate</span><span class="p">:</span> <span class="s1">&#39;b_H&#39;</span><span class="p">,</span> <span class="n">prototype</span><span class="p">:</span> <span class="s1">&#39;newborn_host&#39;</span><span class="p">}</span>
+      <span class="o">-</span> <span class="p">{</span><span class="n">from</span><span class="p">:</span> <span class="n">U</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="n">U</span><span class="p">,</span> <span class="n">rate</span><span class="p">:</span> <span class="s1">&#39;b_V&#39;</span><span class="p">,</span> <span class="n">prototype</span><span class="p">:</span> <span class="s1">&#39;newborn_vector&#39;</span><span class="p">}</span>
+
+<span class="n">parameters</span><span class="p">:</span>
+  <span class="n">initial_host_population</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;initial number of hosts in the population&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mi">100</span>
+  <span class="n">initial_host_prevalence</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;initial proportion of infected hosts in an infected population&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mf">0.1</span>
+  <span class="n">beta_W</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;within-group transmission rate from infectious individuals (/day)&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mf">0.1</span>
+  <span class="n">beta_B</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;between-group transmission rate from infectious individuals (/day)&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mf">0.01</span>
+  <span class="n">gamma_H</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;recovery rate for hosts&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;1/30&#39;</span>
+  <span class="n">b_H</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;the birth rate of hosts (/day)&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mf">0.005</span>
+  <span class="n">m</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;maturation rate, at which juveniles become adults (/day)&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;1/50&#39;</span>
+  <span class="n">mu_J</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;base mortality rate for juveniles (/day)&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mf">0.01</span>
+  <span class="n">mu_A</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;base mortality rate for adults (/day)&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mf">0.0025</span>
+  <span class="n">K_H</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;carriage capacity of the environment for hosts&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mi">150</span>
+  <span class="n">force_infection_juveniles</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;force of infection experienced by juveniles&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;beta_W * total_I_J_H / (total_J + 1e-9) + beta_B * total_I_A_H / (total_A + 1e-9)&#39;</span>
+  <span class="n">force_infection_adults</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;force of infection experienced by adults&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;beta_W * total_I_A_H / (total_A + 1e-9) + beta_B * total_I_J_H / (total_J + 1e-9)&#39;</span>
+  <span class="n">prevalence_J</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;prevalence in juvenile group&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;total_I_J_H / (total_J + 1e-9)&#39;</span>
+  <span class="n">prevalence_A</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;prevalence in adult group&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;total_I_A_H / (total_A + 1e-9)&#39;</span>
+  <span class="n">force_of_infection_vectors</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;force of infection experienced by vectors&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;rho_HV * a * (total_I_A_H + total_I_J_H) / (total_H + 1e-9)&#39;</span>
+  <span class="n">force_of_infection_due_to_vectors</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;force of infection experienced by hosts due to vectors&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;rho_VH * a * total_I_U_V / (total_V + 1e-9)&#39;</span>
+  <span class="n">rho_HV</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;transmission probability from an infected host to a</span>
+    <span class="n">susceptible</span> <span class="n">vector</span><span class="s1">&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mf">0.6</span>
+  <span class="n">rho_VH</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;transmission probability from an infected vector to a</span>
+    <span class="n">susceptible</span> <span class="n">host</span><span class="s1">&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mf">0.1</span>
+  <span class="n">a</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;biting rate (/day)&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;1/10&#39;</span>
+  <span class="n">K_V</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;carriage capacity of the environment for vectors&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mi">500</span>
+  <span class="n">b_V</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;the birth rate of vectors (/day)&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mf">0.05</span>
+  <span class="n">gamma_V</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;recovery rate for vectors&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;1/20&#39;</span>
+  <span class="n">initial_vector_population</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;initial number of vectors in the population&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mi">300</span>
+  <span class="n">initial_vector_prevalence</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;initial proportion of infected vectors in an infected population&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mi">0</span>
+  <span class="n">prevalence_V</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;prevalence in vector group&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;total_I_U_V / (total_V + 1e-9)&#39;</span>
+  <span class="n">nb_populations</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;number of populations in the metapop&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mi">20</span>
+  <span class="n">nb_prevalent_pop</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;number of populations initially infected&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mi">1</span>
+  <span class="n">p_move</span><span class="p">:</span>
+    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;probability for a host to leave its current population and move</span>
+    <span class="n">to</span> <span class="n">a</span> <span class="n">neighbour</span> <span class="n">population</span><span class="s1">&#39;</span>
+    <span class="n">value</span><span class="p">:</span> <span class="mf">0.02</span>
+
+<span class="hll"><span class="n">statevars</span><span class="p">:</span>
+</span><span class="hll">  <span class="n">local_vector_prevalence</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;initial proportion of infectious vectors in the population,</span>
+</span><span class="hll">    <span class="n">defined</span> <span class="ow">in</span> <span class="n">prototype</span> <span class="s2">&quot;infected_population&quot;</span><span class="s1">&#39;</span>
+</span><span class="hll">  <span class="n">local_host_prevalence</span><span class="p">:</span>
+</span><span class="hll">    <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;initial proportion of infectious hosts in the population,</span>
+</span><span class="hll">    <span class="n">defined</span> <span class="ow">in</span> <span class="n">prototype</span> <span class="s2">&quot;infected_population&quot;</span><span class="s1">&#39;</span>
+</span>
+<span class="n">prototypes</span><span class="p">:</span>
+<span class="hll">  <span class="n">population</span><span class="p">:</span>
+</span><span class="hll">    <span class="o">-</span> <span class="n">healthy_population</span><span class="p">:</span>
+</span><span class="hll">        <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;population with only susceptible hosts and vectors&#39;</span>
+</span><span class="hll">        <span class="n">local_vector_prevalence</span><span class="p">:</span> <span class="mi">0</span>
+</span><span class="hll">        <span class="n">local_host_prevalence</span><span class="p">:</span> <span class="mi">0</span>
+</span><span class="hll">    <span class="o">-</span> <span class="n">infected_population</span><span class="p">:</span>
+</span><span class="hll">        <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;population with possibly infected hosts and vectors&#39;</span>
+</span><span class="hll">        <span class="n">local_vector_prevalence</span><span class="p">:</span> <span class="s1">&#39;initial_vector_prevalence&#39;</span>
+</span><span class="hll">        <span class="n">local_host_prevalence</span><span class="p">:</span> <span class="s1">&#39;initial_host_prevalence&#39;</span>
+</span>  <span class="n">individuals</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">healthy_host</span><span class="p">:</span>
+        <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;healthy hosts&#39;</span>
+        <span class="n">health_state</span><span class="p">:</span> <span class="n">S</span>
+        <span class="n">age_group</span><span class="p">:</span> <span class="s1">&#39;random(0.5, 0.5, 0)&#39;</span>
+        <span class="n">species</span><span class="p">:</span> <span class="n">H</span>
+    <span class="o">-</span> <span class="n">infected_host</span><span class="p">:</span>
+        <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;infected hosts&#39;</span>
+        <span class="n">health_state</span><span class="p">:</span> <span class="n">I</span>
+        <span class="n">age_group</span><span class="p">:</span> <span class="s1">&#39;random(0.5, 0.5, 0)&#39;</span>
+        <span class="n">species</span><span class="p">:</span> <span class="n">H</span>
+    <span class="o">-</span> <span class="n">newborn_host</span><span class="p">:</span>
+        <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;newborn host assuming no vertical transmission&#39;</span>
+        <span class="n">health_state</span><span class="p">:</span> <span class="n">S</span>
+        <span class="n">age_group</span><span class="p">:</span> <span class="n">J</span>
+        <span class="n">species</span><span class="p">:</span> <span class="n">H</span>
+    <span class="o">-</span> <span class="n">healthy_vector</span><span class="p">:</span>
+        <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;healthy vector&#39;</span>
+        <span class="n">health_state</span><span class="p">:</span> <span class="n">S</span>
+        <span class="n">age_group</span><span class="p">:</span> <span class="n">U</span>
+        <span class="n">species</span><span class="p">:</span> <span class="n">V</span>
+    <span class="o">-</span> <span class="n">infected_vector</span><span class="p">:</span>
+        <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;infected vector&#39;</span>
+        <span class="n">health_state</span><span class="p">:</span> <span class="n">I</span>
+        <span class="n">age_group</span><span class="p">:</span> <span class="n">U</span>
+        <span class="n">species</span><span class="p">:</span> <span class="n">V</span>
+    <span class="o">-</span> <span class="n">newborn_vector</span><span class="p">:</span>
+        <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;newborn vector assuming no vertical transmission&#39;</span>
+        <span class="n">health_state</span><span class="p">:</span> <span class="n">S</span>
+        <span class="n">age_group</span><span class="p">:</span> <span class="n">U</span>
+        <span class="n">species</span><span class="p">:</span> <span class="n">V</span>
+
+<span class="n">initial_conditions</span><span class="p">:</span>
+<span class="hll">  <span class="n">metapop</span><span class="p">:</span>
+</span><span class="hll">    <span class="o">-</span> <span class="n">prototype</span><span class="p">:</span> <span class="n">infected_population</span>
+</span><span class="hll">      <span class="n">amount</span><span class="p">:</span> <span class="s1">&#39;nb_prevalent_pop&#39;</span>
+</span><span class="hll">    <span class="o">-</span> <span class="n">prototype</span><span class="p">:</span> <span class="n">healthy_population</span>
+</span><span class="hll">      <span class="n">amount</span><span class="p">:</span> <span class="s1">&#39;nb_populations - nb_prevalent_pop&#39;</span>
+</span>  <span class="n">population</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">prototype</span><span class="p">:</span> <span class="n">healthy_host</span>
+      <span class="n">amount</span><span class="p">:</span> <span class="s1">&#39;initial_host_population * (1 - local_host_prevalence)&#39;</span>
+    <span class="o">-</span> <span class="n">prototype</span><span class="p">:</span> <span class="n">infected_host</span>
+      <span class="n">amount</span><span class="p">:</span> <span class="s1">&#39;initial_host_population * local_host_prevalence&#39;</span>
+    <span class="o">-</span> <span class="n">prototype</span><span class="p">:</span> <span class="n">healthy_vector</span>
+      <span class="n">amount</span><span class="p">:</span> <span class="s1">&#39;initial_vector_population * (1 - local_vector_prevalence)&#39;</span>
+    <span class="o">-</span> <span class="n">prototype</span><span class="p">:</span> <span class="n">infected_vector</span>
+      <span class="n">amount</span><span class="p">:</span> <span class="s1">&#39;initial_vector_population * local_vector_prevalence&#39;</span>
+
+<span class="n">outputs</span><span class="p">:</span>
+  <span class="nb">type</span><span class="p">:</span> <span class="n">csv</span>
+  <span class="n">population</span><span class="p">:</span>
+    <span class="n">period</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">extra_vars</span><span class="p">:</span>
+      <span class="o">-</span> <span class="n">prevalence_A</span>
+      <span class="o">-</span> <span class="n">prevalence_J</span>
+      <span class="o">-</span> <span class="n">prevalence_V</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>Python add-on :</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Python add-on for model 5 (Epidemiological Benchmark)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>                 <span class="k">as</span>     <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">emulsion.agent.managers</span> <span class="k">import</span> <span class="n">MetapopProcessManager</span>
+<span class="kn">from</span> <span class="nn">emulsion.agent.views</span> <span class="k">import</span> <span class="n">AutoStructuredView</span>
+<span class="kn">from</span> <span class="nn">emulsion.agent.managers</span> <span class="k">import</span> <span class="n">MultiProcessManager</span>
+<span class="kn">from</span> <span class="nn">emulsion.agent.views</span> <span class="k">import</span> <span class="n">SimpleView</span>
+<span class="kn">from</span> <span class="nn">emulsion.agent.atoms</span> <span class="k">import</span> <span class="n">AtomAgent</span>
+
+
+<span class="c1">#===============================================================</span>
+<span class="c1"># CLASS Metapop (LEVEL &#39;metapop&#39;)</span>
+<span class="c1">#===============================================================</span>
+<span class="k">class</span> <span class="nc">Metapop</span><span class="p">(</span><span class="n">MetapopProcessManager</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    level of the metapopulation.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#----------------------------------------------------------------</span>
+    <span class="c1"># Processes</span>
+    <span class="c1">#----------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">host_trade</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Proceed to host moves from source populations to dest</span>
+<span class="sd">        populations.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">populations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_populations</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">pop</span> <span class="ow">in</span> <span class="n">populations</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">outgoing</span> <span class="o">=</span> <span class="n">pop</span><span class="o">.</span><span class="n">get_outbox</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">outgoing</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">outgoing</span><span class="p">:</span>
+                    <span class="n">populations</span><span class="p">[</span><span class="n">message</span><span class="p">[</span><span class="s1">&#39;dest&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">add_inbox</span><span class="p">([</span><span class="n">message</span><span class="p">])</span>
+
+
+<span class="c1">#===============================================================</span>
+<span class="c1"># CLASS Population (LEVEL &#39;population&#39;)</span>
+<span class="c1">#===============================================================</span>
+<span class="k">class</span> <span class="nc">Population</span><span class="p">(</span><span class="n">MultiProcessManager</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    level of the population.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#----------------------------------------------------------------</span>
+    <span class="c1"># Processes</span>
+    <span class="c1">#----------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">integrate_purchased_hosts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check incoming hosts (put in &#39;inbox&#39;) and add them to local</span>
+<span class="sd">        population.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># collect incoming hosts from &#39;inbox&#39;</span>
+        <span class="n">purchased</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inbox</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;hosts&#39;</span> <span class="ow">in</span> <span class="n">message</span><span class="p">:</span>
+                <span class="n">purchased</span> <span class="o">+=</span> <span class="n">message</span><span class="p">[</span><span class="s1">&#39;hosts&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">purchased</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_atoms</span><span class="p">(</span><span class="n">purchased</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clean_inbox</span><span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">select_sold_hosts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Select hosts to be sold and move them to &#39;outbox&#39;.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># clean outgoing messages</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_outbox</span><span class="p">()</span>
+        <span class="c1"># retrieve model parameters</span>
+        <span class="n">nb_pop</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="s1">&#39;nb_populations&#39;</span><span class="p">))</span>
+        <span class="n">p_move</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="s1">&#39;p_move&#39;</span><span class="p">)</span>
+        <span class="c1"># select randomly hosts to sell among hosts only</span>
+        <span class="n">hosts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_atoms</span><span class="p">(</span><span class="n">variable</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s1">&#39;H&#39;</span><span class="p">)</span>
+        <span class="n">nb_to_sell</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hosts</span><span class="p">),</span> <span class="n">p_move</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nb_to_sell</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">hosts</span><span class="p">)</span>
+            <span class="n">to_sell</span> <span class="o">=</span> <span class="n">hosts</span><span class="p">[:</span><span class="n">nb_to_sell</span><span class="p">]</span>
+            <span class="n">nb_left</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">to_sell</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">)</span>
+            <span class="c1"># select hosts going to each neighbour population</span>
+            <span class="n">left_pop</span><span class="p">,</span> <span class="n">right_pop</span> <span class="o">=</span> <span class="n">to_sell</span><span class="p">[:</span><span class="n">nb_left</span><span class="p">],</span> <span class="n">to_sell</span><span class="p">[</span><span class="n">nb_left</span><span class="p">:]</span>
+            <span class="n">left_id</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population_id</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">nb_pop</span><span class="p">)</span> <span class="o">%</span> <span class="n">nb_pop</span>
+            <span class="n">right_id</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population_id</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">nb_pop</span>
+            <span class="c1"># create new messages</span>
+            <span class="k">if</span> <span class="n">left_pop</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_outbox</span><span class="p">({</span><span class="s1">&#39;src&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population_id</span><span class="p">,</span>
+                                 <span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="n">left_id</span><span class="p">,</span>
+                                 <span class="s1">&#39;hosts&#39;</span><span class="p">:</span> <span class="n">left_pop</span> <span class="p">})</span>
+            <span class="k">if</span> <span class="n">right_pop</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_outbox</span><span class="p">({</span><span class="s1">&#39;src&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population_id</span><span class="p">,</span>
+                                 <span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="n">right_id</span><span class="p">,</span>
+                                 <span class="s1">&#39;hosts&#39;</span><span class="p">:</span> <span class="n">right_pop</span> <span class="p">})</span>
+            <span class="c1"># remove host from current population</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_atoms</span><span class="p">(</span><span class="n">to_sell</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To run the model (one stochastic repetition):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emulsion run --plot model5.yaml -r <span class="m">1</span>
+</pre></div>
+</div>
+<p>Which produces <a class="reference external" href="../_static/benchmark/model5-outputs.html">the following outputs</a></p>
+<p>State machine diagrams are the same as in Model 4.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/benchmark/Model5.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

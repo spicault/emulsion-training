@@ -1,0 +1,618 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.tools.functions &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.tools.functions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;.. module:: emulsion.tools.functions</span>
+
+<span class="sd">Additional functions for symbolic computing in YAML model definition files.</span>
+
+<span class="sd">All functions in this module can be used in EMULSION models.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># [HEADER]</span>
+
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="IfThenElse"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.IfThenElse">[docs]</a><span class="k">def</span> <span class="nf">IfThenElse</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">val_if_true</span><span class="p">,</span> <span class="n">val_if_false</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Ternary conditional function: return either *val_if_true* or</span>
+<span class="sd">    *val_if_false* depending on *condition*.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    Here in a parameter definition (assuming that ``summer_period`` is</span>
+<span class="sd">    defined e.g. in the *calendars* section of the model)::</span>
+
+<span class="sd">      average_temperature:</span>
+<span class="sd">        desc: &#39;average temperature for the season&#39;</span>
+<span class="sd">        value: &#39;IfThenElse(summer_period, 25, 8)&#39;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    condition: bool</span>
+<span class="sd">        a boolean expression</span>
+<span class="sd">    val_if_true: number</span>
+<span class="sd">        value to return if the expression is True</span>
+<span class="sd">    val_if_false: number</span>
+<span class="sd">        value to return if the expression is False</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    number:</span>
+<span class="sd">        One of the two values, depending on *condition*.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">val_if_true</span> <span class="k">if</span> <span class="n">condition</span> <span class="k">else</span> <span class="n">val_if_false</span></div>
+
+
+<span class="c1"># BEWARE: using lambdify, by default And and Or fall back to numpy&#39;s</span>
+<span class="c1"># *binary* operators, so that more than 3 conditions linked by And or</span>
+<span class="c1"># Or trigger a TypeError (&#39;return arrays must be of ArrayType&#39;)</span>
+<span class="c1"># see topic addressed there:</span>
+<span class="c1"># https://stackoverflow.com/questions/42045906/typeerror-return-arrays-must-be-of-arraytype-using-lambdify-of-sympy-in-python</span>
+
+<span class="c1"># To avoid problems, please use AND / OR (fully in UPPERCASE) instead</span>
+<span class="c1"># of And / Or (Capitalized) in the conditions of Emulsion models</span>
+<div class="viewcode-block" id="NOT"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.functions.NOT">[docs]</a><span class="k">def</span> <span class="nf">NOT</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An alias for Not&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="AND"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.AND">[docs]</a><span class="k">def</span> <span class="nf">AND</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a logical AND (conjunction) between all the values.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    To define symptomatic individuals as infected for at least 5 days::</span>
+
+<span class="sd">      is_symptomatic:</span>
+<span class="sd">        desc: &#39;test if individuals has symptoms&#39;</span>
+<span class="sd">        value: &#39;AND(is_I, duration_in_health_state &gt;= 5)&#39;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *values: list</span>
+<span class="sd">        boolean values separated by commas</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool:</span>
+<span class="sd">        True if **all** values are True, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OR"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.OR">[docs]</a><span class="k">def</span> <span class="nf">OR</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a logical OR (disjunction) between all the values.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    To sell animals depending on either their weight or their age::</span>
+
+<span class="sd">      transitions:</span>
+<span class="sd">        ...</span>
+<span class="sd">        - from: Fattening</span>
+<span class="sd">          to: Sold</span>
+<span class="sd">          proba: 1</span>
+<span class="sd">          cond: &#39;OR(weight &gt;= weight_thr, age &gt;= age_thr)&#39;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *values: list</span>
+<span class="sd">        boolean values separated by commas</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool:</span>
+<span class="sd">        True if **at least one** of the values is True, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MIN"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.MIN">[docs]</a><span class="k">def</span> <span class="nf">MIN</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the minimum of all values.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *values: list</span>
+<span class="sd">        boolean values separated by commas</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float:</span>
+<span class="sd">        the lowest value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MAX"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.MAX">[docs]</a><span class="k">def</span> <span class="nf">MAX</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the maximum of all values.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *values: list</span>
+<span class="sd">        boolean values separated by commas</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float:</span>
+<span class="sd">        the highest value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DIV"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.DIV">[docs]</a><span class="k">def</span> <span class="nf">DIV</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return 0 if a=0 without considering b, otherwise a/b.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    a, b:</span>
+<span class="sd">        the values to divide</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float:</span>
+<span class="sd">        0 if a is 0, otherwise a/b</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">a</span><span class="o">/</span><span class="n">b</span></div>
+
+
+<span class="c1">#   _____ _                _             _         _</span>
+<span class="c1">#  / ____| |              | |           | |       | |</span>
+<span class="c1"># | (___ | |__   ___  _ __| |_ ___ _   _| |_ ___  | |_ ___</span>
+<span class="c1">#  \___ \| &#39;_ \ / _ \| &#39;__| __/ __| | | | __/ __| | __/ _ \</span>
+<span class="c1">#  ____) | | | | (_) | |  | || (__| |_| | |_\__ \ | || (_) |</span>
+<span class="c1"># |_____/|_| |_|\___/|_|   \__\___|\__,_|\__|___/  \__\___/</span>
+<span class="c1">#                                                          _</span>
+<span class="c1">#                                                         | |</span>
+<span class="c1">#  _ __  _   _ _ __ ___  _ __  _   _   _ __ __ _ _ __   __| | ___  _ __ ___</span>
+<span class="c1"># | &#39;_ \| | | | &#39;_ ` _ \| &#39;_ \| | | | | &#39;__/ _` | &#39;_ \ / _` |/ _ \| &#39;_ ` _ \</span>
+<span class="c1"># | | | | |_| | | | | | | |_) | |_| |_| | | (_| | | | | (_| | (_) | | | | | |</span>
+<span class="c1"># |_| |_|\__,_|_| |_| |_| .__/ \__, (_)_|  \__,_|_| |_|\__,_|\___/|_| |_| |_|</span>
+<span class="c1">#                       | |     __/ |</span>
+<span class="c1">#                       |_|    |___/</span>
+
+
+<div class="viewcode-block" id="random_bool"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.random_bool">[docs]</a><span class="k">def</span> <span class="nf">random_bool</span><span class="p">(</span><span class="n">proba_success</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return a random boolean value (actually, 0 or 1) depending on</span>
+<span class="sd">    *proba_success*.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    Set the value of a state variable ``has_symptoms`` when entering</span>
+<span class="sd">    in the infectious state::</span>
+
+<span class="sd">      states:</span>
+<span class="sd">        ...</span>
+<span class="sd">        - I:</span>
+<span class="sd">          ...</span>
+<span class="sd">          on_enter:</span>
+<span class="sd">            - set_var: has_symptoms</span>
+<span class="sd">              value: &#39;random_bool(proba_symptomatic)&#39;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    proba_success: float in [0,1]</span>
+<span class="sd">        probability of returning 1 (True)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int:</span>
+<span class="sd">        either 1 with probability *proba_success*, or 0 with</span>
+<span class="sd">        probability 1-*proba_success*</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">proba_success</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="random_choice"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.random_choice">[docs]</a><span class="k">def</span> <span class="nf">random_choice</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a value chosen randomly among those provided (equiprobable</span>
+<span class="sd">    sampling).</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    To init ``age`` among three typical values::</span>
+
+<span class="sd">      prototypes:</span>
+<span class="sd">        individuals:</span>
+<span class="sd">          init_individual:</span>
+<span class="sd">            age: &#39;random_choice(10, 50, 200)&#39;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    *values: list</span>
+<span class="sd">        the possible values, separated by commas</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    val:</span>
+<span class="sd">        one of the values (equiprobable choice)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="random_choice_weighted"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.random_choice_weighted">[docs]</a><span class="k">def</span> <span class="nf">random_choice_weighted</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a value chosen randomly among those provided (but not</span>
+<span class="sd">    equiprobably).</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    To init ``age`` among three typical values which respectively</span>
+<span class="sd">    represent 10%, 20% and 70% of the population::</span>
+
+<span class="sd">      prototypes:</span>
+<span class="sd">        individuals:</span>
+<span class="sd">          init_individual:</span>
+<span class="sd">            age: &#39;random_choice_weighted(10, 0.1, 50, 0.2, 200, 0.7)&#39;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    values: list</span>
+<span class="sd">        possibles choices and their weight, alternatively, separated</span>
+<span class="sd">        by commas. Weights are normalized to be used as probabilities.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    One of the choices</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">choices_and_values</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">iter</span><span class="p">(</span><span class="n">values</span><span class="p">)]</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">choices</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">choices_and_values</span><span class="p">)</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+    <span class="n">probas</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="o">/</span> <span class="n">total</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">choices</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">probas</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="random_multinomial"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.random_multinomial">[docs]</a><span class="k">def</span> <span class="nf">random_multinomial</span><span class="p">(</span><span class="n">number_of_samples</span><span class="p">,</span> <span class="o">*</span><span class="n">probas</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a multinomial sample based on the specified probabilities.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    number_of_samples: int</span>
+<span class="sd">        number of experiments</span>
+<span class="sd">    probas: list</span>
+<span class="sd">        list of probabilities</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list:</span>
+<span class="sd">        the drawn samples</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">number_of_samples</span><span class="p">,</span> <span class="n">probas</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="random_uniform"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.random_uniform">[docs]</a><span class="k">def</span> <span class="nf">random_uniform</span><span class="p">(</span><span class="n">low</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return a random value drawn from a uniform distribution between</span>
+<span class="sd">    *low* (inclusive) and *high* (exclusive).</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    In a prototype definition::</span>
+
+<span class="sd">      age: random_uniform(min_age, max_age)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    low: float</span>
+<span class="sd">        lower boundary of the sample interval (inclusive)</span>
+<span class="sd">    high: float</span>
+<span class="sd">        upper boundary of the sample interval (exclusive)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float:</span>
+<span class="sd">        a random value sampled according to a uniform distribution</span>
+<span class="sd">        between *low* and *high*</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    numpy.random.uniform</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="random_integers"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.random_integers">[docs]</a><span class="k">def</span> <span class="nf">random_integers</span><span class="p">(</span><span class="n">low</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">high</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return a random integer value drawn from a discrete uniform</span>
+<span class="sd">    distribution between *low* and *high* (both inclusive).</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    In a prototype definition::</span>
+
+<span class="sd">      age: random_integers(min_age, max_age)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    low: int</span>
+<span class="sd">        lower boundary of the sample interval (inclusive)</span>
+<span class="sd">    high: int</span>
+<span class="sd">        upper boundary of the sample interval (inclusive)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int:</span>
+<span class="sd">        a random integer value sampled according to a discrete uniform</span>
+<span class="sd">        distribution between *low* and *high*</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    numpy.random.random_integers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random_integers</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="random_exponential"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.random_exponential">[docs]</a><span class="k">def</span> <span class="nf">random_exponential</span><span class="p">(</span><span class="n">scale</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return a random value drawn from an exponential distribution of</span>
+<span class="sd">    rate 1/*scale* (thus of mean *scale*).</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    In a prototype definition::</span>
+
+<span class="sd">      time_to_live: random_exponential(mean_duration)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scale: float</span>
+<span class="sd">        the scale parameter of the distribution, i.e. the inverse of the rate</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float:</span>
+<span class="sd">        a random value sampled according to an exponential</span>
+<span class="sd">        distribution of rate 1/*scale*</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    numpy.random.exponential</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="random_beta"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.random_beta">[docs]</a><span class="k">def</span> <span class="nf">random_beta</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return a random value drawn from a beta distribution of parameters</span>
+<span class="sd">    *a* and *b*.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    In a prototype definition::</span>
+
+<span class="sd">      age: &#39;random_beta(2, 5) * age_max&#39;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    a: float, positive (&gt;0)</span>
+<span class="sd">        first shape parameter of the beta distribution</span>
+<span class="sd">    b: float, positive (&gt;0)</span>
+<span class="sd">        second shape parameter of the beta distribution</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float:</span>
+<span class="sd">        a random value sampled according to a beta distribution of</span>
+<span class="sd">        parameters *a* and *b*</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    numpy.random.beta</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">beta</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="random_gamma"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.random_gamma">[docs]</a><span class="k">def</span> <span class="nf">random_gamma</span><span class="p">(</span><span class="n">shape</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return a random value drawn from a gamma distribution of parameters</span>
+<span class="sd">    *shape* and *scale*.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    In a prototype definition::</span>
+
+<span class="sd">      age: &#39;random_gamma(3, 2)&#39;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    shape: float, positive (&gt;0)</span>
+<span class="sd">        the shape of the gamma distribution</span>
+<span class="sd">    scale: float, positive (&gt;0)</span>
+<span class="sd">        the scale of the gamma distribution</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float:</span>
+<span class="sd">        a random value sampled according to a gamma distribution of</span>
+<span class="sd">        parameters *shape* and *scale*</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    numpy.random.gamma</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">gamma</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">scale</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="random_normal"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.random_normal">[docs]</a><span class="k">def</span> <span class="nf">random_normal</span><span class="p">(</span><span class="n">mn</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sd</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return a random value drawn from a normal distribution of mean *mn*</span>
+<span class="sd">    and standard deviation *sd*.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    In a prototype definition::</span>
+
+<span class="sd">      age: &#39;random_normal(100, 5)&#39;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mn: float</span>
+<span class="sd">        the mean of the normal distribution</span>
+<span class="sd">    sd: float, positive (&gt;=0)</span>
+<span class="sd">        the standard deviation of the normal distribution</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float:</span>
+<span class="sd">        a random value sampled according to a normal distribution of</span>
+<span class="sd">        mean *mn* and standard deviation *sd*</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    numpy.random.normal</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mn</span><span class="p">,</span> <span class="n">sd</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="random_poisson"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.functions.random_poisson">[docs]</a><span class="k">def</span> <span class="nf">random_poisson</span><span class="p">(</span><span class="n">lam</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return an integer random value drawn from a Poisson distribution of</span>
+<span class="sd">    mean *lam*.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    In an action, e.g. here when computing how many newborn</span>
+<span class="sd">    individuals will be produced::</span>
+
+<span class="sd">      - from: Gestating</span>
+<span class="sd">        to: NonGestating</span>
+<span class="sd">        on_cross:</span>
+<span class="sd">          - produce_offspring: newborn</span>
+<span class="sd">            amount: &#39;random_poisson(1.05)&#39;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lam: float</span>
+<span class="sd">        the mean of the Poisson distribution</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int:</span>
+<span class="sd">        a random integer value sampled according to a Poisson distribution of</span>
+<span class="sd">        mean *lam*</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    numpy.random.poisson</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">lam</span><span class="p">)</span></div>
+
+
+<span class="n">IfThenElse</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">AND</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">OR</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">MIN</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">MAX</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">DIV</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+
+<span class="n">random_bool</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">random_choice</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">random_poisson</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">random_choice_weighted</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">random_uniform</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">random_multinomial</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">random_integers</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">random_exponential</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">random_beta</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">random_gamma</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+<span class="n">random_normal</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Functions Available for Models&#39;</span><span class="p">]</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

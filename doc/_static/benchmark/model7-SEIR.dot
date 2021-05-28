@@ -1,0 +1,19 @@
+digraph {
+          charset="utf-8"
+        	rankdir=LR;
+        
+        	node[fontsize=16, fontname=Arial, shape=box, style="filled,rounded"];
+        	edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip="", headtooltip=""];
+
+        	"S" [shape="Mrecord", label="S", tooltip="S (Susceptible):
+	suceptible of becoming infected", fillcolor=deepskyblue, style="filled,rounded,bold"] ;
+	"E" [shape="Mrecord", label="E&nbsp;&#9719;", tooltip="E (Exposed):
+	infected but not yet able to transit the disease", fillcolor=orange, style="filled,rounded"] ;
+	"I" [shape="Mrecord", label="I", tooltip="I (Infectious):
+	infected and able to transmit the disease", fillcolor=red, style="filled,rounded"] ;
+	"R" [shape="Mrecord", label="R", tooltip="R (Resistant):
+	recovered and resistant to new infections", fillcolor=limegreen, style="filled,rounded"] ;
+	"E" -> "I" [label="proba: 1", labeltooltip="proba: 1", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"I" -> "R" [label="rate: is_H * gamma_H + is_V * gamma_V", labeltooltip="rate: is_H * gamma_H + is_V * gamma_V", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"S" -> "E" [label="rate: is_H * (is_J * force_infection_juveniles + is_A * force_infection_adults + force_of_infection_due_to_vectors) + is_V * force_of_infection_vectors", labeltooltip="rate: is_H * (is_J * force_infection_juveniles + is_A * force_infection_adults + force_of_infection_due_to_vectors) + is_V * force_of_infection_vectors", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+}

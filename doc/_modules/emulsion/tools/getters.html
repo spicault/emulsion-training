@@ -1,0 +1,718 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.tools.getters &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.tools.getters</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;.. module:: emulsion.tools.getters</span>
+
+<span class="sd">Collection of callable classes used in EMULSION framework to replace</span>
+<span class="sd">closures and lambda functions.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># [HEADER]</span>
+
+
+<span class="kn">from</span>   <span class="nn">importlib</span>                 <span class="k">import</span> <span class="n">import_module</span>
+<span class="kn">from</span>   <span class="nn">typing</span>                    <span class="k">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span>   <span class="nn">collections</span>               <span class="k">import</span> <span class="n">Counter</span>
+<span class="kn">import</span> <span class="nn">itertools</span>                 <span class="k">as</span> <span class="nn">it</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>                     <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">emulsion.tools.functions</span>  <span class="k">as</span> <span class="nn">em_func</span>
+
+<div class="viewcode-block" id="create_population_getter"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_population_getter">[docs]</a><span class="k">class</span> <span class="nc">create_population_getter</span><span class="p">:</span>
+<div class="viewcode-block" id="create_population_getter.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_population_getter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grouping_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">t_states</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Build a callable class used as a getter for property of the form</span>
+<span class="sd">        ``total_X_Y`` where ``X`` and ``Y`` are states of two</span>
+<span class="sd">        different states machines used in the grouping *grouping_name*.</span>
+
+<span class="sd">        The functions can handle groupings with an arbitrary number of</span>
+<span class="sd">        states.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        grouping_name: str</span>
+<span class="sd">            the name of the grouping for which the population getter is created</span>
+<span class="sd">        t_states: str or tuple</span>
+<span class="sd">            either a string representing the state name (if only one), or</span>
+<span class="sd">            a tuple of several state names</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+<span class="sd">            A callable class which can be applied to an</span>
+<span class="sd">            ``AbstractProcessManager`` agent which returns the</span>
+<span class="sd">            population size for the specified group.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t_states</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">t_states</span> <span class="o">=</span> <span class="p">(</span><span class="n">t_states</span><span class="p">,)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grouping_name</span> <span class="o">=</span> <span class="n">grouping_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_states</span> <span class="o">=</span> <span class="n">t_states</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_group_population</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grouping_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_states</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="create_relative_population_getter"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_relative_population_getter">[docs]</a><span class="k">class</span> <span class="nc">create_relative_population_getter</span><span class="p">:</span>
+<div class="viewcode-block" id="create_relative_population_getter.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_relative_population_getter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">t_variables</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build a callable class used as a getter for property of the form</span>
+<span class="sd">        ``total_X_Y`` where ``X`` and ``Y`` are either states of two</span>
+<span class="sd">        different states machines used in the grouping described by *t_variables*,</span>
+<span class="sd">        or keywords built upon a state machine name ``M`` of the form ``my_M`` or</span>
+<span class="sd">        ``other_M``.</span>
+
+<span class="sd">        The functions can handle groupings with an arbitrary number of</span>
+<span class="sd">        states.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model: EmulsionModel</span>
+<span class="sd">            the model in which population counts apply</span>
+<span class="sd">        t_variables: str or tuple</span>
+<span class="sd">            tuple of strings (possibly one string), each one</span>
+<span class="sd">            representing either an explicit state (e.g. &#39;S&#39;), or the current</span>
+<span class="sd">            state of the agent for a specific state machine (e.g.</span>
+<span class="sd">            &#39;my_health_state&#39;), or all states other than the current state of</span>
+<span class="sd">            the agent for a specific state machine (e.g. &#39;other_health_state&#39;)</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+<span class="sd">            A callable class which can be applied to an</span>
+<span class="sd">            ``AtomAgent`` agent which returns the</span>
+<span class="sd">            population size for the specified group.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t_variables</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">t_variables</span> <span class="o">=</span> <span class="p">(</span><span class="n">t_variables</span><span class="p">,)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_variables</span> <span class="o">=</span> <span class="n">t_variables</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">):</span>
+        <span class="c1"># build list of total_X_Y where X, Y are only real states</span>
+        <span class="n">l_real_states</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_variables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;my_&quot;</span><span class="p">):</span>
+                <span class="n">machine_name</span> <span class="o">=</span> <span class="n">field</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;my_&quot;</span><span class="p">):]</span>
+                <span class="c1">## replace e.g. &#39;my_health_state&#39; by the health_state (string) of the agent, e.g. [&#39;I&#39;]</span>
+                <span class="n">l_real_states</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">agent</span><span class="o">.</span><span class="n">statevars</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">field</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;other_&quot;</span><span class="p">):</span>
+                <span class="n">machine_name</span> <span class="o">=</span> <span class="n">field</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;other_&quot;</span><span class="p">):]</span>
+                <span class="n">agent_state_name</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">statevars</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+                <span class="c1">## replace e.g. &#39;other_health_state&#39; by all names of non-autoremove states which are not the agent&#39;s state, e.g. [&#39;S&#39;, &#39;R&#39;]</span>
+                <span class="n">l_state_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span>
+                               <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_machines</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span><span class="o">.</span><span class="n">states</span>
+                               <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">autoremove</span> <span class="ow">or</span> <span class="n">state</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">agent_state_name</span><span class="p">)</span> <span class="p">]</span>
+                <span class="n">l_real_states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l_state_names</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1">## add &#39;true&#39; state as such</span>
+                <span class="n">l_real_states</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">field</span><span class="p">])</span>
+        <span class="c1"># build list of total_X_Y where X, Y are only real states</span>
+        <span class="n">l_combinations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">l_real_states</span><span class="p">))</span>
+        <span class="c1"># get corresponding values in agent</span>
+        <span class="n">l_totals</span> <span class="o">=</span> <span class="p">[</span><span class="n">agent</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="s1">&#39;total_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">t_group</span><span class="p">)))</span>
+                    <span class="k">for</span> <span class="n">t_group</span> <span class="ow">in</span> <span class="n">l_combinations</span><span class="p">]</span>
+        <span class="c1"># return the sum of values</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">l_totals</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_counter_getter"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_counter_getter">[docs]</a><span class="k">class</span> <span class="nc">create_counter_getter</span><span class="p">:</span>
+<div class="viewcode-block" id="create_counter_getter.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_counter_getter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grouping_name</span><span class="p">,</span> <span class="n">t_states</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build a callable class used as a getter for property of the form</span>
+<span class="sd">        ``total_X_Y`` where ``X`` and ``Y`` are state names in the</span>
+<span class="sd">        tuple *t_states* and where the total number of individuals in</span>
+<span class="sd">        those states can be calculated from the specified</span>
+<span class="sd">        *grouping_name*.</span>
+
+<span class="sd">        If a single state is passed to *t_states*, a tuple is created.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        grouping_name: str</span>
+<span class="sd">            the name of the grouping (or single state machine) to use for calculation</span>
+<span class="sd">        t_states: tuple</span>
+<span class="sd">            tuple of states to count (possibly single value)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+<span class="sd">            A callable class which can be applied to an</span>
+<span class="sd">            ``IBMProcessManager`` agent which returns the</span>
+<span class="sd">            population size for the specified group.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grouping_name</span> <span class="o">=</span> <span class="n">grouping_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_states</span> <span class="o">=</span> <span class="n">t_states</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t_states</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">t_states</span><span class="p">,)</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_group_population</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grouping_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_states</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_state_tester"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_state_tester">[docs]</a><span class="k">class</span> <span class="nc">create_state_tester</span><span class="p">:</span>
+<div class="viewcode-block" id="create_state_tester.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_state_tester.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build a callable class used as a getter for property of the form</span>
+<span class="sd">        ``is_X`` where ``X`` is a state of a state machine.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        state_name: str</span>
+<span class="sd">            the name of state</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+<span class="sd">            A callable class which can be applied to an ``AtomAgent``</span>
+<span class="sd">            agent which returns True if the agent is in state</span>
+<span class="sd">            *state_name*, False otherwise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_name</span> <span class="o">=</span> <span class="n">state_name</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">agent</span><span class="o">.</span><span class="n">is_in_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="create_duration_getter"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_duration_getter">[docs]</a><span class="k">class</span> <span class="nc">create_duration_getter</span><span class="p">:</span>
+<div class="viewcode-block" id="create_duration_getter.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_duration_getter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build a callable class used as a getter for property of the form</span>
+<span class="sd">        ``duration_in_M`` where ``M`` is a *machine_name*.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        machine_name: str</span>
+<span class="sd">            the name of the state machine</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+
+<span class="sd">            A callable class which can be applied to an ``AtomAgent``</span>
+<span class="sd">            agent which returns the duration elapsed since the agent</span>
+<span class="sd">            entered the current state of *machine_name*</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span> <span class="o">=</span> <span class="n">machine_name</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">agent</span><span class="o">.</span><span class="n">duration_in_current_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="find_operator"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.find_operator">[docs]</a><span class="k">class</span> <span class="nc">find_operator</span><span class="p">:</span>
+<div class="viewcode-block" id="find_operator.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.find_operator.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an aggregation function named *operator*.</span>
+
+<span class="sd">        Search starts with emulsion functions (module</span>
+<span class="sd">        `emulsion.tools.functions`), which includes Python built-ins, then</span>
+<span class="sd">        in `numpy`.</span>
+
+<span class="sd">        A special shortcut is provided for percentiles: ``percentileXX``</span>
+<span class="sd">        is interpreted as the partial function</span>
+<span class="sd">        ``numpy.percentile(q=int(XX))``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        operator: str</span>
+<span class="sd">            the name of the aggregation operator</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+<span class="sd">            a callable class which can be called on a list (or</span>
+<span class="sd">            array-like) as input and returns the application of the</span>
+<span class="sd">            *operator* to the values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># current_module = import_module(&#39;emulsion.tools.functions&#39;)</span>
+        <span class="c1"># current_module = sys.modules[&#39;emulsion.tools.functions&#39;]</span>
+        <span class="n">current_module</span> <span class="o">=</span> <span class="n">em_func</span>
+
+        <span class="c1"># search in emulsion functions module first</span>
+        <span class="c1"># if hasattr(current_module, operator):</span>
+        <span class="c1">#     op = getattr(current_module, operator)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">current_module</span><span class="p">,</span> <span class="n">operator</span><span class="p">):</span>
+            <span class="n">op</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">current_module</span><span class="p">,</span> <span class="n">operator</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">operator</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;percentile&#39;</span><span class="p">):</span>
+            <span class="c1"># special case of &#39;percentileXX&#39; where XX is a number (0 to</span>
+            <span class="c1"># 100) and automatically extracted</span>
+            <span class="n">op</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">operator</span><span class="p">[</span><span class="mi">10</span><span class="p">:]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># otherwise search in numpy</span>
+            <span class="n">op</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">np</span><span class="p">,</span> <span class="n">operator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">=</span> <span class="n">op</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">values</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_aggregator"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_aggregator">[docs]</a><span class="k">class</span> <span class="nc">create_aggregator</span><span class="p">:</span>
+<div class="viewcode-block" id="create_aggregator.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_aggregator.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sourcevar</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an aggregator function to be used as property getter. This</span>
+<span class="sd">        aggregator function has to collect all values of *sourcevar*</span>
+<span class="sd">        for agents contained in a given host, and reduce them to one</span>
+<span class="sd">        avalue using the specified *operator*.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sourcevar: str</span>
+<span class="sd">            the name of the variable to collect in the sublevel</span>
+<span class="sd">        operator: str</span>
+<span class="sd">            the name of the operator to apply to the collected values</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+<span class="sd">            A callable class which can be applied to a</span>
+<span class="sd">            `MultiProcessManager` agent (i.e. with explicit sublevel</span>
+<span class="sd">            agents) which returns the aggregated values for the whole</span>
+<span class="sd">            population.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">=</span> <span class="n">find_operator</span><span class="p">(</span><span class="n">operator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcevar</span> <span class="o">=</span> <span class="n">sourcevar</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">([</span><span class="n">sublevel</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcevar</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">sublevel</span> <span class="ow">in</span> <span class="n">agent</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]])</span></div>
+
+
+<div class="viewcode-block" id="create_group_aggregator"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_group_aggregator">[docs]</a><span class="k">class</span> <span class="nc">create_group_aggregator</span><span class="p">:</span>
+<div class="viewcode-block" id="create_group_aggregator.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_group_aggregator.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sourcevar</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">process_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">group_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Build a getter for property of the form ``newvar_X_Y`` where ``X``</span>
+<span class="sd">        and ``Y`` are states of two different states machines used in</span>
+<span class="sd">        a grouping, ``newvar`` is an aggregate variable based on</span>
+<span class="sd">        collecting all values of *sourcevar* for the specific</span>
+<span class="sd">        *group_name* and aggregating the values using *operator*. The</span>
+<span class="sd">        functions can handle groupings with an arbitrary number of</span>
+<span class="sd">        states.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sourcevar: str</span>
+<span class="sd">            the name of the variable to collect in the sublevel</span>
+<span class="sd">        operator: str</span>
+<span class="sd">            the name of the operator to apply to the collected values</span>
+<span class="sd">        process_name: str</span>
+<span class="sd">            the name of the process associated with the grouping for which</span>
+<span class="sd">            the population getter is created</span>
+<span class="sd">        group_name: str or tuple</span>
+<span class="sd">            either a string representing the state name (if only one), or</span>
+<span class="sd">            a tuple of several state names</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+<span class="sd">            A callable class which can be applied to an</span>
+<span class="sd">            `MultiProcessManager` agent (i.e. with explicit sublevel</span>
+<span class="sd">            agents) which returns the aggregated value for the</span>
+<span class="sd">            specified group.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">=</span> <span class="n">find_operator</span><span class="p">(</span><span class="n">operator</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group_name</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">group_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">group_name</span><span class="p">,)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_name</span> <span class="o">=</span> <span class="n">group_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcevar</span> <span class="o">=</span> <span class="n">sourcevar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_name</span> <span class="o">=</span> <span class="n">process_name</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">([</span><span class="n">sublevel</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcevar</span><span class="p">)</span>
+                       <span class="k">for</span> <span class="n">sublevel</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_group_atoms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">group_name</span><span class="p">)])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
+
+
+<div class="viewcode-block" id="create_atoms_aggregator"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_atoms_aggregator">[docs]</a><span class="k">class</span> <span class="nc">create_atoms_aggregator</span><span class="p">:</span>
+<div class="viewcode-block" id="create_atoms_aggregator.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_atoms_aggregator.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sourcevar</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">operator</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">machine_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">state_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build a getter for property of the form ``newvar_X`` where ``X`` if</span>
+<span class="sd">        the value of *state_name* (a state of *state_machine*),</span>
+<span class="sd">        ``newvar`` is an aggregate variable based on collecting all</span>
+<span class="sd">        values of *sourcevar* for the specific *group_name* and</span>
+<span class="sd">        aggregating the values using *operator*. This function is</span>
+<span class="sd">        intended to work on `IBMProcessManager` agents, which do not</span>
+<span class="sd">        benefit from groupings.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sourcevar: str</span>
+<span class="sd">            the name of the variable to collect in the sublevel</span>
+<span class="sd">        operator: str</span>
+<span class="sd">            the name of the operator to apply to the collected values</span>
+<span class="sd">        machine_name: str</span>
+<span class="sd">            the name of the state machine for which the getter is created</span>
+<span class="sd">        state_name: str</span>
+<span class="sd">            the state name</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+<span class="sd">            A callable class on which can be applied to an</span>
+<span class="sd">            `IBMProcessManager` agent (i.e. with explicit but</span>
+<span class="sd">            ungrouped sublevel agents) which returns the aggregated</span>
+<span class="sd">            value for the specified group.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">=</span> <span class="n">find_operator</span><span class="p">(</span><span class="n">operator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcevar</span> <span class="o">=</span> <span class="n">sourcevar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span> <span class="o">=</span> <span class="n">machine_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_name</span> <span class="o">=</span> <span class="n">state_name</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="p">([</span><span class="n">sublevel</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcevar</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">sublevel</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">select_atoms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state_name</span><span class="p">)])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
+
+
+<div class="viewcode-block" id="create_new_serial"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_new_serial">[docs]</a><span class="k">class</span> <span class="nc">create_new_serial</span><span class="p">:</span>
+<div class="viewcode-block" id="create_new_serial.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_new_serial.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create the serial number generator associated to the specified</span>
+<span class="sd">        variable.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generator</span> <span class="o">=</span> <span class="n">serial</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generator</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_successor_getter"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_successor_getter">[docs]</a><span class="k">class</span> <span class="nc">create_successor_getter</span><span class="p">:</span>
+<div class="viewcode-block" id="create_successor_getter.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_successor_getter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a callable class to access the successor state for the</span>
+<span class="sd">        specified *machine_name*.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        machine_name: str</span>
+<span class="sd">            the name of a state machine for which the function will be built</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+<span class="sd">            a function that returns the successor state for the</span>
+<span class="sd">            current state of the statevar specified by</span>
+<span class="sd">            *state_machine*. If no value is set, returns a random</span>
+<span class="sd">            state of this state machine.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span> <span class="o">=</span> <span class="n">machine_name</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">qty</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the successor state for the state stored in</span>
+<span class="sd">        *machine_name*. If no value is set, return a random state.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">statevars</span><span class="p">:</span>
+            <span class="n">succ</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">statevars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="p">]</span><span class="o">.</span><span class="n">successor</span>
+            <span class="k">return</span> <span class="n">succ</span> <span class="k">if</span> <span class="n">qty</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{</span><span class="n">succ</span><span class="p">:</span> <span class="n">qty</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">agent</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_machines</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="p">]</span><span class="o">.</span><span class="n">get_random_state</span><span class="p">(</span><span class="n">qty</span><span class="o">=</span><span class="n">qty</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="create_predecessor_getter"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_predecessor_getter">[docs]</a><span class="k">class</span> <span class="nc">create_predecessor_getter</span><span class="p">:</span>
+<div class="viewcode-block" id="create_predecessor_getter.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_predecessor_getter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a function to access the predecessor state for the specified</span>
+<span class="sd">        *machine_name*.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        machine_name: str</span>
+<span class="sd">            the name of a state machine for which the function will be built</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+<span class="sd">            a callable class that returns the predecessor state for</span>
+<span class="sd">            the current state of the statevar specified by</span>
+<span class="sd">            *state_machine*. If no value is set, returns a random</span>
+<span class="sd">            state of this state machine.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span> <span class="o">=</span> <span class="n">machine_name</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">qty</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the predecessor state for the state stored in statevar</span>
+<span class="sd">        *machine_name*. If no value is set, return a random state.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">statevars</span><span class="p">:</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">statevars</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="p">]</span><span class="o">.</span><span class="n">predecessor</span>
+            <span class="k">return</span> <span class="n">pred</span> <span class="k">if</span> <span class="n">qty</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{</span><span class="n">pred</span><span class="p">:</span> <span class="n">qty</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">agent</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_machines</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="p">]</span><span class="o">.</span><span class="n">get_random_state</span><span class="p">(</span><span class="n">qty</span><span class="o">=</span><span class="n">qty</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_weighted_random"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_weighted_random">[docs]</a><span class="k">class</span> <span class="nc">create_weighted_random</span><span class="p">:</span>
+<div class="viewcode-block" id="create_weighted_random.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.create_weighted_random.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_name</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a random choice function which returns a random state from</span>
+<span class="sd">        the given state machine (among non-autoremove states), according</span>
+<span class="sd">        to the weights. Weights are interpreted either directly as</span>
+<span class="sd">        probabilities (if the number of weights is stricly one below the</span>
+<span class="sd">        number of available states, the last state getting the complement</span>
+<span class="sd">        to 1), or as true weights which are then normalized to be used as</span>
+<span class="sd">        probabilities.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        machine_name: str</span>
+<span class="sd">            the name of the state machine where the states must be chosen</span>
+<span class="sd">            among the *N* non-autoremove states.</span>
+<span class="sd">        weights: list</span>
+<span class="sd">            a list of *N* or *N-1* model expressions assumed to produce positive numbers</span>
+<span class="sd">        model: EmulsionModel</span>
+<span class="sd">            the model where this function is defined</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+<span class="sd">            a callable class that returns a random state according to the</span>
+<span class="sd">            values of the weights list, interpreted either as</span>
+<span class="sd">            probabilities (if size *N-1*) or as weights (if size *N*)</span>
+<span class="sd">            which are then normalized to provide probabilities</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">machine</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">state_machines</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">machine</span><span class="o">.</span><span class="n">states</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">autoremove</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">qty</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">agent</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span> <span class="k">for</span> <span class="n">weight</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">]</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">):</span>
+            <span class="k">assert</span><span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">total</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">probas</span> <span class="o">=</span> <span class="n">values</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="n">total</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">probas</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="o">/</span> <span class="n">total</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">qty</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">probas</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Counter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">,</span> <span class="n">qty</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">probas</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="make_random_prototype_getter"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.make_random_prototype_getter">[docs]</a><span class="k">class</span> <span class="nc">make_random_prototype_getter</span><span class="p">:</span>
+<div class="viewcode-block" id="make_random_prototype_getter.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.make_random_prototype_getter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">freqs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a function to access to random prototypes based on given</span>
+<span class="sd">        frequencies.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        names: list</span>
+<span class="sd">            the list of prototypes to sample</span>
+<span class="sd">        freqs: list</span>
+<span class="sd">            list of probabilities for random sampling</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+<span class="sd">            a callable class that returns a random prototype name sampled</span>
+<span class="sd">            randomly in *names* based on *freqs*</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="n">names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freqs</span> <span class="o">=</span> <span class="n">freqs</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simu_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">freqs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PrototypeGenerator"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.PrototypeGenerator">[docs]</a><span class="k">class</span> <span class="nc">PrototypeGenerator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Class designed to give prototypes on demand in a collection.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PrototypeGenerator.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.PrototypeGenerator.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">collection_name</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">cycle</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="n">names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freqs</span> <span class="o">=</span> <span class="n">freqs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection_name</span> <span class="o">=</span> <span class="n">collection_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cycle</span> <span class="o">=</span> <span class="n">cycle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simu_id</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="PrototypeGenerator.set_simu_id"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.PrototypeGenerator.set_simu_id">[docs]</a>    <span class="k">def</span> <span class="nf">set_simu_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">simu_id</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">simu_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simu_id</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="c1"># if method is &#39;random&#39;, sample without replacement of the size of the list, according to the frequencies</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">):</span>
+                <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">)),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">freqs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">freqs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">freqs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cycle</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;Too many prototypes used from collection </span><span class="si">{}</span><span class="s1"> with method </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="make_generator_prototype_getter"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.make_generator_prototype_getter">[docs]</a><span class="k">class</span> <span class="nc">make_generator_prototype_getter</span><span class="p">:</span>
+<div class="viewcode-block" id="make_generator_prototype_getter.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.make_generator_prototype_getter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">collection_name</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">cycle</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a function to access to prototypes in order, based on given</span>
+<span class="sd">        *names*.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        names: list</span>
+<span class="sd">            the list of prototypes to sample</span>
+<span class="sd">        freqs: list</span>
+<span class="sd">            the list of probabilities associated with each name</span>
+<span class="sd">        collection_name: str</span>
+<span class="sd">            the name of the prototype collection</span>
+<span class="sd">        method: str</span>
+<span class="sd">            the method used to pick concrete prototypes in the collection</span>
+<span class="sd">        cycle: bool</span>
+<span class="sd">            True if the values must cycle when end of list is reached,</span>
+<span class="sd">            False otherwise</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        callable:</span>
+<span class="sd">            a callable class that returns a prototype name when called</span>
+
+<span class="sd">     &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gen</span> <span class="o">=</span> <span class="n">PrototypeGenerator</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">collection_name</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">cycle</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gen</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simu_id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gen</span><span class="o">.</span><span class="n">set_simu_id</span><span class="p">(</span><span class="n">simu_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">it</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="make_information_getter"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.make_information_getter">[docs]</a><span class="k">class</span> <span class="nc">make_information_getter</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Build and return a callable class, which can be called on an agent</span>
+<span class="sd">    to return the value of the specified parameter (or expression) in</span>
+<span class="sd">    the the agent.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value_name: ``str``</span>
+<span class="sd">        the name of the statevar to get</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    class:</span>
+<span class="sd">        a callable which can be called on an agent</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="make_information_getter.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.getters.make_information_getter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_vame</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_vame</span> <span class="o">=</span> <span class="n">value_vame</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">agent</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_vame</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

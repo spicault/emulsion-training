@@ -1,0 +1,369 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.tools.calendar &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.tools.calendar</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;.. module:: emulsion.tools.calendar</span>
+
+<span class="sd">Classes and functions for the definition of Emulsion calendars.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># [HEADER]</span>
+
+
+<span class="kn">from</span>   <span class="nn">sortedcontainers</span>      <span class="k">import</span> <span class="n">SortedDict</span>
+
+
+<span class="c1">#  ______                    _   _</span>
+<span class="c1"># |  ____|                  | | (_)</span>
+<span class="c1"># | |__  __  _____ ___ _ __ | |_ _  ___  _ __  ___</span>
+<span class="c1"># |  __| \ \/ / __/ _ \ &#39;_ \| __| |/ _ \| &#39;_ \/ __|</span>
+<span class="c1"># | |____ &gt;  &lt; (_|  __/ |_) | |_| | (_) | | | \__ \</span>
+<span class="c1"># |______/_/\_\___\___| .__/ \__|_|\___/|_| |_|___/</span>
+<span class="c1">#                     | |</span>
+<span class="c1">#                     |_|</span>
+
+<div class="viewcode-block" id="InvalidIntervalException"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.InvalidIntervalException">[docs]</a><span class="k">class</span> <span class="nc">InvalidIntervalException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Exception raised when trying to insert an inconsistent event in the</span>
+<span class="sd">    calendar. An event is considered inconsistent if the begin date is</span>
+<span class="sd">    posterior to the send date in a non-periodic calendar.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="InvalidIntervalException.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.InvalidIntervalException.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create the exception with the incorrect *begin* and *end* dates.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Invalid dates interval </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<span class="c1">#  ______                _   _</span>
+<span class="c1"># |  ____|              | | (_)</span>
+<span class="c1"># | |__ _   _ _ __   ___| |_ _  ___  _ __  ___</span>
+<span class="c1"># |  __| | | | &#39;_ \ / __| __| |/ _ \| &#39;_ \/ __|</span>
+<span class="c1"># | |  | |_| | | | | (__| |_| | (_) | | | \__ \</span>
+<span class="c1"># |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/</span>
+
+<div class="viewcode-block" id="date_in"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.date_in">[docs]</a><span class="k">def</span> <span class="nf">date_in</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a callable class which tests if a date belongs to the</span>
+<span class="sd">    specified interval (from *begin* to *end*). If a *period* is</span>
+<span class="sd">    specified, the test relies upon the periodicity, otherwise dates</span>
+<span class="sd">    are considered absolute.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    begin: ``datetime.datetime``</span>
+<span class="sd">        the date when the interval begins</span>
+<span class="sd">    end: ``datetime.datetime``</span>
+<span class="sd">        the date when the interval ends</span>
+<span class="sd">    period: ``datetime.timedelta``</span>
+<span class="sd">        the duration of the period after which the calendar cycles</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    class:</span>
+<span class="sd">        a callable class which depends on relations between parameter</span>
+<span class="sd">        values and can be called on a date (``datetime.datetime``) to</span>
+<span class="sd">        return a ``bool`` which indicates whether or not the date</span>
+<span class="sd">        belongs to the *begin*-*end* interval.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    InvalidIntervalexception</span>
+<span class="sd">        if *begin* is posterior to *end* in a non-periodic calendar</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">begin</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">begin</span> <span class="o">%</span> <span class="n">period</span><span class="p">,</span> <span class="n">end</span> <span class="o">%</span> <span class="n">period</span>
+        <span class="k">if</span> <span class="n">begin</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">periodic_date_tester</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">period</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">periodic_date_tester_inverted</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">period</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">begin</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">date_tester</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidIntervalException</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="periodic_date_tester"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.periodic_date_tester">[docs]</a><span class="k">class</span> <span class="nc">periodic_date_tester</span><span class="p">:</span>
+<div class="viewcode-block" id="periodic_date_tester.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.periodic_date_tester.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">period</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">begin</span> <span class="o">=</span> <span class="n">begin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">=</span> <span class="n">period</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check that the specified date belongs to the event interval,</span>
+<span class="sd">            considering the periodicity.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">begin</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">date</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span></div>
+
+<div class="viewcode-block" id="periodic_date_tester_inverted"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.periodic_date_tester_inverted">[docs]</a><span class="k">class</span> <span class="nc">periodic_date_tester_inverted</span><span class="p">:</span>
+<div class="viewcode-block" id="periodic_date_tester_inverted.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.periodic_date_tester_inverted.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">period</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">begin</span> <span class="o">=</span> <span class="n">begin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">=</span> <span class="n">period</span></div>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check that the specified date belongs to the event interval,</span>
+<span class="sd">           considering the periodicity and the fact that the end date</span>
+<span class="sd">           appears before the begin date in a civil year.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">date</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="ow">or</span> <span class="p">(</span><span class="n">date</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">begin</span></div>
+
+<div class="viewcode-block" id="date_tester"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.date_tester">[docs]</a><span class="k">class</span> <span class="nc">date_tester</span><span class="p">:</span>
+<div class="viewcode-block" id="date_tester.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.date_tester.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">begin</span> <span class="o">=</span> <span class="n">begin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">end</span></div>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check that the specified date belongs to the event interval,</span>
+<span class="sd">        considered as absolute (no periodicity).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">begin</span> <span class="o">&lt;=</span> <span class="n">date</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span></div>
+
+
+<span class="c1">#  ______               _    _____      _                _</span>
+<span class="c1"># |  ____|             | |  / ____|    | |              | |</span>
+<span class="c1"># | |____   _____ _ __ | |_| |     __ _| | ___ _ __   __| | __ _ _ __</span>
+<span class="c1"># |  __\ \ / / _ \ &#39;_ \| __| |    / _` | |/ _ \ &#39;_ \ / _` |/ _` | &#39;__|</span>
+<span class="c1"># | |___\ V /  __/ | | | |_| |___| (_| | |  __/ | | | (_| | (_| | |</span>
+<span class="c1"># |______\_/ \___|_| |_|\__|\_____\__,_|_|\___|_| |_|\__,_|\__,_|_|</span>
+
+
+<div class="viewcode-block" id="EventCalendar"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.EventCalendar">[docs]</a><span class="k">class</span> <span class="nc">EventCalendar</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;The EventCalendar class is intended to handle events and</span>
+<span class="sd">    periods of time. Dates/times are given to the calendar in a</span>
+<span class="sd">    human-readable format, and converted to integers (simulation</span>
+<span class="sd">    steps).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="EventCalendar.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.EventCalendar.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calendar_name</span><span class="p">,</span> <span class="n">step_duration</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span>
+                 <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">initial_dates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the calendar using the specified information.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        calendar_name: string</span>
+<span class="sd">            the name of the calendar</span>
+<span class="sd">        step_duration: ``datetime.timedelta``</span>
+<span class="sd">            actual duration of one simulation step</span>
+<span class="sd">        origin: ``datetime.datetime``</span>
+<span class="sd">            date/time value of the beginning of the calendar</span>
+<span class="sd">        period: ``datetime.timedelta``</span>
+<span class="sd">            if the calendar is periodic, actual duration of the</span>
+<span class="sd">            period, None otherwise</span>
+<span class="sd">        initial_dates: dict</span>
+<span class="sd">             initial dictionary of events (event name as key, dict as</span>
+<span class="sd">             value with either begin/end dates or one single date if</span>
+<span class="sd">             punctual event)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calendar_name</span> <span class="o">=</span> <span class="n">calendar_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_duration</span> <span class="o">=</span> <span class="n">step_duration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin</span> <span class="o">=</span> <span class="n">origin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events</span> <span class="o">=</span> <span class="n">SortedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">SortedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="kc">None</span>\
+          <span class="k">else</span> <span class="n">period</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_duration</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">initial_dates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_event</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EventCalendar.increment"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.EventCalendar.increment">[docs]</a>    <span class="k">def</span> <span class="nf">increment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Advance the current date by the specified number of</span>
+<span class="sd">        simulation steps.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        steps: int</span>
+<span class="sd">            number of steps to &#39;add&#39; to the current date</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_date</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_duration</span> <span class="o">*</span> <span class="n">steps</span></div>
+
+<div class="viewcode-block" id="EventCalendar.step_to_date"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.EventCalendar.step_to_date">[docs]</a>    <span class="k">def</span> <span class="nf">step_to_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the date when the specified step begins.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        step: int</span>
+<span class="sd">            the time step to convert to a date</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        d: ``datetime.datetime``</span>
+<span class="sd">            the corresponding date</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_duration</span> <span class="o">*</span> <span class="n">step</span></div>
+
+<div class="viewcode-block" id="EventCalendar.date_to_step"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.EventCalendar.date_to_step">[docs]</a>    <span class="k">def</span> <span class="nf">date_to_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the step corresponding the specified date.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        date: ``datetime.datetime``</span>
+<span class="sd">            the date to convert into time steps</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        t: int</span>
+<span class="sd">            the time step during which the specified date occurs (the</span>
+<span class="sd">            date occurs between the returned time step *t* and time</span>
+<span class="sd">            step *t+1*)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">date</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">origin</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_duration</span></div>
+
+
+<div class="viewcode-block" id="EventCalendar.add_event"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.EventCalendar.add_event">[docs]</a>    <span class="k">def</span> <span class="nf">add_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">begin_end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add the specified event to the calendar. An event is characterized</span>
+<span class="sd">        by its *name* and a *begin_end* tuple indicating the begin and</span>
+<span class="sd">        end dates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name: str</span>
+<span class="sd">            the name of the event</span>
+<span class="sd">        begin_end: tuple</span>
+<span class="sd">           a tuple composed of the begin date and the end date</span>
+<span class="sd">           (possibly identical for handling punctual events)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">begin_date</span><span class="p">,</span> <span class="n">end_date</span> <span class="o">=</span> <span class="n">begin_end</span>
+        <span class="n">begin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_to_step</span><span class="p">(</span><span class="n">begin_date</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_to_step</span><span class="p">(</span><span class="n">end_date</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="o">&lt;</span> <span class="n">begin</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidIntervalException</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">begin_end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">date_in</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EventCalendar.get_events"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.calendar.EventCalendar.get_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_events</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the list of events contained in the current calendar.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        l: list</span>
+<span class="sd">            the list of all event names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

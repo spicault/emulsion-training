@@ -1,0 +1,63 @@
+Model 6 (M5 + external forcing data)
+************************************
+
+In this example, introducing external forcing data
+(`moves.csv <../_static/benchmark/moves.csv>`_) has an impact on the
+Python code add-ons:
+
+- at instantiation, class ``Metapopulation`` reads the CSV file and
+  restructures the data in a more convenient way (nested dictionaries,
+  keys being time steps instead of dates, and ID of source
+  populations)
+- other processes at population scale are redefined to take those data
+  into account
+- the metapopulation handles data-driven movements coming from outside
+  the metapopulation, to create new host individuals with the proper
+  age group. Their health state is determined according to the
+  expression ``external_risk`` defined in section ``parameters``.
+
+Besides, to be able to set this external risk to the prevalence in the
+metapopulation, aggregate variables are defined in the EMULSION model
+(in section ``levels``) to compute the total number of infectious
+individuals and the total number of individuals respectively in the
+metapopulation (by aggregating the corresponding values collected at
+the population level). These variables are computed only when actually
+used.
+
+File with full comments: `model6.yaml <../_static/benchmark/model6.yaml>`_
+
+YAML model file :
+
+.. literalinclude:: ../_static/benchmark/model6-short.yaml
+   :emphasize-lines: 14, 23-31, 37-38, 216-232, 284-295
+
+Python add-on :
+
+.. literalinclude:: ../_static/benchmark/model6.py
+
+
+
+To have some data-driven movements considered coming from outside the
+metapopulation, we ran the model with 10 populations instead of 20
+(one stochastic repetition):
+
+- with constant external risk (0.1) for individuals coming from outside the
+  metapopulation:
+
+  .. code-block:: bash
+
+    emulsion run --plot model6.yaml -r 1 -p nb_populations=10 -p use_metapop_prevalence=0
+
+  which produced `the following outputs <../_static/benchmark/model6-constant-outputs.html>`_
+- with external risk equal to the prevalence in the whole
+  metapopulation:
+
+
+  .. code-block:: bash
+
+    emulsion run --plot model6.yaml -r 1 -p nb_populations=10 -p use_metapop_prevalence=1
+
+  which produced `the following outputs <../_static/benchmark/model6-metapop-outputs.html>`_
+
+
+State machine diagrams are the same as in Model 4.

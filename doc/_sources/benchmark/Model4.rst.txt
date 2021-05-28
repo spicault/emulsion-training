@@ -1,0 +1,59 @@
+Model 4 (M3 + vectors)
+**********************
+
+Species are introduced as states of a new state machines (without any
+transition). A dedicated age group  called Undefined is added to
+indicate that vectors do not follow the Juvenile/Adult transitions in
+this model. Otherwise, other modifications in the model are very
+similar to what was done for structured populations.
+
+File with full comments: `model4.yaml <../_static/benchmark/model4.yaml>`_
+
+.. literalinclude:: ../_static/benchmark/model4-short.yaml
+   :emphasize-lines: 26-28, 38, 43-53, 90-92, 74-77, 102, 105, 150-184, 203-217, 225-228
+
+To run the model for 20 stochastic repetitions:
+
+.. code-block:: bash
+
+  emulsion run --plot model4.yaml -r 20 --silent
+
+Which produces the following outputs:
+
+.. image:: ../_images/benchmark/model4-output1.png
+   :width: 75%
+
+.. image:: ../_images/benchmark/model4-output2.png
+   :width: 75%
+
+.. image:: ../_images/benchmark/model4-output3.png
+   :width: 75%
+
+.. image:: ../_images/benchmark/model4-output4.png
+   :width: 75%
+
+To produce the diagrams of the state machines which control health
+states, age groups and species:
+
+.. code-block:: bash
+
+   emulsion diagrams model4.yaml
+
+Which gives:
+
+.. graphviz:: ../_images/benchmark/model4-VH.dot
+
+.. graphviz:: ../_images/benchmark/model4-SIR.dot
+
+.. graphviz:: ../_images/benchmark/model4-UJA.dot
+
+
+To view model parameters:
+
+.. code-block:: bash
+
+   emulsion show model4.yaml
+
+which produces:
+
+.. literalinclude:: ../_images/benchmark/model4.txt

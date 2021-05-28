@@ -1,0 +1,74 @@
+************************************************************************
+Introduction to the exploration of epidemiological models using EMULSION
+************************************************************************
+
+This training is part of the `EGAAL doctoral school <https://ed-egaal.doctorat-bretagneloire.fr/fr/5_documents-de-led-egaal>`_ and is open to doctoral students (in priority), post-doctoral students and researchers.
+
+Notions in mechanistic modelling, fair knowledge of epidemiological models (SIR-like models), and for the last session, an experience in programming (even limited) are required.
+
+.. warning::
+
+   Due to the COVID-19 situation in France, the training will be
+   entirely on-line.
+
+
+Purpose of the training
+***********************
+
+The aim of this training is to introduce the principles of modelling and simulation implemented in framework `EMULSION <https://sourcesup.renater.fr/www/emulsion-public/>`_, and to endow doctoral students (or researchers) with the ability to use this framework for their own research. In particular, the practical work and case study proposed will enable them to master the model description language, through exercises of graduated difficulty illustrating various concrete problems that may arise in epidemiological modeling. We will also present the integration of EMULSION in a workflow (experiment plans, outcomes synthesis).
+
+`EMULSION <https://sourcesup.renater.fr/www/emulsion-public/>`_ is a new software framework designed to facilitate multi-scale and multi-paradigm mechanistic modelling of infectious diseases in animal, human or plant epidemiology. It relies upon a generic simulation engine (which integrates many of the functionalities required for simulating the spread of pathogens), controlled by a **language dedicated to epidemiological modelling**. This language fosters the explicit and exhaustive description of epidemiological models, to make them intelligible and revisable by non-computer scientists (modelers, epidemiologists, veterinarians, agronomists, biologists.) who can thus, throughout the model development process, **participate in the reflection on the hypotheses and parameters required without having to dive in computer code**. It thus allows a **focus on epidemiological research issues** (comparison of biological assumptions, evaluation of control strategies, health and economic impact of diseases) by reducing the time invested in programming, and enhances the reproducibility of simulations. EMULSION is released under an open source license to make it usable and mobilizable for various categories of users, including those involved in modeling.
+
+Schedule
+********
+
++---------------+--------------+--------------+--------------+
+| Hours (UTC+2) | June 2, 2021 | June 3, 2021 | June 4, 2021 |
++===============+==============+==============+==============+
+|  9:00-12:30   |              | PART 2       | PART 4       |
++---------------+--------------+--------------+--------------+
+| 13:30-17:00   | PART 1       | PART 3       |              |
++---------------+--------------+--------------+--------------+
+
+Program
+*******
+
+#. Presentation of the problems of implementation and reproducibility
+   of epidemiological models. Presentation of EMULSION principles,
+   multi-agent architecture, simulation framework and dedicated
+   language (course, 2H, PART 1)
+
+#. Getting started with the framework through SIR-type models:
+   discovery of the modeling language. Switch from compartment models
+   to individual-based or hybrid models (TP, 1H30, PART 1).
+
+#. Model complexification: Addition of assumptions and processes
+   (demography, livestock management, disease impact) in the model
+   (TP, 2H, PART 2).
+
+#. Scale change: transition to metapopulation, contact structure
+   between populations, animal mobility (TP, 1H30, PART 2)
+
+#. Connection between model and data (TP, 2H, PART 3)
+
+#. Addition of specific functionalities in Python for processes absent
+   from the generic simulation engine (TP, 1H30, PART 3)
+
+#. Case study on a real disease (TP, 2H, PART 4)
+
+#. Integration of EMULSION within a workflow and related work
+   (TP/demonstration, 1H30, PART 4)
+
+Registration
+************
+
+Deadline for registration is **May 21, 2021**.
+
+For Ph.D. students from Brittany and Région Pays-de-la-Loire,
+please register directly through one of the following portals
+(formation ID: DIS-EGAAL-2021-01):
+
+- `AMETHIS <https://amethis.doctorat-bretagneloire.fr/>`_
+- `LUNAM <http://ludoc.lunam.fr/>`_
+
+Others: please fill `the following form <../_static/FORMULAIRE_INSCRIPTION_EMULSION.docx>`_ and send it to ed-egaal@doctorat-bretagneloire.fr

@@ -1,0 +1,63 @@
+Model 2b (Model 2 + "evolutionary" issues)
+******************************************
+
+Here we simply assume that the transmission rate (``beta``) varies
+periodically over time.
+
+File with full comments: `model2b.yaml <../_static/benchmark/model2b.yaml>`_
+
+.. literalinclude:: ../_static/benchmark/model2b-short.yaml
+
+
+
+To run the model for 100 stochastic repetitions:
+
+.. code-block:: bash
+
+  emulsion run --plot model2b.yaml -r 100 --silent
+
+Which produces the following outputs:
+
+.. image:: ../_images/benchmark/model2b-output1.png
+   :width: 75%
+
+.. image:: ../_images/benchmark/model2b-output2.png
+   :width: 75%
+
+.. image:: ../_images/benchmark/model2b-output3.png
+   :width: 75%
+
+To produce the diagrams of the state machines which control health
+states and age groups:
+
+.. code-block:: bash
+
+   emulsion diagrams model2b.yaml
+
+Which gives:
+
+.. graphviz:: ../_images/benchmark/model2-SIR.dot
+
+.. graphviz:: ../_images/benchmark/model2-JA.dot
+
+
+To view model parameters:
+
+.. code-block:: bash
+
+   emulsion show model2b.yaml
+
+which produces:
+
+.. literalinclude:: ../_images/benchmark/model2b.txt
+
+It is also possible to view the description of the new transmission
+rate (``beta``):
+
+.. code-block:: bash
+
+   emulsion describe model2b.yaml beta
+
+which produces:
+
+.. literalinclude:: ../_images/benchmark/model2b-2.txt

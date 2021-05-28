@@ -1,0 +1,286 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.agent.atoms &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.agent.atoms</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A Python implementation of the EMuLSion framework (Epidemiologic</span>
+<span class="sd">MUlti-Level SImulatiONs).</span>
+
+<span class="sd">Classes and functions for entities management.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># [HEADER]</span>
+
+
+<span class="kn">from</span>   <span class="nn">collections</span>               <span class="k">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span>   <span class="nn">emulsion.agent.core</span>       <span class="k">import</span> <span class="n">EmulsionAgent</span>
+<span class="kn">from</span>   <span class="nn">emulsion.agent.process</span>    <span class="k">import</span> <span class="n">StateMachineProcess</span><span class="p">,</span> <span class="n">MethodProcess</span>
+
+<span class="c1">#          _                                           _</span>
+<span class="c1">#     /\  | |                    /\                   | |</span>
+<span class="c1">#    /  \ | |_ ___  _ __ ___    /  \   __ _  ___ _ __ | |_</span>
+<span class="c1">#   / /\ \| __/ _ \| &#39;_ ` _ \  / /\ \ / _` |/ _ \ &#39;_ \| __|</span>
+<span class="c1">#  / ____ \ || (_) | | | | | |/ ____ \ (_| |  __/ | | | |_</span>
+<span class="c1"># /_/    \_\__\___/|_| |_| |_/_/    \_\__, |\___|_| |_|\__|</span>
+<span class="c1">#                                      __/ |</span>
+<span class="c1">#                                     |___/</span>
+
+<div class="viewcode-block" id="AtomAgent"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.AtomAgent">[docs]</a><span class="k">class</span> <span class="nc">AtomAgent</span><span class="p">(</span><span class="n">EmulsionAgent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The AtomAgent is aimed at representing an &#39;individual&#39;, i.e. the</span>
+<span class="sd">    smallest organization level to be modeled as an entity in the</span>
+<span class="sd">    simulation. An AtomAgent may be situated in several hosts, each one</span>
+<span class="sd">    associated with a specific tuple of state variables.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="AtomAgent.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.AtomAgent.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stochastic</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_host</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;host&#39;</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_host</span><span class="p">(</span><span class="n">others</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">])</span></div>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="AtomAgent.get_content"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.AtomAgent.get_content">[docs]</a>    <span class="k">def</span> <span class="nf">get_content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the population (1) of the current unit.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;population&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AtomAgent.add_host"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.AtomAgent.add_host">[docs]</a>    <span class="k">def</span> <span class="nf">add_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add the specified host to the current AtomAgent, associated</span>
+<span class="sd">        with the specified key.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">[</span><span class="n">host</span><span class="o">.</span><span class="n">keys</span><span class="p">]</span> <span class="o">=</span> <span class="n">host</span>
+        <span class="k">if</span> <span class="n">host</span><span class="o">.</span><span class="n">simulation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span> <span class="o">=</span> <span class="n">host</span><span class="o">.</span><span class="n">simulation</span></div>
+
+<div class="viewcode-block" id="AtomAgent.remove_host"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.AtomAgent.remove_host">[docs]</a>    <span class="k">def</span> <span class="nf">remove_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove the specified host from the current AtomAgent,</span>
+<span class="sd">        associated with the specified key.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">[</span><span class="n">host</span><span class="o">.</span><span class="n">keys</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">keys</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">[</span><span class="n">keys</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="AtomAgent.get_host"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.AtomAgent.get_host">[docs]</a>    <span class="k">def</span> <span class="nf">get_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;MASTER&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Retrieve the host of the current AtomAgent identified by the</span>
+<span class="sd">        specific key.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># DEBUG</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;has pb getting host&#39;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AtomAgent.clone"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.AtomAgent.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prototype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">custom_prototype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make a copy of the current compartment with the specified</span>
+<span class="sd">        observable/value settings. If a prototype is provided, it is</span>
+<span class="sd">        applied to the new atom.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="p">)</span>
+        <span class="n">new_atom</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+        <span class="n">new_atom</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span>
+        <span class="n">new_atom</span><span class="o">.</span><span class="n">_host</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">)</span>
+        <span class="n">new_atom</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prototype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_atom</span><span class="o">.</span><span class="n">apply_prototype</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">prototype</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">custom_prototype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_atom</span><span class="o">.</span><span class="n">apply_prototype</span><span class="p">(</span><span class="n">prototype</span><span class="o">=</span><span class="n">custom_prototype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_atom</span></div></div>
+
+
+<span class="c1">#  ______          _       _                     _</span>
+<span class="c1"># |  ____|        | |     (_)               /\  | |</span>
+<span class="c1"># | |____   _____ | |_   ___ _ __   __ _   /  \ | |_ ___  _ __ ___</span>
+<span class="c1"># |  __\ \ / / _ \| \ \ / / | &#39;_ \ / _` | / /\ \| __/ _ \| &#39;_ ` _ \</span>
+<span class="c1"># | |___\ V / (_) | |\ V /| | | | | (_| |/ ____ \ || (_) | | | | | |</span>
+<span class="c1"># |______\_/ \___/|_| \_/ |_|_| |_|\__, /_/    \_\__\___/|_| |_| |_|</span>
+<span class="c1">#                                   __/ |</span>
+<span class="c1">#                                  |___/</span>
+
+<div class="viewcode-block" id="EvolvingAtom"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.EvolvingAtom">[docs]</a><span class="k">class</span> <span class="nc">EvolvingAtom</span><span class="p">(</span><span class="n">AtomAgent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An EvolvingAtom is able to change state according to its</span>
+<span class="sd">    own statemachines.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="EvolvingAtom.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.EvolvingAtom.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statemachines</span><span class="o">=</span><span class="p">[],</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statemachine_processes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_processes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">statemachines</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_statemachines</span><span class="p">(</span><span class="n">statemachines</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EvolvingAtom.set_statemachines"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.EvolvingAtom.set_statemachines">[docs]</a>    <span class="k">def</span> <span class="nf">set_statemachines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statemachines</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Define the state machines that this agent is able to execute.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statemachine_processes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">sm</span><span class="o">.</span><span class="n">machine_name</span><span class="p">:</span> <span class="n">StateMachineProcess</span><span class="p">(</span><span class="n">sm</span><span class="o">.</span><span class="n">machine_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">sm</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">sm</span> <span class="ow">in</span> <span class="n">statemachines</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="EvolvingAtom.init_level_processes"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.EvolvingAtom.init_level_processes">[docs]</a>    <span class="k">def</span> <span class="nf">init_level_processes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the level of the agent.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">processes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">processes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">processes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">d_process</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">processes</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">process_name</span><span class="p">,</span> <span class="n">grouping</span> <span class="ow">in</span> <span class="n">d_process</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="c1"># iterate over items of the dict which should contain only one key:value prepair</span>
+                    <span class="k">if</span> <span class="n">process_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">statemachine_processes</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">add_method_process</span><span class="p">(</span><span class="n">process_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EvolvingAtom.add_method_process"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.EvolvingAtom.add_method_process">[docs]</a>    <span class="k">def</span> <span class="nf">add_method_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_name</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a process based on a method name.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">method</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">process_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method_processes</span><span class="p">[</span><span class="n">process_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">MethodProcess</span><span class="p">(</span><span class="n">process_name</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EvolvingAtom.get_machine"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.EvolvingAtom.get_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the state machine with the specified name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">statemachine_processes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">state_machine</span></div>
+
+<div class="viewcode-block" id="EvolvingAtom.evolve"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.EvolvingAtom.evolve">[docs]</a>    <span class="k">def</span> <span class="nf">evolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">evolve</span><span class="p">(</span><span class="n">machine</span><span class="o">=</span><span class="n">machine</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evolve_states</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EvolvingAtom.evolve_states"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.atoms.EvolvingAtom.evolve_states">[docs]</a>    <span class="k">def</span> <span class="nf">evolve_states</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Change the state of the current unit according to the</span>
+<span class="sd">        specified state machine name. If no special state machine is</span>
+<span class="sd">        provided, executes all the machines.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># retrieve the iterable containing the processes to execute</span>
+        <span class="k">if</span> <span class="n">machine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">statemachine_processes</span><span class="p">[</span><span class="n">machine</span><span class="p">]</span><span class="o">.</span><span class="n">evolve</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">d_process</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">processes</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">process_name</span> <span class="ow">in</span> <span class="n">d_process</span><span class="p">:</span>
+                    <span class="n">process</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statemachine_processes</span><span class="p">[</span><span class="n">process_name</span><span class="p">]</span>\
+                                <span class="k">if</span> <span class="n">process_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">statemachine_processes</span>\
+                                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">method_processes</span><span class="p">[</span><span class="n">process_name</span><span class="p">]</span>
+                    <span class="n">process</span><span class="o">.</span><span class="n">evolve</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

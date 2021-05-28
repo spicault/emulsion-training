@@ -1,0 +1,44 @@
+emulsion.model package
+======================
+
+.. automodule:: emulsion.model
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+emulsion.model.emulsion\_model module
+-------------------------------------
+
+.. automodule:: emulsion.model.emulsion_model
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+emulsion.model.exceptions module
+--------------------------------
+
+.. automodule:: emulsion.model.exceptions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+emulsion.model.functions module
+-------------------------------
+
+.. automodule:: emulsion.model.functions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+emulsion.model.state\_machines module
+-------------------------------------
+
+.. automodule:: emulsion.model.state_machines
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

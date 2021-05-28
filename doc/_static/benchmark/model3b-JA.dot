@@ -1,0 +1,22 @@
+digraph {
+          charset="utf-8"
+        	rankdir=LR;
+        
+        	node[fontsize=16, fontname=Arial, shape=box, style="filled,rounded"];
+        	edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip="", headtooltip=""];
+
+        	"J" [shape="Mrecord", label="J", tooltip="J (Juvenile):
+	juvenile individuals", fillcolor=orange, style="filled,rounded"] ;
+	"A" [shape="Mrecord", label="A", tooltip="A (Adult):
+	adult individuals (producing new juveniles)", fillcolor=brown, style="filled,rounded"] ;
+	"D" [shape="Mrecord", label="D", tooltip="D (Dead):
+	compartment to put dead individuals", fillcolor=white, style="filled,rounded,dotted"] ;
+	"A" -> "D" [label="rate: mu_A * total_population / K", labeltooltip="rate: mu_A * total_population / K", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"A" -> "J" [label="rate: b", labeltooltip="b [parameter]:
+	the birth rate (/day)                                                   
+	0.005", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="dashed"];
+	"J" -> "A" [label="rate: m", labeltooltip="m [parameter]:
+	maturation rate, at which juveniles become adults (/day)                
+	1/50", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"J" -> "D" [label="rate: mu_J * total_population / K", labeltooltip="rate: mu_J * total_population / K", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+}

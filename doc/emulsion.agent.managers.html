@@ -1,0 +1,1063 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.agent.managers package &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="emulsion.model package" href="emulsion.model.html" />
+    <link rel="prev" title="emulsion.agent.core package" href="emulsion.agent.core.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-emulsion.agent.managers">
+<span id="emulsion-agent-managers-package"></span><h1>emulsion.agent.managers package<a class="headerlink" href="#module-emulsion.agent.managers" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-emulsion.agent.managers"></span><p><em>Module author: Sébastien Picault &lt;<a class="reference external" href="mailto:sebastien&#46;picault&#37;&#52;&#48;inra&#46;fr">sebastien<span>&#46;</span>picault<span>&#64;</span>inra<span>&#46;</span>fr</a>&gt;</em></p>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-emulsion.agent.managers.abstract_process_manager">
+<span id="emulsion-agent-managers-abstract-process-manager-module"></span><h2>emulsion.agent.managers.abstract_process_manager module<a class="headerlink" href="#module-emulsion.agent.managers.abstract_process_manager" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.agent.managers.functions"></span><p><em>Module author: Sébastien Picault &lt;<a class="reference external" href="mailto:sebastien&#46;picault&#37;&#52;&#48;inra&#46;fr">sebastien<span>&#46;</span>picault<span>&#64;</span>inra<span>&#46;</span>fr</a>&gt;</em></p>
+<dl class="class">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager">
+<em class="property">class </em><code class="descclassname">emulsion.agent.managers.abstract_process_manager.</code><code class="descname">AbstractProcessManager</code><span class="sig-paren">(</span><em>model=None</em>, <em>master=None</em>, <em>level=None</em>, <em>stochastic=True</em>, <em>keep_history=False</em>, <em>prototype=None</em>, <em>custom_prototype=None</em>, <em>execute_actions=False</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="emulsion.agent.html#emulsion.agent.views.StructuredView" title="emulsion.agent.views.StructuredView"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.views.StructuredView</span></code></a></p>
+<p>An AbstractProcessManager is aimed handling several independent
+StructuredViews at the same time, to represent several
+concerns. It can automatically build compartments for state
+machines associated with a specific state variable or attribute.</p>
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>model=None</em>, <em>master=None</em>, <em>level=None</em>, <em>stochastic=True</em>, <em>keep_history=False</em>, <em>prototype=None</em>, <em>custom_prototype=None</em>, <em>execute_actions=False</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the unit with a health state and a name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.add_compart_process">
+<code class="descname">add_compart_process</code><span class="sig-paren">(</span><em>process_name</em>, <em>key_variables=[]</em>, <em>compart_manager=(&lt;class 'emulsion.agent.managers.group_manager.GroupManager'&gt;</em>, <em>{})</em>, <em>state_machines=[]</em>, <em>allowed_values=None</em>, <em>compart_class=(&lt;class 'emulsion.agent.views.AdaptiveView'&gt;</em>, <em>{})</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.add_compart_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.add_compart_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a process aimed at managing a ‘Compartment Manager’, i.e. an
+object aimed at managing a collection of compartments. This
+compartment manager is automatically initialized from the
+<cite>compart_manager</cite> class (which should be a subclass of
+StructuredView or GroupManager). The compartment manager may
+be associated with a specific state machine, and MUST BE
+identified by a tuple of state variables names. Additionally,
+since a first compartment is also instantiated, a specific
+class to do so can be also specified.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.add_method_process">
+<code class="descname">add_method_process</code><span class="sig-paren">(</span><em>process_name</em>, <em>method=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.add_method_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.add_method_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a process based on a method name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.add_new_population">
+<code class="descname">add_new_population</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.add_new_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.add_new_population" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.add_statemachine_process">
+<code class="descname">add_statemachine_process</code><span class="sig-paren">(</span><em>process_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.add_statemachine_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.add_statemachine_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a process based on the direct execution of a state machine.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.apply_initial_conditions">
+<code class="descname">apply_initial_conditions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.apply_initial_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.apply_initial_conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply initial conditions (if any) as defined in the model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.apply_initial_prototype">
+<code class="descname">apply_initial_prototype</code><span class="sig-paren">(</span><em>name=None</em>, <em>prototype=None</em>, <em>execute_actions=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.apply_initial_prototype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.apply_initial_prototype" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method inherited from <cite>AbstractAgent</cite> and called by <cite>new_atom</cite>
+is intentionnaly doing nothing in the current class to ensure
+that initial prototype of a <cite>MultiProcessManager</cite> is applied
+before creating the sublevels.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.counts">
+<code class="descname">counts</code><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a pandas DataFrame containing counts of each process if existing.
+TODO: column steps need to be with one of process</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.create_count_properties_for_state">
+<code class="descname">create_count_properties_for_state</code><span class="sig-paren">(</span><em>grouping_or_machine_name</em>, <em>state_name</em>, <em>count_function</em>, <em>aggregation_function</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.create_count_properties_for_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.create_count_properties_for_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamically add properties of the form <code class="docutils literal notranslate"><span class="pre">total_S</span></code> where S can be
+any state of the state machine. Counts are expected to be
+computed by the grouping associated with the specified
+process. The access to counts is defined by
+<em>count_function</em>. If aggregated variables such as <code class="docutils literal notranslate"><span class="pre">aggvar</span></code>
+are defined, corresponding properties of the form
+<a href="#id1"><span class="problematic" id="id2">``</span></a>aggvar_S``are also defined with the specified
+<em>aggregation_function</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.create_properties_for_groups">
+<code class="descname">create_properties_for_groups</code><span class="sig-paren">(</span><em>grouping_name</em>, <em>key_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.create_properties_for_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.create_properties_for_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamically add properties of the form <cite>total_S_T</cite> where S, T are a
+valid key in the specified grouping.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make the ProcessManager evolve, i.e. all the registered processes
+in order, starting with the evolution of the sublevels, and
+followed by the evolution inherited from superclasses.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['AbstractProcessManager'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.finalize_level">
+<code class="descname">finalize_level</code><span class="sig-paren">(</span><em>simulation=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.finalize_level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.finalize_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>User-defined operations at the end of simulation for an instance of
+this level.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.get_default_sublevel">
+<code class="descname">get_default_sublevel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.get_default_sublevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.get_default_sublevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return by default the first sublevel contained in this level, if
+any. If this level contains no sublevels, raise a
+LevelException.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.get_group_population">
+<code class="descname">get_group_population</code><span class="sig-paren">(</span><em>grouping_name</em>, <em>t_states</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.get_group_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.get_group_population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the size of the subgroup within the specified <em>grouping_name</em>
+associated with the specified tuple of states <em>t_states</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.init_processes">
+<code class="descname">init_processes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.init_processes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.init_processes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Init the processes that the ProcessManager will undergo during each
+time step, in order. Processes may be either ‘method’
+processes (based on the execution of the specified method
+name), or ‘group-based’ processes (defined by the evolution of
+a grouping (aggregation or compartment), possibly endowed with
+a state machine), or even a ‘state-machine-driven’ process,
+based on the direct execution of a state machine within the
+ProcessManager.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.initialize_level">
+<code class="descname">initialize_level</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.initialize_level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.initialize_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>User-defined operations when creating an instance of this
+level. These operations are performed <em>after</em> the application of
+initial conditions possibly defined in the corresponding model
+section.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.load_state_from_file">
+<code class="descname">load_state_from_file</code><span class="sig-paren">(</span><em>simu_id</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.load_state_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.load_state_from_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', 'upper_level', 'load_state_from_file', 'save_state_to_file', 'apply_initial_prototype', 'apply_initial_conditions', 'initialize_level', 'finalize_level', 'add_new_population', 'init_processes', 'get_default_sublevel', 'evolve', 'add_method_process', 'add_statemachine_process', 'add_compart_process', 'create_count_properties_for_state', 'create_properties_for_groups', 'get_group_population', 'counts', 'remove_randomly', 'remove', 'population', 'remove_all', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.population">
+<code class="descname">population</code><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the total population of the compartment. It is
+calculated either using a true ‘population’ statevar if any,
+or as the sum of the population of each unit contained in the
+compartment.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>agents_or_population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the specified population from the current
+compartment.  The population is expected to be a dictionary
+with names as keys and compartments as values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.remove_all">
+<code class="descname">remove_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.remove_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.remove_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.remove_randomly">
+<code class="descname">remove_randomly</code><span class="sig-paren">(</span><em>proba=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.remove_randomly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.remove_randomly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove randomly chosen atoms or population from this
+ProcessManager.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.save_state_to_file">
+<code class="descname">save_state_to_file</code><span class="sig-paren">(</span><em>simu_id</em>, <em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.save_state_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.save_state_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize the top-level agent into the filename (binary format)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.upper_level">
+<code class="descname">upper_level</code><span class="sig-paren">(</span><em>init=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/abstract_process_manager.html#AbstractProcessManager.upper_level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager.upper_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the ‘upper level’ for this agent, i.e. the first host with
+a not-None level attribute.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.managers.compart_process_manager">
+<span id="emulsion-agent-managers-compart-process-manager-module"></span><h2>emulsion.agent.managers.compart_process_manager module<a class="headerlink" href="#module-emulsion.agent.managers.compart_process_manager" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.agent.managers.functions"></span><p><em>Module author: Sébastien Picault &lt;<a class="reference external" href="mailto:sebastien&#46;picault&#37;&#52;&#48;inrae&#46;fr">sebastien<span>&#46;</span>picault<span>&#64;</span>inrae<span>&#46;</span>fr</a>&gt;</em></p>
+<dl class="class">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager">
+<em class="property">class </em><code class="descclassname">emulsion.agent.managers.compart_process_manager.</code><code class="descname">CompartProcessManager</code><span class="sig-paren">(</span><em>model=None</em>, <em>master=None</em>, <em>level=None</em>, <em>stochastic=True</em>, <em>keep_history=False</em>, <em>prototype=None</em>, <em>custom_prototype=None</em>, <em>execute_actions=False</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/compart_process_manager.html#CompartProcessManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager" title="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.managers.abstract_process_manager.AbstractProcessManager</span></code></a></p>
+<p>A CompartProcessManager is aimed handling several independent
+StructuredViews at the same time, for managing true compartments.
+It can automatically allocate compartments for state machines
+associated with a specific state variable or attribute.</p>
+<dl class="method">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.add_compart_process">
+<code class="descname">add_compart_process</code><span class="sig-paren">(</span><em>process_name</em>, <em>key_variables</em>, <em>compart_manager=(&lt;class 'emulsion.agent.managers.group_manager.GroupManager'&gt;</em>, <em>{})</em>, <em>state_machines=[]</em>, <em>compart_class=(&lt;class 'emulsion.agent.comparts.Compartment'&gt;</em>, <em>{})</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/compart_process_manager.html#CompartProcessManager.add_compart_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.add_compart_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a process aimed at managing a ‘Compartment Manager’, i.e. an
+object aimed at managing a collection of compartments. This
+compartment manager is automatically initialized from the
+<cite>compart_manager</cite> class (which should be a subclass of
+StructuredView or GroupManager). The compartment manager may
+be associated with a specific state machine, and MUST BE
+identified by a tuple of state variables names. Additionally,
+since a first compartment is also instantiated, a specific
+class to do so can be also specified.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.add_host">
+<code class="descname">add_host</code><span class="sig-paren">(</span><em>host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/compart_process_manager.html#CompartProcessManager.add_host"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.add_host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified host to the current Multiprocessmanager, associated
+with the specified key.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.add_new_population">
+<code class="descname">add_new_population</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/compart_process_manager.html#CompartProcessManager.add_new_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.add_new_population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new individuals to the appropriate compartments</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.add_population">
+<code class="descname">add_population</code><span class="sig-paren">(</span><em>d_population_spec</em>, <em>init=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/compart_process_manager.html#CompartProcessManager.add_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.add_population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified population specification <em>d_population_spec</em> to the current
+CompartProcessManager. <em>d_population_spec</em> is a dictionary keyed by tuples
+indexing the compartments, associated with the quantity of individuals to add.
+All keys are assumed to be composed of values for all state machines in the current
+CompartProcessManager.
+If <em>init</em> is True, the compartment managers counts the initial value of
+the populations in each compartment.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt><em>d_population_spec</em> <span class="classifier-delimiter">:</span> <span class="classifier">{(S, A, V): 3, (R, A, V): 5, (I, J, H): 2}</span></dt>
+<dd>when executing state machine health_state</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.apply_initial_conditions">
+<code class="descname">apply_initial_conditions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/compart_process_manager.html#CompartProcessManager.apply_initial_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.apply_initial_conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize level with initial conditions specified in the model.</p>
+<p>As this agent is aimed at managing aggregated populations, ‘prototypes’
+are taken into account to initialize sub-populations. Each prototype describes
+how variables corresponding to state machines are initialized for each
+sub-population.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.clone_and_add">
+<code class="descname">clone_and_add</code><span class="sig-paren">(</span><em>source_agent</em>, <em>prototype</em>, <em>quantity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/compart_process_manager.html#CompartProcessManager.clone_and_add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.clone_and_add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new population of size <em>quantity</em> corresponding to the specified <em>prototype</em>. Parameter <em>source_agent</em> is present for compatibilities purpose, not used in compartment-based models.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.counts">
+<code class="descname">counts</code><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a pandas DataFrame containing counts of each process if existing.
+TODO: column steps need to be with one of process</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['CompartProcessManager'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.init_processes">
+<code class="descname">init_processes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/compart_process_manager.html#CompartProcessManager.init_processes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.init_processes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Init the processes that the CompartProcessManager will undergo during each
+time step, in order. In a compartment-based process manager, processes may be either:</p>
+<ul class="simple">
+<li>method processes based on the execution of the specified method name in a Python add-on</li>
+<li>state-machine driven processes based on the direct execution of a state machine at the population level</li>
+<li>grouping-based processes defined for the sublevel, based on the execution of a state machine on the MASTER grouping</li>
+</ul>
+<dl class="docutils">
+<dt>processes:</dt>
+<dd><dl class="first last docutils">
+<dt>individual:</dt>
+<dd><ul class="first last simple">
+<li>health_state: MASTER  ## grouping-based process</li>
+<li>age_group: MASTER     ## grouping-based process</li>
+<li>species: MASTER       ## grouping-based process</li>
+</ul>
+</dd>
+<dt>population:</dt>
+<dd><ul class="first last simple">
+<li>adhesion_to_GDS ## state-machine process</li>
+<li>python_method   ## method process</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', 'init_processes', 'add_compart_process', 'add_host', 'apply_initial_conditions', 'add_new_population', 'clone_and_add', 'add_population', 'remove_population', 'remove', 'remove_all', 'remove_randomly', 'counts', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>agents_or_population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/compart_process_manager.html#CompartProcessManager.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove from the current CompartProcessManager the specified
+population.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.remove_all">
+<code class="descname">remove_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/compart_process_manager.html#CompartProcessManager.remove_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.remove_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the whole population from the current
+CompartProcessManager.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.remove_population">
+<code class="descname">remove_population</code><span class="sig-paren">(</span><em>d_population_spec</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/compart_process_manager.html#CompartProcessManager.remove_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.remove_population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the specified population specification from the current
+CompartProcessManager. Dictionay <em>d_population_spec</em> is keyed by tuples
+indexing the compartments, associated with the quantity of individuals
+to remove. All keys are assumed to be composed of values for all
+state machines of the current CompartProcessManager.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt><em>d_population_spec</em> <span class="classifier-delimiter">:</span> <span class="classifier">{(S, A, V): 3, (R, A, V): 5, (I, J, H): 2}</span></dt>
+<dd>when executing state machine health_state</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.compart_process_manager.CompartProcessManager.remove_randomly">
+<code class="descname">remove_randomly</code><span class="sig-paren">(</span><em>proba=0</em>, <em>amount=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/compart_process_manager.html#CompartProcessManager.remove_randomly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.compart_process_manager.CompartProcessManager.remove_randomly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove random amounts of populations from this ProcessManager. If
+<em>amount</em> is not None, a multinomial sampling is performed for
+each compartment. Otherwise: <em>proba</em> can be either a probability applied
+in a uniform way to all compartments, or a dictionary which specifies
+the probabilities associated to specific states. Removed quantities are
+returned by the method.</p>
+<p>When probabilities are specified as a dictionary, keys must be
+consistent, i.e. have the same size (e.g. 2 variables) and refer to
+exactly the same state machines.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.managers.functions">
+<span id="emulsion-agent-managers-functions-module"></span><h2>emulsion.agent.managers.functions module<a class="headerlink" href="#module-emulsion.agent.managers.functions" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.agent.managers.functions"></span><p><em>Module author: Sébastien Picault &lt;<a class="reference external" href="mailto:sebastien&#46;picault&#37;&#52;&#48;inra&#46;fr">sebastien<span>&#46;</span>picault<span>&#64;</span>inra<span>&#46;</span>fr</a>&gt;</em></p>
+<dl class="function">
+<dt id="emulsion.agent.managers.functions.group_and_split_populations">
+<code class="descclassname">emulsion.agent.managers.functions.</code><code class="descname">group_and_split_populations</code><span class="sig-paren">(</span><em>transitions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/functions.html#group_and_split_populations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.functions.group_and_split_populations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform a list of transitions into a dictionary based on the
+underlying populations.</p>
+<p><cite>transitions</cite> is a list of tuples (state, flux, value,
+cond_result, actions) where:
+- state is a possible state reachable from the current state flux
+- is either ‘rate’ or ‘proba’ or ‘amount’ or ‘amount-all-but’
+- value is the corresponding rate or probability or amount
+- cond_result is a couple (either (‘population’, qty, esc) or (‘agents’, list, None))</p>
+<blockquote>
+<div>describing who fulfills the condition to cross the transition</div></blockquote>
+<ul class="simple">
+<li>actions is the list of actions on cross</li>
+</ul>
+<p>The goal of this function is to restructure all those elements for
+disjoint sub-populations.</p>
+<dl class="docutils">
+<dt>Return a list of tuples:</dt>
+<dd>either ((‘population’, qty, esc), attributes)
+or     ((‘agents’, list, None), attributes)</dd>
+</dl>
+<p>where attributes is a list of tuples (state, flux, value, actions)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.managers.group_manager">
+<span id="emulsion-agent-managers-group-manager-module"></span><h2>emulsion.agent.managers.group_manager module<a class="headerlink" href="#module-emulsion.agent.managers.group_manager" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.agent.managers.functions"></span><p><em>Module author: Sébastien Picault &lt;<a class="reference external" href="mailto:sebastien&#46;picault&#37;&#52;&#48;inra&#46;fr">sebastien<span>&#46;</span>picault<span>&#64;</span>inra<span>&#46;</span>fr</a>&gt;</em></p>
+<dl class="class">
+<dt id="emulsion.agent.managers.group_manager.GroupManager">
+<em class="property">class </em><code class="descclassname">emulsion.agent.managers.group_manager.</code><code class="descname">GroupManager</code><span class="sig-paren">(</span><em>l_state_machines=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/group_manager.html#GroupManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.group_manager.GroupManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="emulsion.agent.html#emulsion.agent.views.StructuredView" title="emulsion.agent.views.StructuredView"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.views.StructuredView</span></code></a></p>
+<p>An GroupManager is able to make its content
+evolve according to specific state machines, the state of each
+subcompartment being stored in a specific state variable or
+attribute.</p>
+<dl class="method">
+<dt id="emulsion.agent.managers.group_manager.GroupManager.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>l_state_machines=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/group_manager.html#GroupManager.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.group_manager.GroupManager.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a GroupManager based on the specified list of state machines
+(<em>l_state_machines</em>).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.group_manager.GroupManager.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.managers.group_manager.GroupManager.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.group_manager.GroupManager.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.managers.group_manager.GroupManager.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.group_manager.GroupManager.apply_changes">
+<code class="descname">apply_changes</code><span class="sig-paren">(</span><em>d_transitions</em>, <em>state_machine</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/group_manager.html#GroupManager.apply_changes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.group_manager.GroupManager.apply_changes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply modifications to the compartments contained in the current
+GroupManager, according to <em>d_transitions</em>. Dictionary <em>d_transitions</em>
+is keyed by a tuple of variables and associated with a list of tuples.
+Each of theses tuples is composed of the key of the target compartment
+and a dictionary, either
+{‘population’: (qty, esc), ‘actions’: list} or {‘agents’: list, ‘actions’: list}.
+Parameter <em>state_machine</em> indicates which state machine produced
+d_transitions, in order to perform adequate actions on
+entering/exiting states or on crossing edges.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.group_manager.GroupManager.do_enter_actions_on_init">
+<code class="descname">do_enter_actions_on_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/group_manager.html#GroupManager.do_enter_actions_on_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.group_manager.GroupManager.do_enter_actions_on_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Force all Compartment agents of this group manager to execute the actions on_enter for each state for their initial population (if any actions on enter). WARNING: this method is intended only for compartment-based models.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.group_manager.GroupManager.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/group_manager.html#GroupManager.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.group_manager.GroupManager.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ask each group to make its content evolve, then remove population or
+agents from autoremove groups and update counts.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.group_manager.GroupManager.evolve_states">
+<code class="descname">evolve_states</code><span class="sig-paren">(</span><em>machine</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/group_manager.html#GroupManager.evolve_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.group_manager.GroupManager.evolve_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ask each group to make its content evolve according
+to its current state and the specified state_machine.</p>
+<p>List <em>l_productions</em> contains tuples (target, {‘population’: qty}, None)
+or (target, {‘agents’: list}, prototype), representing individuals
+produced by <cite>productions</cite> edges in the state machine, and to be added to
+the population at the end of the current time step.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.group_manager.GroupManager.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['GroupManager'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.managers.group_manager.GroupManager.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.group_manager.GroupManager.init_counts">
+<code class="descname">init_counts</code><span class="sig-paren">(</span><em>index=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/group_manager.html#GroupManager.init_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.group_manager.GroupManager.init_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the counts.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.group_manager.GroupManager.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', 'init_counts', 'update_counts', 'do_enter_actions_on_init', 'apply_changes', 'evolve', 'evolve_states', '_evolve_transitions', '_evolve_productions', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.managers.group_manager.GroupManager.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.group_manager.GroupManager.update_counts">
+<code class="descname">update_counts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/group_manager.html#GroupManager.update_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.group_manager.GroupManager.update_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the number of atoms for each state of the state
+machine (TODO: for each value of the key[index] enum).</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.managers.ibm_process_manager">
+<span id="emulsion-agent-managers-ibm-process-manager-module"></span><h2>emulsion.agent.managers.ibm_process_manager module<a class="headerlink" href="#module-emulsion.agent.managers.ibm_process_manager" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.agent.managers.functions"></span><p><em>Module author: Sébastien Picault &lt;<a class="reference external" href="mailto:sebastien&#46;picault&#37;&#52;&#48;inra&#46;fr">sebastien<span>&#46;</span>picault<span>&#64;</span>inra<span>&#46;</span>fr</a>&gt;</em></p>
+<dl class="class">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager">
+<em class="property">class </em><code class="descclassname">emulsion.agent.managers.ibm_process_manager.</code><code class="descname">IBMProcessManager</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/ibm_process_manager.html#IBMProcessManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager" title="emulsion.agent.managers.multi_process_manager.MultiProcessManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.managers.multi_process_manager.MultiProcessManager</span></code></a></p>
+<p>An IBMProcessManager is a MultiProcessManager dedicated to the
+management of Individual-Based Models. This class is endowed with
+a <cite>counters</cite> attribute which is a dictionary {process -&gt; counter of
+states in relation with the process}.</p>
+<dl class="method">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/ibm_process_manager.html#IBMProcessManager.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the unit with a health state and a name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.add_atoms">
+<code class="descname">add_atoms</code><span class="sig-paren">(</span><em>atom_set</em>, <em>init=False</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/ibm_process_manager.html#IBMProcessManager.add_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.add_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified set of atoms to the current
+MultiProcessManager. Atoms are especially added
+automatically to each of the compartment managers.  If <cite>init</cite>
+is True, the compartment managers counts the initial value of
+the populations in each compartment.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.add_grouping_counts">
+<code class="descname">add_grouping_counts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/ibm_process_manager.html#IBMProcessManager.add_grouping_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.add_grouping_counts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.add_relative_counts">
+<code class="descname">add_relative_counts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/ibm_process_manager.html#IBMProcessManager.add_relative_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.add_relative_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override method inherited from MultiProcessManager with no action (no grouping to work on).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.counts">
+<code class="descname">counts</code><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a pandas DataFrame containing counts of each process if
+existing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/ibm_process_manager.html#IBMProcessManager.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make the agent evolve and update counts based on sub-level
+agents.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['IBMProcessManager'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.find_sublevel_statemachines">
+<code class="descname">find_sublevel_statemachines</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/ibm_process_manager.html#IBMProcessManager.find_sublevel_statemachines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.find_sublevel_statemachines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve state machines used as processes by agents from the
+sub-level.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.get_group_population">
+<code class="descname">get_group_population</code><span class="sig-paren">(</span><em>grouping_name</em>, <em>t_values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/ibm_process_manager.html#IBMProcessManager.get_group_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.get_group_population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the size of the subgroup within the specified <em>grouping_name</em>
+associated with the specified tuple of states <em>t_states</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.get_sublevels">
+<code class="descname">get_sublevels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/ibm_process_manager.html#IBMProcessManager.get_sublevels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.get_sublevels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of sublevels contained in this level.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.init_getters_for_initial_atoms">
+<code class="descname">init_getters_for_initial_atoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/ibm_process_manager.html#IBMProcessManager.init_getters_for_initial_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.init_getters_for_initial_atoms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', 'add_grouping_counts', 'get_group_population', 'update_counts', 'add_relative_counts', 'add_atoms', 'init_getters_for_initial_atoms', 'get_sublevels', 'find_sublevel_statemachines', 'evolve', 'counts', 'remove_randomly', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.remove_randomly">
+<code class="descname">remove_randomly</code><span class="sig-paren">(</span><em>proba=0</em>, <em>statevar=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/ibm_process_manager.html#IBMProcessManager.remove_randomly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.remove_randomly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove randomly chosen atoms from this ProcessManager. <cite>proba</cite> can
+be either a probability or a dictionary. In that case, the
+<cite>statevar</cite> parameter indicates the name of the state variable
+which drives the probabilities, and the keys must be valid
+values for this state variable. Selected atoms are removed and
+returned by the method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.ibm_process_manager.IBMProcessManager.update_counts">
+<code class="descname">update_counts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/ibm_process_manager.html#IBMProcessManager.update_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.ibm_process_manager.IBMProcessManager.update_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update counters based on invdividual status.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.managers.metapop_process_manager">
+<span id="emulsion-agent-managers-metapop-process-manager-module"></span><h2>emulsion.agent.managers.metapop_process_manager module<a class="headerlink" href="#module-emulsion.agent.managers.metapop_process_manager" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.agent.managers.functions"></span><p><em>Module author: Sébastien Picault &lt;<a class="reference external" href="mailto:sebastien&#46;picault&#37;&#52;&#48;inra&#46;fr">sebastien<span>&#46;</span>picault<span>&#64;</span>inra<span>&#46;</span>fr</a>&gt;</em></p>
+<dl class="class">
+<dt id="emulsion.agent.managers.metapop_process_manager.MetapopProcessManager">
+<em class="property">class </em><code class="descclassname">emulsion.agent.managers.metapop_process_manager.</code><code class="descname">MetapopProcessManager</code><span class="sig-paren">(</span><em>model=None</em>, <em>level=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/metapop_process_manager.html#MetapopProcessManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.metapop_process_manager.MetapopProcessManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager" title="emulsion.agent.managers.multi_process_manager.MultiProcessManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.managers.multi_process_manager.MultiProcessManager</span></code></a></p>
+<p>This class is in charge of handling multiple populations.</p>
+<dl class="attribute">
+<dt id="emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.counts">
+<code class="descname">counts</code><a class="headerlink" href="#emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a pandas DataFrame containing counts of each process if
+existing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/metapop_process_manager.html#MetapopProcessManager.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make the ProcessManager evolve as in AbstractProcessManager, then integrate new populations if created directly by a StateMachineProcess (as in IBM).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['MetapopProcessManager'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.get_populations">
+<code class="descname">get_populations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/metapop_process_manager.html#MetapopProcessManager.get_populations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.get_populations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', 'get_populations', 'evolve', 'counts', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.managers.multi_process_manager">
+<span id="emulsion-agent-managers-multi-process-manager-module"></span><h2>emulsion.agent.managers.multi_process_manager module<a class="headerlink" href="#module-emulsion.agent.managers.multi_process_manager" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.agent.managers.functions"></span><p><em>Module author: Sébastien Picault &lt;<a class="reference external" href="mailto:sebastien&#46;picault&#37;&#52;&#48;inra&#46;fr">sebastien<span>&#46;</span>picault<span>&#64;</span>inra<span>&#46;</span>fr</a>&gt;</em></p>
+<dl class="class">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager">
+<em class="property">class </em><code class="descclassname">emulsion.agent.managers.multi_process_manager.</code><code class="descname">MultiProcessManager</code><span class="sig-paren">(</span><em>model=None</em>, <em>level=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.managers.abstract_process_manager.AbstractProcessManager" title="emulsion.agent.managers.abstract_process_manager.AbstractProcessManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.managers.abstract_process_manager.AbstractProcessManager</span></code></a></p>
+<p>A MultiProcessManager is aimed handling several independent
+StructuredViews at the same time, together with a
+SimpleView containing all the atom units. It can
+automatically build compartments for:
+- state machines associated with a specific state variable or attribute
+- specific state variables or attributes with a limited number of
+values, such as booleans or enumerations</p>
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>model=None</em>, <em>level=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the unit with a health state and a name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.add_atoms">
+<code class="descname">add_atoms</code><span class="sig-paren">(</span><em>atom_set</em>, <em>init=False</em>, <em>level=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.add_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.add_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified set of atoms to the current
+MultiProcessManager. Atoms are especially added
+automatically to each of the compartment managers.  If <cite>init</cite>
+is True, the compartment managers counts the initial value of
+the populations in each compartment.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.add_compart_process">
+<code class="descname">add_compart_process</code><span class="sig-paren">(</span><em>process_name</em>, <em>key_variables</em>, <em>compart_manager=(&lt;class 'emulsion.agent.managers.group_manager.GroupManager'&gt;</em>, <em>{})</em>, <em>state_machines=[]</em>, <em>compart_class=(&lt;class 'emulsion.agent.views.AdaptiveView'&gt;</em>, <em>{})</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.add_compart_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.add_compart_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a process aimed at managing a ‘Compartment Manager’, i.e. an
+object aimed at managing a collection of compartments. This
+compartment manager is automatically initialized from the
+<cite>compart_manager</cite> class (which should be a subclass of
+StructuredView or GroupManager). The compartment manager may
+be associated with a specific state machine, and MUST BE
+identified by a tuple of state variables names. Additionally,
+since a first compartment is also instantiated, a specific
+class to do so can be also specified.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.add_host">
+<code class="descname">add_host</code><span class="sig-paren">(</span><em>host</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.add_host"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.add_host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified host to the current Multiprocessmanager, associated
+with the specified key.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.add_new_population">
+<code class="descname">add_new_population</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.add_new_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.add_new_population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new atoms with the population information</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.add_relative_counts">
+<code class="descname">add_relative_counts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.add_relative_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.add_relative_counts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.apply_initial_conditions">
+<code class="descname">apply_initial_conditions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.apply_initial_conditions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.apply_initial_conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize level with initial conditions specified in the model.</p>
+<p>As this agent is aimed at managing individuals in the
+sub-levels, only ‘prototypes’ are taken into account to
+initialize the sub-levels.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.clone_and_add">
+<code class="descname">clone_and_add</code><span class="sig-paren">(</span><em>source_agent</em>, <em>prototype</em>, <em>quantity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.clone_and_add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.clone_and_add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clone the <em>source_agent</em> into <em>quantity</em> copies applying the specified <em>prototype</em> and add the resulting atoms to the current manager.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['MultiProcessManager'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.get_agent_class_for_sublevel">
+<code class="descname">get_agent_class_for_sublevel</code><span class="sig-paren">(</span><em>sublevel</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.get_agent_class_for_sublevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.get_agent_class_for_sublevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the agent class in charge of representing the specified
+sublevel.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.get_group_atoms">
+<code class="descname">get_group_atoms</code><span class="sig-paren">(</span><em>process_name</em>, <em>group_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.get_group_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.get_group_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all atoms which belong to the the specified group
+name (state names). (<em>group_name</em> may be a subset of the grouping key)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.init_processes">
+<code class="descname">init_processes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.init_processes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.init_processes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Init the processes that the CompartProcessManager will undergo during each
+time step, in order. In a compartment-based process manager, processes may be either:</p>
+<ul class="simple">
+<li>method processes based on the execution of the specified method name in a Python add-on</li>
+<li>state-machine driven processes based on the direct execution of a state machine at the population level</li>
+<li>grouping-based processes defined for the sublevel, based on the execution of a state machine on the MASTER grouping</li>
+</ul>
+<dl class="docutils">
+<dt>processes:</dt>
+<dd><dl class="first last docutils">
+<dt>individual:</dt>
+<dd><ul class="first last simple">
+<li>species: infection_by_species        # grouping-based process</li>
+<li>health_state: infection_by_species   # grouping-based process</li>
+<li>age_group: age_group_by_species      # grouping-based process</li>
+</ul>
+</dd>
+<dt>population:</dt>
+<dd><ul class="first last simple">
+<li>adhesion_to_GDS  ## state-machine process</li>
+<li>python_method    ## method process</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.make_all_consistent">
+<code class="descname">make_all_consistent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.make_all_consistent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.make_all_consistent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check all compartments to ensure their consistency</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.make_consistent">
+<code class="descname">make_consistent</code><span class="sig-paren">(</span><em>compartment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.make_consistent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.make_consistent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make the specified dict compartment check and handle the
+consistency of its own sub-compartments.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', 'init_processes', 'add_relative_counts', 'add_compart_process', 'apply_initial_conditions', 'add_host', 'clone_and_add', 'add_new_population', 'select_atoms', 'get_group_atoms', 'get_agent_class_for_sublevel', 'new_atom', 'add_atoms', 'make_all_consistent', 'make_consistent', 'remove', 'remove_all', 'remove_atoms', 'select_randomly', 'remove_randomly', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.new_atom">
+<code class="descname">new_atom</code><span class="sig-paren">(</span><em>sublevel=None</em>, <em>prototype=None</em>, <em>custom_prototype=None</em>, <em>execute_actions=False</em>, <em>**args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.new_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.new_atom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate a new atom for the specified sublevel, with the
+specified arguments. If the sublevel is not specified, the
+first one from the <cite>contains</cite> list is taken. If the name of a
+prototype is provided, it is applied to the new agent (using
+the <cite>execute_actions</cite> parameter).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>agents_or_population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the specified population from the current
+compartment.  The population is expected to be a dictionary
+with names as keys and compartments as values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.remove_all">
+<code class="descname">remove_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.remove_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.remove_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all agents from the current MultiProcessManager.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.remove_atoms">
+<code class="descname">remove_atoms</code><span class="sig-paren">(</span><em>atom_set</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.remove_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.remove_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the specified atoms from the current
+MultiProcessManager. Atoms are removed from each of the
+compartment managers (including the ‘MASTER’ set).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.remove_randomly">
+<code class="descname">remove_randomly</code><span class="sig-paren">(</span><em>proba=0</em>, <em>amount=None</em>, <em>process=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.remove_randomly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.remove_randomly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove randomly chosen atoms from this ProcessManager. <cite>proba</cite> can
+be either a probability or a dictionary. In that case, the
+<cite>process</cite> parameter indicates the name of the process grouping
+which drives the probabilities, and the keys must be those of
+the grouping. Selected atoms are removed and returned by the
+method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.select_atoms">
+<code class="descname">select_atoms</code><span class="sig-paren">(</span><em>variable=None</em>, <em>state=None</em>, <em>value=None</em>, <em>process=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.select_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.select_atoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of atoms selected by specific <em>value</em> or <em>state</em> of a
+<em>variable</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>variable</strong> (<em>str</em>) – the variable to be compared to the <em>value</em> - if <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+all atoms are selected.</li>
+<li><strong>state</strong> (<em>str</em>) – a name of the state used for the selection (instead of <em>value</em>)</li>
+<li><strong>value</strong> (<em>object</em>) – the value to use for selection - if <code class="docutils literal notranslate"><span class="pre">None</span></code>, the value is
+replaced with the model state specified in parameter
+<em>state</em></li>
+<li><strong>process</strong> (<em>str</em>) – name of a process associated to a specific grouping based
+on the <em>variable</em> (to accelerate search)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> – the list of matching agents in the sublevel</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.managers.multi_process_manager.MultiProcessManager.select_randomly">
+<code class="descname">select_randomly</code><span class="sig-paren">(</span><em>proba=0</em>, <em>amount=None</em>, <em>process=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/managers/multi_process_manager.html#MultiProcessManager.select_randomly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.managers.multi_process_manager.MultiProcessManager.select_randomly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select randomly chosen atoms from this ProcessManager. <cite>proba</cite> can
+be either a probability or a dictionary. In that case, the
+<cite>process</cite> parameter indicates the name of the process grouping
+which drives the probabilities, and the keys must be those of
+the grouping. Selected atoms are removed and returned by the
+method.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="emulsion.html">11. emulsion package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="emulsion.html#subpackages">11.1. Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="emulsion.agent.html">emulsion.agent package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emulsion.model.html">emulsion.model package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emulsion.tools.html">emulsion.tools package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.html#submodules">11.2. Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.html#module-emulsion.init_emulsion">11.3. emulsion.init_emulsion module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="emulsion.html">11. emulsion package</a><ul>
+  <li><a href="emulsion.agent.html">emulsion.agent package</a><ul>
+      <li>Previous: <a href="emulsion.agent.core.html" title="previous chapter">emulsion.agent.core package</a></li>
+      <li>Next: <a href="emulsion.model.html" title="next chapter">emulsion.model package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/emulsion.agent.managers.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,349 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.agent.comparts &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.agent.comparts</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A Python implementation of the EMuLSion framework (Epidemiologic</span>
+<span class="sd">MUlti-Level SImulatiONs).</span>
+
+<span class="sd">Classes and functions for entities management.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># [HEADER]</span>
+
+
+<span class="kn">import</span> <span class="nn">numpy</span>                     <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span>   <span class="nn">emulsion.agent.core</span>       <span class="k">import</span> <span class="n">GroupAgent</span>
+<span class="kn">from</span>   <span class="nn">emulsion.agent.exceptions</span> <span class="k">import</span> <span class="n">InvalidCompartmentOperation</span>
+<span class="kn">from</span>   <span class="nn">emulsion.tools.misc</span>       <span class="k">import</span> <span class="n">POPULATION</span>
+<span class="kn">from</span>   <span class="nn">emulsion.tools.debug</span>      <span class="k">import</span> <span class="n">debuginfo</span>
+
+<div class="viewcode-block" id="Compartment"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.comparts.Compartment">[docs]</a><span class="k">class</span> <span class="nc">Compartment</span><span class="p">(</span><span class="n">GroupAgent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An Compartment is a compartment which does not</span>
+<span class="sd">    represent the underlying level but with aggregate information such</span>
+<span class="sd">    as the total population (&#39;individuals&#39; are not represented).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Compartment.__init__"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.comparts.Compartment.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">stochastic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an Compartment with an initial population.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span> <span class="o">=</span> <span class="n">population</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stochastic</span> <span class="o">=</span> <span class="n">stochastic</span></div>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="p">[</span><span class="n">obs</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">obs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">observables</span> <span class="p">))</span>
+
+<div class="viewcode-block" id="Compartment.get_content"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.comparts.Compartment.get_content">[docs]</a>    <span class="k">def</span> <span class="nf">get_content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the population of the current unit.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;population&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Compartment.update_time_to_exit"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.comparts.Compartment.update_time_to_exit">[docs]</a>    <span class="k">def</span> <span class="nf">update_time_to_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_steps_by_statemachine</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># debuginfo(&quot;UPDATING TIME TO EXIT&quot;, self.statevars.step, self.times_to_exit, d_steps_by_statemachine, &quot;REMOVE&quot; if remove else &quot;ADD&quot;)</span>
+        <span class="k">for</span> <span class="n">machine_name</span><span class="p">,</span> <span class="n">d_qty_by_step</span> <span class="ow">in</span> <span class="n">d_steps_by_statemachine</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">machine_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">qty</span> <span class="ow">in</span> <span class="n">d_qty_by_step</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">step</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">remove</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;Cannot remove </span><span class="si">{}</span><span class="s1"> from times_to_exit </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d_steps_by_statemachine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">[</span><span class="n">machine_name</span><span class="p">][</span><span class="n">step</span><span class="p">]</span> <span class="o">=</span> <span class="n">qty</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">remove</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">[</span><span class="n">machine_name</span><span class="p">][</span><span class="n">step</span><span class="p">]</span> <span class="o">-=</span> <span class="n">qty</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">[</span><span class="n">machine_name</span><span class="p">][</span><span class="n">step</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="k">del</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">[</span><span class="n">machine_name</span><span class="p">][</span><span class="n">step</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">[</span><span class="n">machine_name</span><span class="p">][</span><span class="n">step</span><span class="p">]</span> <span class="o">+=</span> <span class="n">qty</span></div>
+
+<div class="viewcode-block" id="Compartment.add"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.comparts.Compartment.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">d_exit_steps</span> <span class="o">=</span> <span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;Add the specified population to the current population of</span>
+<span class="sd">        the compartment.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span> <span class="o">+=</span> <span class="n">population</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_time_to_exit</span><span class="p">(</span><span class="n">d_exit_steps</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Compartment.remove"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.comparts.Compartment.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove the specified population from the current population</span>
+<span class="sd">        of the compartment (the population is kept positive).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nb_removed</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span><span class="p">,</span> <span class="n">population</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span> <span class="o">-</span> <span class="n">nb_removed</span>
+        <span class="k">return</span> <span class="n">nb_removed</span></div>
+
+    <span class="k">def</span> <span class="nf">_base_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_comp</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">state_machine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">escape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="c1"># 1. Identify observables of current compartment, e.g. health_state, age_group, species</span>
+        <span class="c1"># 2. Iterate over all observables which differ between this compartment and target compartment</span>
+        <span class="c1">#    e.g. E, J, Vector -&gt; I, J, Vector : health_state changes</span>
+        <span class="c1"># 3. If an observable which does NOT change is associated with any durations, the population transfer must also &quot;move&quot; dates</span>
+        <span class="c1">#    e.g. population = 5, {&#39;age_group&#39;: {10: 3, 12: 2}}</span>
+
+        <span class="c1">## determine random exit dates for OTHER state machines</span>
+        <span class="c1"># debuginfo(self, &#39;MOVING TO&#39;, target_comp, population, state_machine.machine_name, escape, others)</span>
+        <span class="n">d_steps_by_statemachine</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">machine_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">observables</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">machine_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span> <span class="o">==</span> <span class="n">target_comp</span><span class="o">.</span><span class="n">statevars</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]:</span>
+                <span class="n">d_steps_by_statemachine</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_random_exit_dates</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">machine_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_time_to_exit</span><span class="p">(</span><span class="n">d_steps_by_statemachine</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1">## for the state machine that determined current move, remove randomly exit dates according to escape parameter (True, False, None)</span>
+        <span class="k">if</span> <span class="n">state_machine</span><span class="o">.</span><span class="n">machine_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_time_to_exit</span><span class="p">({</span><span class="n">state_machine</span><span class="o">.</span><span class="n">machine_name</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_random_exit_dates</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">state_machine</span><span class="o">.</span><span class="n">machine_name</span><span class="p">,</span> <span class="n">escape</span><span class="o">=</span><span class="n">escape</span><span class="p">)},</span> <span class="n">remove</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">population</span><span class="p">)</span>
+        <span class="n">target_comp</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">d_exit_steps</span><span class="o">=</span><span class="n">d_steps_by_statemachine</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Compartment.get_random_exit_dates"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.comparts.Compartment.get_random_exit_dates">[docs]</a>    <span class="k">def</span> <span class="nf">get_random_exit_dates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">total_qty</span><span class="p">,</span> <span class="n">machine_name</span><span class="p">,</span> <span class="n">escape</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a dictionary of steps (to exit the specified machine_name) with a quantity (at most the quantity available for the step and this machine_name), sampled randomly. The total of all quantities is total_qty. Exit dates are chosen according to the *escape* parameter: None = all dates (default), False: dates corresponding only to current step, True: dates others than current step&quot;&quot;&quot;</span>
+        <span class="n">current_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">step</span>
+        <span class="k">if</span> <span class="n">escape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">l_available_dates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">escape</span><span class="p">:</span>
+            <span class="n">l_available_dates</span> <span class="o">=</span> <span class="p">[(</span><span class="n">step</span><span class="p">,</span> <span class="n">qty</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">qty</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">step</span> <span class="o">&gt;</span> <span class="n">current_step</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">current_step</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="n">current_step</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">total_qty</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="p">[</span><span class="n">machine_name</span><span class="p">][</span><span class="n">current_step</span><span class="p">])}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span>
+
+        <span class="n">d_result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">while</span> <span class="n">total_qty</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">l_steps</span><span class="p">,</span> <span class="n">l_qty</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">l_available_dates</span><span class="p">)</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">l_qty</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">total</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{}</span>
+            <span class="n">l_probas</span> <span class="o">=</span> <span class="p">[</span><span class="n">qty</span> <span class="o">/</span> <span class="n">total</span> <span class="k">for</span> <span class="n">qty</span> <span class="ow">in</span> <span class="n">l_qty</span><span class="p">]</span>
+            <span class="n">l_to_sample</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">total_qty</span><span class="p">,</span> <span class="n">l_probas</span><span class="p">)</span>
+            <span class="c1"># check that quantities required by multinomial sampling are available</span>
+            <span class="n">l_available_dates</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">total_removed</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">nb_available</span><span class="p">,</span> <span class="n">nb_required</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">l_steps</span><span class="p">,</span> <span class="n">l_qty</span><span class="p">,</span> <span class="n">l_to_sample</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">nb_required</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">l_available_dates</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">step</span><span class="p">,</span> <span class="n">nb_available</span><span class="p">))</span>
+                    <span class="k">continue</span>
+                <span class="n">nb_removed</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">nb_required</span><span class="p">,</span> <span class="n">nb_available</span><span class="p">)</span>
+                <span class="n">nb_available</span> <span class="o">-=</span> <span class="n">nb_removed</span>
+                <span class="k">if</span> <span class="n">step</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d_result</span><span class="p">:</span>
+                    <span class="n">d_result</span><span class="p">[</span><span class="n">step</span><span class="p">]</span> <span class="o">=</span> <span class="n">nb_removed</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">d_result</span><span class="p">[</span><span class="n">step</span><span class="p">]</span> <span class="o">+=</span> <span class="n">nb_removed</span>
+                <span class="k">if</span> <span class="n">nb_available</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">l_available_dates</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">step</span><span class="p">,</span> <span class="n">nb_available</span><span class="p">))</span>
+                <span class="n">total_removed</span> <span class="o">+=</span> <span class="n">nb_removed</span>
+            <span class="n">total_qty</span> <span class="o">-=</span> <span class="n">total_removed</span>
+        <span class="k">return</span> <span class="n">d_result</span></div>
+
+<div class="viewcode-block" id="Compartment.move_to"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.comparts.Compartment.move_to">[docs]</a>    <span class="k">def</span> <span class="nf">move_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_comp</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">state_machine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Move the specified population from the current population</span>
+<span class="sd">        of the compartment (the population is kept positive) to the</span>
+<span class="sd">        target compartment *target_comp*. If a state machine is provided, executes the</span>
+<span class="sd">        corresponding actions when entering/exiting nodes and crossing</span>
+<span class="sd">        edges if needed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">base_qty</span><span class="p">,</span> <span class="n">escape</span> <span class="o">=</span> <span class="n">population</span>
+        <span class="n">quantity</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">base_qty</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">move_to</span><span class="p">(</span><span class="n">target_comp</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="n">quantity</span><span class="p">,</span> <span class="n">state_machine</span><span class="o">=</span><span class="n">state_machine</span><span class="p">,</span> <span class="n">escape</span><span class="o">=</span><span class="n">escape</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">population</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span>
+
+<div class="viewcode-block" id="Compartment.shift_times_to_exit"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.comparts.Compartment.shift_times_to_exit">[docs]</a>    <span class="k">def</span> <span class="nf">shift_times_to_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update times to exit at the end of the current time step to make populations remaining at current time step available for next time step.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d_shift_times_to_exit</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">current_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">step</span>
+        <span class="c1"># debuginfo(&quot;-&quot;*20, &quot;\n&quot;, self, current_step, self.times_to_exit)</span>
+        <span class="k">for</span> <span class="n">machine_name</span><span class="p">,</span> <span class="n">d_times_to_exit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">times_to_exit</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">current_step</span> <span class="ow">in</span> <span class="n">d_times_to_exit</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">machine_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d_shift_times_to_exit</span><span class="p">:</span>
+                    <span class="n">d_shift_times_to_exit</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">d_times_to_exit</span><span class="p">[</span><span class="n">current_step</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">d_shift_times_to_exit</span><span class="p">):</span>
+            <span class="n">d_to_remove</span> <span class="o">=</span> <span class="p">{</span> <span class="n">machine_name</span><span class="p">:</span> <span class="p">{</span> <span class="n">current_step</span><span class="p">:</span> <span class="n">qty</span><span class="p">}</span> <span class="k">for</span> <span class="n">machine_name</span><span class="p">,</span> <span class="n">qty</span> <span class="ow">in</span> <span class="n">d_shift_times_to_exit</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="n">d_to_add</span> <span class="o">=</span> <span class="p">{</span> <span class="n">machine_name</span><span class="p">:</span> <span class="p">{</span> <span class="n">current_step</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span> <span class="n">qty</span><span class="p">}</span>  <span class="k">for</span> <span class="n">machine_name</span><span class="p">,</span> <span class="n">qty</span> <span class="ow">in</span> <span class="n">d_shift_times_to_exit</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_time_to_exit</span><span class="p">(</span><span class="n">d_to_remove</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_time_to_exit</span><span class="p">(</span><span class="n">d_to_add</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Compartment.clone"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.comparts.Compartment.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make a copy of the current compartment with the specified</span>
+<span class="sd">        observable/value settings. The new content is empty.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># debuginfo(&quot;=== CLONE ===&quot;)</span>
+        <span class="n">new_comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="p">)</span>
+        <span class="n">new_comp</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">new_comp</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+        <span class="n">new_comp</span><span class="o">.</span><span class="n">stochastic</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stochastic</span>
+        <span class="n">new_comp</span><span class="o">.</span><span class="n">_host</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_host</span>
+        <span class="n">new_comp</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="c1">## ENSURE THAT CURRENT TIME STEP IS COPIED FROM UPPER LEVEL, SINCE THE COMPARTMENT THAT IS BEING CLONED MAY HAVE NOT EVOLVED FROM BEGINNING</span>
+        <span class="c1"># new_comp.statevars.step = self.upper_level().statevars.step + 1 ## to account for evolve() done in Compartment before upper_level() which is a CompartmentProcessManager (late)</span>
+        <span class="n">new_comp</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">step</span> <span class="c1">## to account for evolve() done in current Compartment but not in the clone</span>
+        <span class="c1"># debuginfo(self, self.statevars.step, &quot;--&gt;&quot;, new_comp, new_comp.statevars.step)</span>
+        <span class="k">return</span> <span class="n">new_comp</span></div>
+
+<div class="viewcode-block" id="Compartment.next_states"><a class="viewcode-back" href="../../../emulsion.agent.html#emulsion.agent.comparts.Compartment.next_states">[docs]</a>    <span class="k">def</span> <span class="nf">next_states</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">populations</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute the population moving from the current compartment to each</span>
+<span class="sd">        of the destination states, handling the values according the</span>
+<span class="sd">        the specified method. Values can be handled either as absolute</span>
+<span class="sd">        amounts (&#39;amount&#39; method), as proportions (&#39;rate&#39;, in a</span>
+<span class="sd">        deterministic approach) or as probabilities (&#39;proba&#39;, in a</span>
+<span class="sd">        stochastic approach). Actions are to be performed when</span>
+<span class="sd">        changing state. The actual population affected by the</span>
+<span class="sd">        transitions is stored in the first element of the</span>
+<span class="sd">        `populations` parameter, as a tuple (&#39;population&#39;, number, esc).</span>
+<span class="sd">        Several edges can lead to the same state.</span>
+
+<span class="sd">        Return a list of tuples:</span>
+<span class="sd">          (state, {&#39;population&#39;: (qty, esc), &#39;actions:&#39; list of actions})</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">current_pop</span><span class="p">,</span> <span class="n">esc</span> <span class="o">=</span> <span class="n">populations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;amount&#39;</span><span class="p">:</span>
+            <span class="c1"># length of values is expected to be the number of output edges</span>
+            <span class="c1"># retrieve the amount of population exiting</span>
+            <span class="n">total_value</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">total_value</span> <span class="o">&gt;</span> <span class="n">current_pop</span><span class="p">:</span>
+                <span class="c1"># restart with proportions instead</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_states</span><span class="p">(</span><span class="n">states</span><span class="p">,</span>
+                                        <span class="nb">tuple</span><span class="p">(</span><span class="n">v</span> <span class="o">/</span> <span class="n">total_value</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">0</span><span class="p">,),</span>
+                                        <span class="n">populations</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">evolution</span> <span class="o">=</span> <span class="n">values</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stochastic</span><span class="p">:</span>
+                <span class="c1"># length of values is expected to be the number of</span>
+                <span class="c1"># output edges + 1 (last value = 1 - sum(values[:-1])</span>
+                <span class="n">evolution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">current_pop</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># length of values is expected to be the number of</span>
+                <span class="c1"># output edges</span>
+                <span class="n">evolution</span> <span class="o">=</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">rate</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">delta_t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">current_pop</span>
+                             <span class="k">for</span> <span class="n">rate</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+        <span class="n">result</span> <span class="o">=</span>  <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="n">state_name</span><span class="p">),</span>
+                    <span class="p">{</span><span class="s1">&#39;population&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">qty</span><span class="p">,</span> <span class="n">esc</span><span class="p">),</span> <span class="s1">&#39;actions&#39;</span><span class="p">:</span> <span class="n">act</span><span class="p">})</span>
+                   <span class="k">for</span> <span class="n">state_name</span><span class="p">,</span> <span class="n">qty</span><span class="p">,</span> <span class="n">act</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">states</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">evolution</span><span class="p">,</span> <span class="n">actions</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                   <span class="k">if</span> <span class="n">qty</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">result</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

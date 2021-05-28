@@ -1,0 +1,936 @@
+*****************************
+Modelling language (advanced)
+*****************************
+
+EMULSION modelling language allows model designers to specify complex
+assumptions in a readable way, to foster interactions with other
+scientists and facilitate model revision throughout the design process
+without having to dive into the simulation code.
+
+Most language features documented below are associated with example
+files, located in the ``models/features`` directory.
+
+Compartments, IBM or hybrid models?
+***********************************
+
+EMULSION helps to transform compartment-based models into
+invidual-based models (or vice-versa, assuming the individual-based
+model can get rid of individual specificities). An intermediate
+approach is the hybrid model, which preserves individual
+characteristics but drives system evolution through compartment-like
+groupings (see: :ref:`Individuals, populations, metapopulations`).
+
+The table below summarises the main differences between each kind of
+models, regarding the sections and keywords to modify in an EMULSION
+model file.
+
+.. include:: paradigms.rst
+
+.. seealso::
+
+   Also, in ``model/features``, many examples are provided with the
+   three modelling paradigms when possible, especially the simplest
+   SIR model (``compart_SIR.yaml``, ``hybrid_SIR.yaml``,
+   ``IBM_SIR.yaml``) and the corresponding version with demographic
+   processes (``compart_SIR_demo.yaml``, ``hybrid_SIR_demo.yaml``,
+   ``IBM_SIR_demo.yaml``).
+
+   See :ref:`SIR model`, :ref:`SEIRS model`, :ref:`SIR model with basic demography (births/deaths)` and many others in :ref:`Feature examples`.
+
+
+Master state machines
+*********************
+
+Set states attributes
+=====================
+
+States can be endowed with *attributes*. For instance, ``fillcolor``
+(default: gray) or ``line_style`` (default: solid) defines,
+respectively, the color of the boxes on state machine diagrams, which
+is the same than the color of plots in outputs, and the line style of
+the plots.
+
+A state can define three main properties:
+
+.. _autoremove_state:
+
+``autoremove: yes``
+    Autoremove states are intended as "sink", so that all individuals
+    that reach such a state are removed from the system. This is a
+    very convenient way to represent deaths or outgoing commercial
+    movements.
+
+    .. seealso::
+
+       :ref:`SIR model with basic demography (births/deaths)`
+
+.. _default_state:
+
+``default: yes``
+    A state can be labelled as "default state". Default state plays
+    the same role but the way to use them differs in compartment-based
+    models and in others:
+
+    - in compartment-based models, when no indication is provided in
+      initial conditions or production links regarding new
+      individuals, they will be put in the default state for each of
+      their state machines
+    - in IBM/hybrid models and metapopulations, ``default`` is a valid
+      value for prototypes definition. For instance, writing
+      ``health_state: default`` in a prototype will set the health
+      state to the default state of the ``health_state`` state machine
+
+      .. seealso::
+
+	 :ref:`Default state`, :ref:`SIR model with age groups`, :ref:`Design prototypes for typical individuals or populations`
+
+.. _next_previous:
+
+``next: AnotherState`` / ``previous: AnotherState``
+    A state, especially when used in a state machine without
+    transitions (e.g. representing a set of discrete states which are
+    driven by another process, such as animal parities) can specify
+    explicitly a predecessor/successor relation with other states from
+    the same state machine. This can be quite useful to induce
+    incremental changes in a state without knowing its value, by using
+    the ``next_state`` and ``previous_state`` keywords in prototypes.
+
+
+    .. seealso::
+
+       :ref:`SIR model with explicit gestation`
+
+
+.. _duration:
+
+``duration`` (valid for **IBM**/**hybrid** models)
+    This keyword allows to assign a specific duration to a
+    state. Durations can be constant values or arbitrary expressions,
+    including a random distribution. When an individual enters the
+    state, it receives a value calculated from this expression
+    (possibly involving a random sample) and cannot leave this state
+    until the duration is over (with the exception of
+    :ref:`escape conditions <escape_conditions>`).
+
+    .. seealso::
+
+       :ref:`Custom state durations`
+
+.. _on_enter_stay_exit:
+
+``on_enter``, ``on_stay``, ``on_exit`` (valid for **IBM**/**hybrid** models)
+    These keywords are used to specify lists of **actions** that
+    individuals have to perform when, respectively, entering, staying
+    in, or leaving the state.
+
+    Actions can be either built-in actions (listed :ref:`there <Built-in actions>`) or the name of a function provided in a code
+    add-on (e.g. ``action: my_custom_function``).
+
+    .. seealso::
+
+       :ref:`SIR model with individual actions and variable aggregation`
+
+Customize transitions
+=====================
+
+In state machines, transitions are composed of at least three items:
+
+.. _quantifiers:
+
+- ``from`` followed by the origin state
+- ``to`` followed by the destination state
+- a **quantifier** to indicate the flow from origin to destination
+  state, which can be:
+
+  - ``rate`` with a transition rate per individual i.e. a number per
+    time unit. In stochastic models , rates are automatically
+    converted into probabilities, assuming that durations in the
+    origin state follow an exponential distribution
+  - ``proba`` with the probabiliy that, during *one time unit*, an
+    individual moves from origin to destination state
+  - ``amount`` which indicates an absolute number of individuals,
+    (bounded by the number of individuals actually in origin state)
+  - ``amount-all-but`` which indicates an absolute number of
+    individuals which have to *stay* in origin state while the others
+    move to destination state. Hence, writing ``amount-all-but: 0``
+    means "all individuals in origin state"
+
+.. warning::
+
+   In a state machine, all quantifiers may be used. However, from a
+   given origin state, all transitions that can be used simultaneously
+   must have the same quantifiers (i.e. only ``rate``, or only
+   ``proba``, or only ``amount``/``amount-all-but``).
+
+Transitions can also incorporate additional elements:
+
+.. _escape_conditions:
+
+- ``cond`` followed with a expression (logical or numeric, non-zero
+  values being considered true) specifies which individuals are
+  allowed to cross the transition
+
+  .. seealso:
+
+     :ref:`SIR model with age groups and explicit age`, :ref:`SIR
+	  model with explicit gestation`
+
+- ``escape`` is a special condition for origin states endowed with a
+  specific duration, which allows individuals that fulfil the
+  expression to exit their state *before* the normal term. For
+  instance, a gestating state has a duration before which individuals should
+  not be able to leave the state, but if abortions are possible, the
+  corresponding condition can be used as escape condition to permit a
+  premature exit of gestation.
+
+  .. seealso:
+
+     :ref:`SIR model with explicit gestation`
+
+- ``when`` is a special condition which refers to *events* from a
+  :ref:`calendar <Regulate time>` (useful to handle seasonality)
+- ``on_cross`` is used to specify a list of actions that indivuals
+  moving from origin state to destination state through this
+  transition have to perform
+
+  .. seealso:
+
+     :ref:`SIR model with explicit gestation`
+
+
+Produce new individuals
+=======================
+
+- Section ``productions`` in state machines allow to define how some
+  states can produce new individuals. Production links are very
+  similar to transitions in their syntax, except that:
+
+  - ``escape`` conditions and ``amount-all-but`` quantifier are not allowed
+  - in IBM/hybrid models, a ``prototype`` must be specified for the new
+    individuals
+
+  Besides, the computation of actual flows uses sampling in Poisson
+  distribution rather than binomial/multinomial sampling.
+
+  .. seealso::
+
+     :ref:`SIR model with basic demography (births/deaths)`, :ref:`SIR model with age groups`, :ref:`Design prototypes for typical individuals or populations`
+
+- Another way to produce new individuals is using an action: ``clone``
+  (aka ``produce_offspring``) associated with a transition or
+  with a state (see :ref:`Set states attributes` and :ref:`Built-in
+  actions`).
+
+  .. seealso::
+
+     :ref:`SIR model with explicit gestation`
+
+State machines without transitions
+==================================
+
+State machines can also be used only for defining states, e.g. to
+differentiate discrete values such as categories (male/female
+individuals) or enumerations (e.g. female parities). In that case, the
+state machine does not require any transition at all.
+
+.. seealso::
+
+   :ref:`SIR model with explicit gestation`
+
+
+Design prototypes for typical individuals or populations
+********************************************************
+
+In EMULSION hybrid and IBM models, prototypes are meant to represent
+typical individuals (within populations) or populations (within
+metapopulations), characterized by their state variables, either
+regarding the state of a state machine (e.g. health state, age
+group...), or specific features (e.g. age, temperature... of an
+individual; initial health status, location, carrying capacity... of a
+population).
+
+Define prototypes
+=================
+
+Prototypes are defined in the section named ``prototypes`` (see
+:ref:`Model structure`).
+
+- Variables corresponding to regular values can be set using any valid expression::
+
+    newborn:
+      age: 0
+
+- Variables corresponding to state machines can be set using:
+
+  - the name of a state::
+
+      healthy_individual:
+        health_state: S
+
+  - keyword ``default`` if a state was marked as default state in the
+    state machine::
+
+      healthy_individual:
+        health_state: S
+	age_group: default
+
+  - keywords ``next_state`` or ``previous_state`` to select the
+    "successor" or "predecessor" state of the current value (see
+    :ref:`Set state attributes` on how to specify
+    predecessor/successor relations between states - by default, they
+    correspond to the order in which states are defined)::
+
+      next_parity:
+        parity: next_state
+
+  - keyword ``random`` possibly with parameters. Without parameters,
+    one state is chosen randomly with equal probability among the
+    states of the state machine (except for those marked as
+    ``autoremove``). To provide parameters:
+
+    - if *N* (non-autoremove) states are defined in the state machine,
+      either *N* or *N-1* values can be provided
+    - values are interpreted in the same order as the definition of
+      states in the state machine
+    - if *N-1* values :math:`p_i` are given, they are interpreted as
+      probabilities, the probability for the last state being:
+
+      .. math::
+	 p_N = 1 - \sum_{i=1}^{N-1} p_i
+
+    - if *N* values :math:`v_i` are given, they are interpreted as
+      weights and normalized to compute probabilities as follows:
+
+      .. math::
+	 \forall i=1..N,  p_i = \frac{v_i}{\sum_{j=1}^N v_j}
+
+.. seealso::
+
+   :ref:`SIR model with age groups`, :ref:`SIR model with basic demography (births/deaths)`,
+   :ref:`SIR model with age groups and random initialization`, :ref:`SIR model with metapopulation`,
+   :ref:`SIR model with explicit gestation`
+
+
+Default prototypes
+==================
+
+Each level can be associated with a default prototype, defined in the
+``prototypes`` section. This ensures for instance that agents created
+for a level have some variables initialized properly, or avoids
+redundancy in other prototypes.
+
+Default prototypes are applied when agents are created, before all
+other possible prototypes.
+
+.. admonition:: Example
+
+   .. code-block:: yaml
+
+     levels:
+       individuals:
+         desc: '...'
+         default_prototype: default_individual
+      ...
+      prototypes:
+        individuals:
+          - default_individual:
+              desc: 'default values for individual variables'
+	         age: 'random(20, 100)'
+		 nb_abortions: 0
+
+
+
+Data-based prototype collections
+================================
+
+.. warning::
+
+   This feature is experimental and likely to evolve in further versions.
+
+Prototype collections can also be defined using CSV files, for
+instance, to initialize individuals within a population or populations
+within metapopulations according to an existing structure.
+
+To do so, a CSV file must be put in the input directory (by default,
+``data/`` in the working directory), each column corresponding to a
+variable (including a ``desc`` field), and each line represents a
+concrete prototype to be used in the simulation. An optional column
+named ``prototype_name`` can specify names for each concrete prototype
+(otherwise concrete prototypes will be named automatically after the
+collection name, the filename and the line number).
+
+Then, at prototype definition, the keyword ``file`` creates a link
+between the collection name and the list of concrete prototypes (each
+line of the CSV file).
+
+To determine how concrete prototypes defined in the CSV file are
+chosen when refering to the collection name, a selection method must
+be specified using keyword ``select``. Available selection methods are
+the following:
+
+- ``ordered``: the first prototype of the file is chosen when the
+  collection name is used at first time (per run), then the next one,
+  etc. Ordering can apply to a specific (numeric) column,
+  e.g. ``ordered(size)``. Beware: the number of concrete prototypes
+  used must be less than the number of lines in the file.
+- ``ordered_cycle``: same as previous, except that when reaching the
+  end of the file, the selection restarts at the fist line
+- ``random_noreplace``: concrete prototypes are sampled randomly in
+  the file, without replacement (hence, the number of concrete
+  prototypes used must be less than the number of lines in the
+  file). By default, a uniform sampling is performed. If necessary,
+  a specific (numeric, positive) column can be used to weight the
+  samlping probability of concrete prototypes,
+  e.g. ``random_noreplace(nb_observed)``.
+- ``random_replace``: same as previous, except that sampling is done
+  with replacement (hence, no constraint on number of samplings).
+
+
+Besides, CSV lines can be filterd before selection, using the
+following keywords:
+
+- ``include_values: list_of_values``: only lines where any field contains
+  exactly one of the values are kept
+- ``exclude_values: list_of_values``: lines where any field contains exactly
+  one of the values are discarded
+- ``filter: condition``: only lines fulfilling the specified condition are
+  kept (e.g. ``filter: 'initial_prevalence > min_initial_prevalence'``
+  where ``initial_prevalence`` is a column of the CSV file and
+  ``min_initial_prevalence`` a model parameter).
+
+
+.. admonition:: Example
+
+   First, a CSV file ``data/initial_individuals.csv`` which specifies a
+   population structure:
+
+   .. code-block:: csv
+
+     health_state,age_group,weight,desc
+     S,J,10,"healthy juvenile individuals"
+     I,J,40,"infected juvenile individuals"
+     S,A,90,"healthy adult individuals"
+     I,A,10,"infected adult individuals"
+
+   and another one ``data/population_size.csv`` which specifies the
+   initial size of populations:
+
+   .. code-block:: csv
+
+     prototype_name,initial_population_size,proportion,desc
+     huge_pop,500,.05,"a huge population"
+     large_pop,100,.35,"a large population"
+     medium_pop,50,.5,"a medium population"
+     small_pop,10,.1,"a small population"
+
+
+   Then the declaration of the collection in the ``prototypes``
+   section and its use in ``initial_conditions``:
+
+   .. code-block:: yaml
+
+      prototypes:
+        population:
+          - data_based_population:
+              desc: 'collection of prototypes specifying several initial population sizes'
+              file: 'population_size.csv'
+              select: 'ordered_cycle(initial_population_size)'
+              exclude_values: ['huge_pop']
+        individuals:
+          - data_based_individual:
+              desc: 'collection of prototypes describing typical distributions
+                     of individuals based on a CSV data file'
+              file: 'initial_individuals.csv'
+              select: 'random_replace(weight)'
+      ...
+      initial_conditions:
+        metapop:
+          - prototype: data_based_population
+            amount: 'nb_populations'
+        population:
+          - prototype: data_based_individual
+            amount: 'initial_population_size'
+
+   In this example, the line ``huge_pop`` is discarded, then
+   population sizes are taken in order based on the
+   ``initial_population_size`` value: 10, 50, 100, starting again at
+   10 for the 4th population.
+
+   In each population, individuals are sampled randomly (with
+   replacement) using column ``weight`` to calculate the probabilities
+   of each line.
+
+.. seealso::
+
+   :ref:`SIR model with age groups and data-based prototypes`
+
+
+Order of variables assignment in prototypes
+===========================================
+
+By default, in prototype definition, the only order that applies in
+setting the value of variables is the following:
+
+- if a default prototype is defined in the ``levels`` section, this
+  prototype is fully applied before any other prototype
+- within a prototype, variables containing the state of a state
+  machine are assigned first, then all other variables
+
+However, in some cases it may be convenient to specify a precise order
+in variable assignement, for instance when some variables depend on
+others. To do so, use keywords ``begin_with`` or ``end_with`` instead
+of a variable name, followed by the list of variable assignments,
+e.g.:
+
+   .. code-block:: yaml
+
+      prototypes:
+        individuals:
+          - infectious:
+              desc: 'infectious individual, which induces hyperthermia'
+              begin_with:
+                - health_state: I
+                - hyperthermia_state: H
+                - _time_to_exit_hyperthermia_state: _time_to_exit_health_state
+              life_cycle: default
+
+Variables listed in the ``begin_with`` section are assigned in the
+specified order, and before all other variables, which then follow the
+default prototype order (state machines, then others). Finally,
+variables listed in the ``end_with`` section are assigner in the
+specific order after all other variables.
+
+In the example above, the ``health_state`` is first defined as
+infectious, then the ``hyperthermia_state`` is set to hyperthermic,
+and finally the durations in both state machines are
+synchronized. After that, the ``life_cycle`` is defined.
+
+
+
+
+Regulate time
+*************
+
+- The simulation time step can be changed either in the model file
+  (section ``time_info``), or at runtime with option ``-p
+  delta_t=value``
+
+- Section ``time_info`` allows the definition of calendars with
+  events, for instance a pasture period:
+
+  .. admonition:: Example
+
+    .. code-block:: yaml
+
+       calendars:
+         pasture:
+           period: {days: 365}
+           events:
+             pasture_period: {begin: 'April 1', end: 'October 1'}
+             open_days: {date: 'May 1'}
+
+   A calendar can be periodic or not, and define events that span from
+   a ``begin`` date to and ``end`` date, or that take place at a
+   specific ``date``. Each event (here ``pasture_period`` and
+   ``open_days``) can be used in conditions, especially in the
+   ``when`` clause of transition or productions. A transition with
+   e.g. ``Not(pasture_period)`` will not be considered at all when the
+   condition is not fulfilled.
+
+   Besides, events with a begin and an end date automatically generate
+   two other events, here for instance ``begin_pasture_period`` and
+   ``end_pasture_period``.
+
+   Finally, the duration of an event is given by the keyword
+   ``duration_of_EVENT``, e.g. ``duration_of_pasture_period``
+
+   .. seealso::
+
+      model :ref:`Quickstart <Test your installation>` provided to test
+      EMULSION installation
+
+Complexify grouping
+*******************
+
+Grouping can be based on several variables, especially when the
+dynamics of one process is affected by another one. For instance, if
+infection is driven by age groups, the grouping section should be
+rewritten as follows:
+
+.. admonition:: Example
+
+  .. code-block:: yaml
+
+     grouping:
+       population:
+         infection:
+           state_machine: health_state
+	   key_variables: [health_state, age_group]
+         age_group:
+           state_machine: age_group
+	   key_variables: [age_group]
+
+.. seealso::
+
+   :ref:`SIR model with structured population`
+
+Grouping are especially useful in hybrid models, either to accelerate
+simulation time, or to benefit from :ref:`automatic variables
+<Automatic variables>`.
+
+A grouping can also be designed just to have access to specific
+subgroups in the population, and thus indicate no state machine, nor
+rely on variables related to state machines.
+
+.. warning::
+
+   In any case, the name of the grouping must appear in the list of
+   processes: otherwise the grouping is not updated at each time step
+   (individuals are not distributed in the proper groups).
+
+Aggregate variables
+*******************
+
+When defining levels, variables that aggregate other variables from a
+sublevel can be defined, for instance:
+
+.. admonition:: Example
+
+  .. code-block:: yaml
+
+     levels:
+       population:
+         ...
+         aggregate_vars:
+           - name: pop_affected_over_time
+             collect: nb_episodes
+             operator: 'sum'
+	   - name: 'avg_inf_duration'
+	     collect: duration_infected
+             operator: 'mean'
+
+Aggregated variables (here, ``pop_affected_over_time`` and
+``avg_inf_duration``) defined by a level (here, ``population``) consist in
+collecting the values of other variables (``nb_episodes``,
+``duration_infected``) in the sublevels (``individuals``) and applying
+an operator (``sum``, ``mean``) to compute the resulting value.
+
+Operators can be any classical usual operation operating on lists:
+sum, prod, min, max, mean, var, std, median, all, any. Shortcuts have
+been defined so that e.g. ``percentile20`` computes the 20th
+percentile.
+
+.. seealso:: :ref:`SIR model with individual actions and variable aggregation`
+
+Automatic variables
+*******************
+
+EMULSION automatically provides variables in relation to model
+components.
+
+- ``step`` represents the current time step, ``delta_t`` the duration
+  of one time step (in time units), and ``time`` the time elapsed
+  since the beginning of simulation (in time units)
+- When defining a level, e.g. ``population``: ``total_population`` gives the total
+  population of this level.
+- When defining a state machine, e.g. ``health_state``, and its
+  states, e.g. ``S``:
+
+  - ``is_S`` tests whether or not an individual is in state ``S``
+  - ``duration_in_health_state`` contains the duration elapsed since
+    the individual entered the current state of state machine
+    ``health_state``
+  - ``total_S`` is the number of individuals in state ``S``
+
+- When defining complex groupings, e.g. ``[age_group, health_state]``:
+
+  - ``total_J_I`` is the number of individuals in age group ``J`` and
+    in health state ``I``
+  - if aggregated variables (e.g. ``mean_age``) were also defined,
+    their counterpart is automatically defined for the grouping
+    (e.g. ``mean_age_J_I`` etc.)
+
+.. seealso::
+
+   :ref:`SIRS model with periodic external risk`,
+   :ref:`SIR model with structured population`
+
+
+Built-in functions
+******************
+
+Expressions used in EMULSION models can refer to classical Python
+mathematical operators (``+``, ``-``, ``*``, ``/``, ``**`` for
+exponentiation, etc. ) and functions (e.g. ``sqrt``, ``cos``, ``sin``,
+``exp``, ``log``, ``log10``, etc.).
+
+The following functions are also available:
+
+``AND(cond1, cond2)``
+    Logical conjunction: return true (1) if ``cond1`` and ``cond2`` are
+    both true, false (0) otherwise
+
+``OR(cond1, cond2)``
+    Logical disjunction: return true (1) if ``cond1`` is true or
+    ``cond2`` is true, false (0) otherwise
+
+``Not(cond)``
+    Logical negation: return true (1) if ``cond1`` and ``cond2`` are
+    both true, false (0) otherwise
+
+``IfThenElse(condition, val_if_true, val_if_false)``
+    Ternary conditional function: return either ``val_if_true`` or
+    ``val_if_false`` depending on ``condition``.
+
+``random_bool(proba_success)``
+    Return a random boolean value (0 or 1) depending on
+    ``proba_success``
+
+
+Shortcuts to distributions from package ``numpy.random`` are also
+available::
+
+    random_uniform(a, b)
+    random_integers(a, b)
+    random_exponential(m)
+    random_poisson(m)
+    random_beta(a, b)
+    random_normal(m, sd)
+    random_gamma(a, b)
+
+.. seealso::
+
+   :ref:`Custom state durations`,
+   :ref:`SIRS model with periodic external risk`
+
+
+Built-in actions
+****************
+
+.. _generic_action:
+
+``{action: action_name, d_params: dict_of_parameters}``
+   The generic keyword to call an external actions, requires Python code.
+
+   - ``action_name`` has to be described (``desc: ...``) explicitly in
+     main section ``actions``
+   - ``action_name`` must be provided in a separate Python file, as a
+     *method* in a class associated with the level at which the action
+     will be performed. This method will look as (assuming that
+     ``d_params`` contains two keys, ``param1`` and ``param2``):
+
+     .. admonition:: Example
+
+        .. code-block:: python
+
+	   def action_name(self, param1, param2):
+   	       """Do something with *param1* and *param2* as specified in
+   	       section ``actions``"""
+   	       # here the Python code for the action
+
+   Whenever possible, prefer other built-in actions described below.
+
+
+.. _message_action:
+
+``{message: 'Some important information'}``
+    Print the specified character string on the standard output while
+    running the model, preceded by the simulation ID, the time step
+    and the identifier of the individual.
+
+    .. admonition:: Example
+
+       .. code-block:: yaml
+
+	  states:
+	  ...
+	    - I:
+	      ...
+	      on_enter:
+	        - message: 'now infected !'
+
+       will produce outputs like this::
+
+	 $0,@2,AtomAgent #55,now infected !
+	 $0,@5,AtomAgent #49,now infected !
+
+
+.. _log_vars_action:
+
+``{log_vars: list_of_variables_or_expressions}``
+
+    Store the specified list of variable to a log file named
+    ``log.txt`` in the output directory (by default, ``outputs/``).
+    Each line starts with the simulation ID, the time step, the class and
+    identifier of the individual, then each variable is associated
+    with its value (variable/value pairs are separated by ``;`` to
+    facilitate sub-field parsing).
+
+    .. admonition:: Example
+
+       .. code-block:: yaml
+
+	  states:
+	  ...
+	    - I:
+	      ...
+	      on_enter:
+	        - log_vars: [is_S, is_I, is_R]
+
+       will produce a log file ``outputs/log.txt`` containing something like this::
+
+         0,0,AtomAgent,100,is_S=False;is_I=True;is_R=False
+         0,4,AtomAgent,57,is_S=False;is_I=True;is_R=False
+         0,5,AtomAgent,8,is_S=False;is_I=True;is_R=False
+
+
+.. _set_var_action:
+
+``{set_var: varname, value: expression}``
+    Change the value of ``varname`` according to what is calculated in
+    ``expression``.
+
+    .. seealso::
+
+       :ref:`SIR model with individual actions and variable aggregation`
+
+
+.. _set_upper_var_action:
+
+``{set_upper_var: varname, value: expression}`` Change the value of
+    ``varname`` according to what is calculated in
+    ``expression``. ``varname`` is expected to be a variable owned by
+    the level above the agent performing the action (e.g. a population
+    variable if the action is performed by an individual)
+
+
+
+.. _record_change_action:
+
+``{record_change: varname}``
+    Add the number of individuals performing the action to the
+    specified state variable, assumed to be defined at population
+    level. This can be used for instance to calculate the cumulative
+    incidence (e.g. as an action ``on_enter`` for the infectious
+    state).
+
+    .. seealso::
+
+       :ref:`SIR model with cumulative incidence`
+
+.. _clone_action:
+
+``{clone: a_prototype_or_list, amount: value, proba: value_or_list}``
+    Clone the individual into new ones. The newly produced individuals
+    follow the specified prototypes, according the given amount and
+    probabilities.
+
+    - default amount is 1
+    - if no probabilities are given, prototypes are considered
+      equiprobable
+    - a single prototype can be given as a single value instead of a
+      list
+    - the list or probabilites must be of same size of prototypes
+      list, only the last value may be omitted to ensure that the sum
+      of probabilities is 1. When N prototypes are associated with N
+      probability values which sum to S < 1, then there is a
+      probability 1-S to produce no offspring. Once probabilies are
+      actualized, a multinomial sampling is performed to determine the
+      number of new individuals in each category
+
+    .. admonition:: Example
+
+       A model with explicit gestation states and possibly vertical disease
+       transmission:
+
+       .. code-block:: yaml
+
+	  - from: G
+	    to: NG
+	    proba: 1
+	    on_cross:
+	      - clone: [infected, healthy]
+		amount: 1
+		proba: [proba_vertical_transmission]
+		# prototype 'healthy' has proba: 1-proba_vertical_transmission
+
+    .. seealso::
+
+      :ref:`SIR model with explicit gestation`, :ref:`Design prototypes for typical individuals or populations`
+
+``{produce_offspring: a_prototype_or_list, amount: value, proba: value_or_list}``
+    Synonym of ``clone``.
+
+.. _become_action:
+
+``{become: a_prototype_or_list, proba: value_or_list}``
+    Force the individual to adopt the specified prototype(s), possibly
+    with probabilities (works like ``clone`` above). Useful to couple states
+    from distinct state machines.
+
+
+
+Changing scale: metapopulations
+*******************************
+
+In EMULSION, ``metapopulation`` is an aggregation type which allows to
+handle multiple populations without regard to how this population is
+built (compartment-based/hybrid/IBM).
+
+It consists in defining a new level and completing initial conditions
+through new population prototypes.
+
+It may be also necessary to transform within-population parameters
+into variables to allow for heterogeneous populations.
+
+.. seealso::
+
+   :ref:`SIR model with metapopulation`
+
+Connecting to Python code add-ons
+*********************************
+
+EMULSION is aimed at providing *generic* features required for
+designing epidemiological models. Thus, some very specific operations
+are not available in the generic engine. In such cases, a small code
+add-on is required to provide additional functionalities.
+
+Code add-ons are mainly used for specific requirements regarding:
+
+- variables which are complicated to change through expressions and
+  actions
+- actions which are not realizable through built-in ones
+- processes which are not realizable through state machines
+- complex intial conditions
+- data loading
+
+To link a level with a code add-on, two elements are required:
+
+- ``file: my_code_add_on.py`` which specified the Python source code to use
+- ``class_name: AClassName`` which defines the name of the Python
+  class associated with the level
+
+EMULSION provides an (experimental) code generator (``emulsion
+generate MODEL.yaml``) which builds a code skeletton for files and
+classes mentioned in the level definition. All actions and variables
+listed respectively in ``actions`` and ``statevars`` sections, as well
+as processes not associated with state machines or groupings, are
+assumed to be defined in the Python file. All you need then is to fill
+the relevant methods with the corresponding code, or remove
+unnecessary parts.
+
+.. seealso::
+
+   :ref:`SIR model with metapopulation, data-driven movements and data pre-processing`
+
+
+Using pre-processors
+********************
+
+.. warning::
+
+   TODO
+
+.. seealso::
+
+   :ref:`SIR model with metapopulation, data-driven movements and data pre-processing`

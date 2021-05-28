@@ -1,0 +1,639 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.tools.simulation &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.tools.simulation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;.. module:: emulsion.tools.simulation</span>
+
+<span class="sd">Tools for providing generic simulation classes.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1">#[HEADER]</span>
+
+
+<span class="kn">import</span> <span class="nn">abc</span>
+
+<span class="kn">from</span>   <span class="nn">pathlib</span>        <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">from</span>   <span class="nn">os.path</span>        <span class="k">import</span> <span class="n">exists</span>
+<span class="kn">from</span>   <span class="nn">typing</span>         <span class="k">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>          <span class="k">as</span>     <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span>         <span class="k">as</span>     <span class="nn">pd</span>
+
+<span class="kn">from</span>   <span class="nn">tqdm</span>           <span class="k">import</span> <span class="n">trange</span><span class="p">,</span> <span class="n">tqdm</span>   <span class="c1"># a nice replacement for progressbar2</span>
+
+<span class="kn">from</span>   <span class="nn">sqlalchemy</span>     <span class="k">import</span> <span class="n">create_engine</span>
+
+<span class="kn">from</span>   <span class="nn">emulsion.model.emulsion_model</span> <span class="k">import</span> <span class="n">EmulsionModel</span>
+<span class="kn">from</span>   <span class="nn">emulsion.tools.misc</span>           <span class="k">import</span> <span class="n">load_class</span>
+<span class="kn">from</span>   <span class="nn">emulsion.tools.debug</span>          <span class="k">import</span> <span class="n">debuginfo</span>
+
+<span class="c1">#   ____        _               _   __  __</span>
+<span class="c1">#  / __ \      | |             | | |  \/  |</span>
+<span class="c1"># | |  | |_   _| |_ _ __  _   _| |_| \  / | __ _ _ __   __ _  __ _  ___ _ __</span>
+<span class="c1"># | |  | | | | | __| &#39;_ \| | | | __| |\/| |/ _` | &#39;_ \ / _` |/ _` |/ _ \ &#39;__|</span>
+<span class="c1"># | |__| | |_| | |_| |_) | |_| | |_| |  | | (_| | | | | (_| | (_| |  __/ |</span>
+<span class="c1">#  \____/ \__,_|\__| .__/ \__,_|\__|_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|</span>
+<span class="c1">#                  | |                                        __/ |</span>
+<span class="c1">#                  |_|                                       |___/</span>
+
+<div class="viewcode-block" id="OutputManager"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.OutputManager">[docs]</a><span class="k">class</span> <span class="nc">OutputManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Manager to handle different outputs (csv, database,... etc)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="OutputManager.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.OutputManager.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="s1">&#39;counts.csv&#39;</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="s1">&#39;log.txt&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the output manager, specifying the model and the</span>
+<span class="sd">        directory where outputs will be stored.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">output_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span> <span class="o">=</span> <span class="n">output_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span> <span class="o">=</span> <span class="n">log_file</span>
+
+        <span class="c1"># database engine</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counts_path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_file</span><span class="p">))</span>
+        <span class="c1"># We choose csv file by default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_type</span> <span class="o">=</span> <span class="s1">&#39;csv&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_output_type</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_output_information</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OutputManager.update_output_type"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.OutputManager.update_output_type">[docs]</a>    <span class="k">def</span> <span class="nf">update_output_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update output type if specified in model</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="OutputManager.update_output_information"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.OutputManager.update_output_information">[docs]</a>    <span class="k">def</span> <span class="nf">update_output_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update csv file path or database connection engine</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_type</span> <span class="o">==</span> <span class="s1">&#39;database&#39;</span><span class="p">:</span>
+            <span class="n">database_information</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;database_information&#39;</span><span class="p">]</span>
+
+            <span class="n">host</span> <span class="o">=</span> <span class="n">database_information</span><span class="p">[</span><span class="s1">&#39;server_name&#39;</span><span class="p">]</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="n">database_information</span><span class="p">[</span><span class="s1">&#39;port&#39;</span><span class="p">]</span>
+            <span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">:</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span> <span class="k">if</span> <span class="n">port</span> <span class="k">else</span> <span class="n">host</span>
+
+            <span class="c1"># dialect+driver://username:password@servername:port/database</span>
+            <span class="n">connection</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">+</span><span class="si">{}</span><span class="s1">://</span><span class="si">{}</span><span class="s1">:</span><span class="si">{}</span><span class="s1">@</span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">database_information</span><span class="p">[</span><span class="s1">&#39;dialect&#39;</span><span class="p">],</span>
+                <span class="n">database_information</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">],</span>
+                <span class="n">database_information</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">],</span>
+                <span class="n">database_information</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">],</span>
+                <span class="n">host</span><span class="p">,</span>
+                <span class="n">database_information</span><span class="p">[</span><span class="s1">&#39;database&#39;</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span>
+            <span class="c1"># self.engine.raw_connection()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_type</span> <span class="o">==</span> <span class="s1">&#39;csv&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">counts_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_file</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;Unknown output type </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_type</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="OutputManager.update_outputs"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.OutputManager.update_outputs">[docs]</a>    <span class="k">def</span> <span class="nf">update_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update outputs: writing in csv file or in database</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_type</span> <span class="o">==</span> <span class="s1">&#39;csv&#39;</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">counts_path</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">counts_path</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_type</span> <span class="o">==</span> <span class="s1">&#39;database&#39;</span><span class="p">:</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span> <span class="n">if_exists</span><span class="o">=</span><span class="s1">&#39;append&#39;</span><span class="p">,</span>
+                      <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span></div></div>
+
+
+<span class="c1">#           _         _                  _    _____ _                 _</span>
+<span class="c1">#     /\   | |       | |                | |  / ____(_)               | |</span>
+<span class="c1">#    /  \  | |__  ___| |_ _ __ __ _  ___| |_| (___  _ _ __ ___  _   _| | __ _</span>
+<span class="c1">#   / /\ \ | &#39;_ \/ __| __| &#39;__/ _` |/ __| __|\___ \| | &#39;_ ` _ \| | | | |/ _` |</span>
+<span class="c1">#  / ____ \| |_) \__ \ |_| | | (_| | (__| |_ ____) | | | | | | | |_| | | (_| |</span>
+<span class="c1"># /_/    \_\_.__/|___/\__|_|  \__,_|\___|\__|_____/|_|_| |_| |_|\__,_|_|\__,_|</span>
+
+<div class="viewcode-block" id="AbstractSimulation"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.AbstractSimulation">[docs]</a><span class="k">class</span> <span class="nc">AbstractSimulation</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abstract class from which any simulation class inherits.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="AbstractSimulation.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.AbstractSimulation.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">stock_agent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;outputs/&#39;</span><span class="p">,</span>
+                 <span class="n">target_agent_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_results</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">input_dir</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">load_from_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">save_to_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">shared_data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the simulation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            start_id: ID of the (first) simulation</span>
+<span class="sd">            model: instance of the model to run</span>
+<span class="sd">            model_path: path to the filename holding the description of the</span>
+<span class="sd">              model, used if *model* is None</span>
+<span class="sd">            stock_agent: TODO</span>
+<span class="sd">            output_dir: name of the directory for simulation outputs</span>
+<span class="sd">            target_agent_class: agent class representing the top level in the</span>
+<span class="sd">              simulation</span>
+<span class="sd">            save_results: True if simulation outputs have to be saved,</span>
+<span class="sd">              False otherwise. TODO: should be removed, and replaced</span>
+<span class="sd">              by a set of OutputManagers dedicated to the specific</span>
+<span class="sd">              expected outputs.</span>
+<span class="sd">            load_from_file: a filename from which the initial state of</span>
+<span class="sd">              the simulation (agents corresponding to levels with</span>
+<span class="sd">              their state) is read (instead of running the</span>
+<span class="sd">              `initialize_level` method)</span>
+<span class="sd">            save_to_file: a filename in which the final state of the</span>
+<span class="sd">              simulation (agents corresponding to levels with their</span>
+<span class="sd">              state) is written (after running the `finalize_level`</span>
+<span class="sd">              method)</span>
+<span class="sd">            shared_data: dict containing pre-loaded input data to be shared</span>
+<span class="sd">              between several simulations (without reloading them)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ID of simulation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span> <span class="o">=</span> <span class="n">start_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">EmulsionModel</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">model_path</span><span class="p">,</span> <span class="n">input_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stock_agent</span> <span class="o">=</span> <span class="n">stock_agent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_agent_class</span> <span class="o">=</span> <span class="n">target_agent_class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_manager</span> <span class="o">=</span> <span class="n">OutputManager</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_results</span> <span class="o">=</span> <span class="n">save_results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_to_file</span> <span class="o">=</span> <span class="n">save_to_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_from_file</span> <span class="o">=</span> <span class="n">load_from_file</span>
+
+        <span class="k">if</span> <span class="n">shared_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_input_data</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shared_data</span> <span class="o">=</span> <span class="n">shared_data</span></div>
+
+        <span class="c1"># filename = &#39;counts.csv&#39;</span>
+        <span class="c1"># self.counts_path = str(Path(output_dir, filename))</span>
+
+<div class="viewcode-block" id="AbstractSimulation.evolve"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.AbstractSimulation.evolve">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">evolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Operations to perform at each time step. Should be defined in</span>
+<span class="sd">        subclasses.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            steps:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="AbstractSimulation.run"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.AbstractSimulation.run">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Entry point to simulation execution. Should be defined in</span>
+<span class="sd">        subclasses.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="AbstractSimulation.update_csv_counts"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.AbstractSimulation.update_csv_counts">[docs]</a>    <span class="k">def</span> <span class="nf">update_csv_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">dparams</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;Update the CSV recording of populations in each state. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_results</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dparams</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="c1"># with open(self.counts_path, &#39;a&#39;) as f:</span>
+            <span class="c1">#     df.to_csv(f, header=header, index=False)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_manager</span><span class="o">.</span><span class="n">update_outputs</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AbstractSimulation.init_input_data"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.AbstractSimulation.init_input_data">[docs]</a>    <span class="k">def</span> <span class="nf">init_input_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize input data. This is composed of two separate operations:</span>
+<span class="sd">        reading CSV files representing data-based parameters and</span>
+<span class="sd">        performing preprocessing operations, which can occur either</span>
+<span class="sd">        before of after loading data-based parameters.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared_data</span> <span class="o">=</span> <span class="p">{}</span>   <span class="c1"># (level, filename) -&gt; Pandas DF</span>
+
+        <span class="c1"># instantiate all preprocessors</span>
+        <span class="n">before_db_params</span><span class="p">,</span> <span class="n">after_db_params</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="c1">## do preprocessing that do not need data_based parameters:</span>
+        <span class="k">for</span> <span class="n">preproc_spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">preprocessing</span><span class="p">:</span>
+            <span class="n">class_name</span> <span class="o">=</span> <span class="n">preproc_spec</span><span class="p">[</span><span class="s1">&#39;class_name&#39;</span><span class="p">]</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">preproc_spec</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">])</span>
+            <span class="n">module_name</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parts</span> <span class="o">+</span> <span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="p">,))</span>
+            <span class="n">preproc_class</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">load_class</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="n">module_name</span><span class="p">,</span> <span class="n">class_name</span><span class="o">=</span><span class="n">class_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;use_data_based_parameters&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">preproc_spec</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">preproc_spec</span><span class="p">[</span><span class="s1">&#39;use_data_based_parameters&#39;</span><span class="p">]:</span>
+                <span class="n">db_params</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">db_params</span> <span class="o">=</span> <span class="n">preproc_spec</span><span class="p">[</span><span class="s1">&#39;use_data_based_parameters&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_params</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">db_params</span> <span class="o">=</span> <span class="p">[</span><span class="n">db_params</span><span class="p">]</span>
+            <span class="n">preprocessor</span> <span class="o">=</span> <span class="n">preproc_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data_based_parameters</span><span class="o">=</span><span class="n">db_params</span><span class="p">,</span> <span class="o">**</span><span class="n">preproc_spec</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">db_params</span><span class="p">:</span>
+                <span class="n">before_db_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">after_db_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">preprocessor</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">preprocessor</span> <span class="ow">in</span> <span class="n">before_db_params</span><span class="p">:</span>
+            <span class="n">preprocessor</span><span class="p">()</span>
+
+        <span class="c1"># handle data-based parameters</span>
+        <span class="k">for</span> <span class="n">level</span><span class="p">,</span> <span class="n">csv_dict</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">databased_parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">csv_info</span> <span class="ow">in</span> <span class="n">csv_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">key_variables</span><span class="p">,</span> <span class="n">l_params</span> <span class="o">=</span> <span class="n">csv_info</span>
+                <span class="n">index_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_variables</span><span class="p">)</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">input_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span>
+                                 <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">index_size</span><span class="p">)))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Loaded CSV file </span><span class="si">{}</span><span class="s1"> indexed by </span><span class="si">{}</span><span class="s1"> for parameters </span><span class="si">{}</span><span class="s1"> at level </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">key_variables</span><span class="p">,</span> <span class="n">l_params</span><span class="p">,</span> <span class="n">level</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">shared_data</span><span class="p">[(</span><span class="n">level</span><span class="p">,</span> <span class="n">filename</span><span class="p">)]</span> <span class="o">=</span> <span class="n">df</span>
+
+        <span class="c1">## do preprocessing that need data_based parameters:</span>
+        <span class="k">for</span> <span class="n">preprocessor</span> <span class="ow">in</span> <span class="n">after_db_params</span><span class="p">:</span>
+            <span class="n">preprocessor</span><span class="p">()</span></div></div>
+
+
+    <span class="c1"># def counts_to_csv(self):</span>
+    <span class="c1">#     &quot;&quot;&quot;Record the counts into a CSV file.&quot;&quot;&quot;</span>
+    <span class="c1">#     self.counts.to_csv(self.counts_path, index=False)</span>
+
+<span class="c1">#   _____ _                 _       _   _</span>
+<span class="c1">#  / ____(_)               | |     | | (_)</span>
+<span class="c1"># | (___  _ _ __ ___  _   _| | __ _| |_ _  ___  _ __</span>
+<span class="c1">#  \___ \| | &#39;_ ` _ \| | | | |/ _` | __| |/ _ \| &#39;_ \</span>
+<span class="c1">#  ____) | | | | | | | |_| | | (_| | |_| | (_) | | | |</span>
+<span class="c1"># |_____/|_|_| |_| |_|\__,_|_|\__,_|\__|_|\___/|_| |_|</span>
+
+<div class="viewcode-block" id="Simulation"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.Simulation">[docs]</a><span class="k">class</span> <span class="nc">Simulation</span><span class="p">(</span><span class="n">AbstractSimulation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Simulation class is aimed at running one repetition of a given</span>
+<span class="sd">    model (for several repetitions, use `MultiSimulation`).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Simulation.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.Simulation.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">simu_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">nocount</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an instance of simulation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            steps: number of time steps to run</span>
+<span class="sd">            simu_id: ID of the simulation</span>
+<span class="sd">            silent: if False, show a progress bar during simulation execution</span>
+<span class="sd">            quiet: if True, show no progressbar at all</span>
+
+<span class="sd">        See Also:</span>
+<span class="sd">            `emulsion.tools.simulation.AbstractSimulation`_</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simu_id</span> <span class="o">=</span> <span class="n">simu_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steps</span> <span class="o">=</span> <span class="n">steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">silent</span> <span class="o">=</span> <span class="n">silent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="n">quiet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nocount</span> <span class="o">=</span> <span class="n">nocount</span>
+
+        <span class="k">del</span><span class="p">(</span><span class="n">others</span><span class="p">[</span><span class="s1">&#39;target_agent_class&#39;</span><span class="p">])</span>
+        <span class="n">others</span><span class="p">[</span><span class="s1">&#39;simu_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simu_id</span>
+        <span class="n">others</span><span class="p">[</span><span class="s1">&#39;simulation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_agent</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span> <span class="c1">##self.target_agent_class(**others)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputs_period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">level</span><span class="p">][</span><span class="s1">&#39;period&#39;</span><span class="p">]</span>\
+                                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">level</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">outputs</span> <span class="k">else</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="Simulation.log_path"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.Simulation.log_path">[docs]</a>    <span class="k">def</span> <span class="nf">log_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the log path used by current simulation&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_manager</span><span class="o">.</span><span class="n">log_path</span></div>
+
+<div class="viewcode-block" id="Simulation.init_agent"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.Simulation.init_agent">[docs]</a>    <span class="k">def</span> <span class="nf">init_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an agent from the target class.&quot;&quot;&quot;</span>
+        <span class="n">toplevel_agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_agent_class</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">toplevel_agent</span></div>
+
+<div class="viewcode-block" id="Simulation.evolve"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.Simulation.evolve">[docs]</a>    <span class="k">def</span> <span class="nf">evolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make the target agent evolve.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            steps: the number of time steps to run</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">evolve</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Simulation.run"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.Simulation.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dparams</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;Make the simulation progress.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">silent</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span><span class="p">:</span>
+            <span class="n">progress</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">progress</span> <span class="o">=</span> <span class="n">trange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">steps</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="n">f</span><span class="s1">&#39;[Run </span><span class="si">{self.simu_id}</span><span class="s1">]&#39;</span><span class="p">,</span>
+                              <span class="n">bar_format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{l_bar}{bar}</span><span class="s1">| </span><span class="si">{n_fmt}</span><span class="s1">/</span><span class="si">{total_fmt}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocount</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_csv_counts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">counts</span><span class="p">,</span> <span class="n">dparams</span><span class="o">=</span><span class="n">dparams</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">evolve</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs_period</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nocount</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_csv_counts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">counts</span><span class="p">,</span>
+                                       <span class="c1"># header=not exists(self.counts_path),</span>
+                                       <span class="n">dparams</span><span class="o">=</span><span class="n">dparams</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">conditional_stop</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="s1">&#39;stop_condition&#39;</span><span class="p">):</span>
+                <span class="n">debuginfo</span><span class="p">(</span><span class="s1">&#39;Stop condition fulfilled: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_description</span><span class="p">[</span><span class="s1">&#39;time_info&#39;</span><span class="p">][</span><span class="s1">&#39;stop_condition&#39;</span><span class="p">]))</span>
+                <span class="k">break</span>
+        <span class="c1">## make main level agent run a &quot;finalization&quot; procedure if any</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">finalize_level</span><span class="p">(</span><span class="n">simulation</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_to_file</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">save_state_to_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simu_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_to_file</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a pandas DataFrame contains counts of each process if existing.</span>
+<span class="sd">        TODO: column steps need to be with one of process</span>
+<span class="sd">        and NO column steps for inter herd</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent</span><span class="o">.</span><span class="n">counts</span>
+        <span class="c1"># insert explcitily modified parameters if asked for log</span>
+        <span class="n">to_log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">params_to_log</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">to_log</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">to_log</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="c1"># insert ID for the simulation</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;simu_id&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simu_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+        <span class="c1"># res = None</span>
+        <span class="c1"># for comp in self.agent:</span>
+        <span class="c1">#     try:</span>
+        <span class="c1">#         counts = pd.DataFrame(comp.counts)</span>
+        <span class="c1">#         res = res.join(counts, lsuffix=&#39;res&#39;, rsuffix=&#39;counts&#39;)\</span>
+        <span class="c1">#                                         if not res is None else counts</span>
+        <span class="c1">#     except AttributeError:</span>
+        <span class="c1">#         pass</span>
+        <span class="c1">#     except Exception as e:</span>
+        <span class="c1">#         raise e</span>
+        <span class="c1"># if not res is None:</span>
+        <span class="c1">#     res.insert(0, &#39;steps&#39;, res.index)</span>
+        <span class="c1">#     res.insert(0, &#39;simu_id&#39;, self.simu_id)</span>
+        <span class="c1"># return res</span>
+
+<span class="c1">#  __  __       _ _   _  _____ _                 _       _   _</span>
+<span class="c1"># |  \/  |     | | | (_)/ ____(_)               | |     | | (_)</span>
+<span class="c1"># | \  / |_   _| | |_ _| (___  _ _ __ ___  _   _| | __ _| |_ _  ___  _ __</span>
+<span class="c1"># | |\/| | | | | | __| |\___ \| | &#39;_ ` _ \| | | | |/ _` | __| |/ _ \| &#39;_ \</span>
+<span class="c1"># | |  | | |_| | | |_| |____) | | | | | | | |_| | | (_| | |_| | (_) | | | |</span>
+<span class="c1"># |_|  |_|\__,_|_|\__|_|_____/|_|_| |_| |_|\__,_|_|\__,_|\__|_|\___/|_| |_|</span>
+
+<div class="viewcode-block" id="MultiSimulation"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.MultiSimulation">[docs]</a><span class="k">class</span> <span class="nc">MultiSimulation</span><span class="p">(</span><span class="n">AbstractSimulation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;MultiSimulation can handle multiple repetitions of a given model.</span>
+<span class="sd">    For sensibility study (same model with different values of variables),</span>
+<span class="sd">    please check out SensitivitySimulation.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MultiSimulation.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.MultiSimulation.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multi_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">nb_simu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+                 <span class="n">set_seed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">silent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">nocount</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">dparams</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a simulation with multiple repetitions of the same</span>
+<span class="sd">        model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multi_id</span> <span class="o">=</span> <span class="n">multi_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_simu</span> <span class="o">=</span> <span class="n">nb_simu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_seed</span> <span class="o">=</span> <span class="n">set_seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">others</span> <span class="o">=</span> <span class="n">others</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">silent</span> <span class="o">=</span> <span class="n">silent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span> <span class="o">=</span> <span class="n">quiet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nocount</span> <span class="o">=</span> <span class="n">nocount</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dparams</span> <span class="o">=</span> <span class="n">dparams</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_simu</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_simu</span><span class="o">.</span><span class="n">values</span><span class="p">()</span><span class="o">.</span><span class="fm">__iter__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="MultiSimulation.evolve"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.MultiSimulation.evolve">[docs]</a>    <span class="k">def</span> <span class="nf">evolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">simu</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_simu</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">simu</span><span class="o">.</span><span class="n">evolve</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MultiSimulation.run"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.MultiSimulation.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run all repetitions one by one.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">silent</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">quiet</span><span class="p">:</span>
+            <span class="n">progress</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">nb_simu</span><span class="p">),</span>
+                            <span class="n">bar_format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{l_bar}{bar}</span><span class="s1">| </span><span class="si">{n_fmt}</span><span class="s1">/</span><span class="si">{total_fmt}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">progress</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">nb_simu</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">simu_id</span> <span class="ow">in</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_seed</span><span class="p">:</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">simu_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;model&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+            <span class="n">simu</span> <span class="o">=</span> <span class="n">Simulation</span><span class="p">(</span><span class="n">simu_id</span><span class="o">=</span><span class="n">simu_id</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">silent</span><span class="p">,</span>
+                              <span class="n">quiet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quiet</span><span class="p">,</span> <span class="n">nocount</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nocount</span><span class="p">,</span>
+                              <span class="n">dparams</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dparams</span><span class="p">,</span> <span class="n">shared_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shared_data</span><span class="p">,</span>
+                              <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">)</span>
+
+            <span class="n">simu</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stock_agent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">d_simu</span><span class="p">[</span><span class="n">simu_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">simu</span></div>
+
+            <span class="c1"># if update:</span>
+            <span class="c1">#     header = not exists(self.counts_path)</span>
+            <span class="c1">#     self.update_csv_counts(simu.counts, header=header, dparams=dparams)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">l_counts</span> <span class="o">=</span> <span class="p">[</span><span class="n">simu</span><span class="o">.</span><span class="n">counts</span> <span class="k">for</span> <span class="n">simu</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">l_counts</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MultiSimulation.write_dot"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.MultiSimulation.write_dot">[docs]</a>    <span class="k">def</span> <span class="nf">write_dot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">write_dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span class="p">])</span></div></div>
+
+
+<span class="c1">#   _____                _ _   _       _ _          _____ _                 _</span>
+<span class="c1">#  / ____|              (_) | (_)     (_) |        / ____(_)               | |</span>
+<span class="c1"># | (___   ___ _ __  ___ _| |_ ___   ___| |_ _   _| (___  _ _ __ ___  _   _| |</span>
+<span class="c1">#  \___ \ / _ \ &#39;_ \/ __| | __| \ \ / / | __| | | |\___ \| | &#39;_ ` _ \| | | | |</span>
+<span class="c1">#  ____) |  __/ | | \__ \ | |_| |\ V /| | |_| |_| |____) | | | | | | | |_| | |</span>
+<span class="c1"># |_____/ \___|_| |_|___/_|\__|_| \_/ |_|\__|\__, |_____/|_|_| |_| |_|\__,_|_|</span>
+<span class="c1">#                                             __/ |</span>
+<span class="c1">#                                            |___/</span>
+<span class="c1">#        _   _</span>
+<span class="c1">#       | | (_)</span>
+<span class="c1">#   __ _| |_ _  ___  _ __</span>
+<span class="c1">#  / _` | __| |/ _ \| &#39;_ \</span>
+<span class="c1"># | (_| | |_| | (_) | | | |</span>
+<span class="c1">#  \__,_|\__|_|\___/|_| |_|</span>
+
+<div class="viewcode-block" id="SensitivitySimulation"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.SensitivitySimulation">[docs]</a><span class="k">class</span> <span class="nc">SensitivitySimulation</span><span class="p">(</span><span class="n">AbstractSimulation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;SensitivitySimulation can handle sensibility study with a given</span>
+<span class="sd">    pandas DataFrame of parameters or a path linked with file which contains</span>
+<span class="sd">    scenarios of parameters. Then it will be transformed to a dictionary of</span>
+<span class="sd">    scenario in the ```d_scenario``` attribute.</span>
+
+<span class="sd">    For instance, d_scenario could be the form (QFever model example) :</span>
+<span class="sd">        {0: {&#39;m&#39;: 0.7, &#39;q&#39;: 0.02 ...},</span>
+<span class="sd">         1: {&#39;m&#39;: 0.5, &#39;q&#39;: 0.02 ...},</span>
+<span class="sd">         2: ...,</span>
+<span class="sd">         ... }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SensitivitySimulation.__init__"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.SensitivitySimulation.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nb_multi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">others</span> <span class="o">=</span> <span class="n">others</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="s1">&#39;start_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Retrieving DataFrame and creation of dictionnary of simulation/scenario</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">scenario_path</span><span class="p">)</span> <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_multi</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="k">if</span> <span class="n">nb_multi</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">nb_multi</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_scenario</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_multi</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SensitivitySimulation.run"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.SensitivitySimulation.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make the simulation advance.&quot;&quot;&quot;</span>
+        <span class="n">bar_sens</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">nb_multi</span><span class="p">),</span>
+                        <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;[Sensitivity Simulation]&#39;</span><span class="p">)</span>
+
+        <span class="c1"># for multi_id, scenario in bar_sens(self.d_scenario.items()):</span>
+        <span class="k">for</span> <span class="n">multi_id</span> <span class="ow">in</span> <span class="n">bar_sens</span><span class="p">:</span>
+            <span class="n">scenario</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_scenario</span><span class="p">[</span><span class="n">multi_id</span><span class="p">]</span>
+            <span class="c1"># Copy a model</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="c1"># Modify model</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">scenario</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">model</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+            <span class="c1"># Instantiate MultiSimulation and execution</span>
+            <span class="n">multi</span> <span class="o">=</span> <span class="n">MultiSimulation</span><span class="p">(</span><span class="n">multi_id</span><span class="o">=</span><span class="n">multi_id</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">)</span>
+            <span class="n">multi</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dparams</span><span class="o">=</span><span class="n">scenario</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stock_agent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">d_multi</span><span class="p">[</span><span class="n">multi_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">multi</span></div>
+
+            <span class="c1"># if update:</span>
+            <span class="c1">#     header = not exists(self.counts_path)</span>
+
+            <span class="c1">#     counts = multi.counts</span>
+            <span class="c1">#     for name, value in self.d_scenario[multi_id].items():</span>
+            <span class="c1">#         counts.insert(0, name, value)</span>
+
+            <span class="c1">#     self.update_csv_counts(counts, header=header)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">l_counts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">multi_id</span><span class="p">,</span> <span class="n">multi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_multi</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">counts</span> <span class="o">=</span> <span class="n">multi</span><span class="o">.</span><span class="n">counts</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_scenario</span><span class="p">[</span><span class="n">multi_id</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">counts</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+            <span class="n">counts</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;scenario_id&#39;</span><span class="p">,</span> <span class="n">multi_id</span><span class="p">)</span>
+            <span class="n">l_counts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">l_counts</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SensitivitySimulation.write_dot"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.simulation.SensitivitySimulation.write_dot">[docs]</a>    <span class="k">def</span> <span class="nf">write_dot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">write_dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">others</span><span class="p">[</span><span class="s1">&#39;output_dir&#39;</span><span class="p">])</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

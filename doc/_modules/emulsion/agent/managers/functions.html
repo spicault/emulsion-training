@@ -1,0 +1,255 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.agent.managers.functions &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.agent.managers.functions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: emulsion.agent.managers.functions</span>
+
+<span class="sd">.. moduleauthor:: Sébastien Picault &lt;sebastien.picault@inra.fr&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># [HEADER]</span>
+
+<span class="kn">from</span>   <span class="nn">collections</span>               <span class="k">import</span> <span class="n">OrderedDict</span>
+
+
+<span class="c1">#  ______                _   _</span>
+<span class="c1"># |  ____|              | | (_)</span>
+<span class="c1"># | |__ _   _ _ __   ___| |_ _  ___  _ __  ___</span>
+<span class="c1"># |  __| | | | &#39;_ \ / __| __| |/ _ \| &#39;_ \/ __|</span>
+<span class="c1"># | |  | |_| | | | | (__| |_| | (_) | | | \__ \</span>
+<span class="c1"># |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/</span>
+
+<span class="k">def</span> <span class="nf">_group_by_populations</span><span class="p">(</span><span class="n">transitions</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;`transitions` is a list of tuples (state, flux, value,</span>
+<span class="sd">    cond_result, actions) where:</span>
+<span class="sd">    - state is a possible state reachable from the current state flux</span>
+<span class="sd">    - is either &#39;rate&#39; or &#39;proba&#39; or &#39;amount&#39; or &#39;amount-all-but&#39;</span>
+<span class="sd">    - value is the corresponding rate or probability or amount</span>
+<span class="sd">    - cond_result is a couple (either (&#39;population&#39;, qty, esc) or (&#39;agents&#39;, list, esc))</span>
+<span class="sd">      describing who fulfills the condition to cross the transition</span>
+<span class="sd">    - actions is the list of actions on cross</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">transitions_by_pop</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">state</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">actions</span> <span class="ow">in</span> <span class="n">transitions</span><span class="p">:</span>
+        <span class="n">desc</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">esc</span> <span class="o">=</span> <span class="n">population</span>
+        <span class="k">if</span> <span class="n">desc</span> <span class="o">==</span> <span class="s1">&#39;agents&#39;</span><span class="p">:</span>
+            <span class="n">pop</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>    <span class="c1"># required to be hashable</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">esc</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">transitions_by_pop</span><span class="p">:</span>
+            <span class="n">transitions_by_pop</span><span class="p">[(</span><span class="n">desc</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">esc</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">transitions_by_pop</span><span class="p">[(</span><span class="n">desc</span><span class="p">,</span> <span class="n">pop</span><span class="p">,</span> <span class="n">esc</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">state</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">actions</span><span class="p">))</span>
+    <span class="c1"># rewrite elements as a list</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">transitions_by_pop</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">_split_populations</span><span class="p">(</span><span class="n">list_of_items</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transform a list of transitions into a dictionary based on the</span>
+<span class="sd">    underlying populations.</span>
+
+<span class="sd">    `list_of_items` is composed of pairs</span>
+<span class="sd">    - the first element is a tuple (&#39;agents&#39;, frozenset, None)</span>
+<span class="sd">    - the second element is a list of tuples (state, flux, value,</span>
+<span class="sd">      actions) associated with the population/agents</span>
+
+<span class="sd">    Greedy algorithm: the first population of agents is compared with</span>
+<span class="sd">    all others to check if any intersection exists. If so, both are</span>
+<span class="sd">    replaced by their difference (if not empty) with the intersection,</span>
+<span class="sd">    and the intersection is added to the list with a concatenation of</span>
+<span class="sd">    the features attached to both populations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># remove &#39;agents&#39; keyword to facilitate set-like operations</span>
+    <span class="n">population_list</span> <span class="o">=</span> <span class="p">[(</span><span class="n">pop</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">attributes</span><span class="p">)</span> <span class="k">for</span> <span class="n">pop</span><span class="p">,</span> <span class="n">attributes</span> <span class="ow">in</span> <span class="n">list_of_items</span><span class="p">]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">population_list</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># select the first population in the list</span>
+        <span class="n">ref_pop</span><span class="p">,</span> <span class="n">ref_attrib</span> <span class="o">=</span> <span class="n">population_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">intersects</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># check if any intersection with another population</span>
+        <span class="k">while</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">population_list</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">intersects</span><span class="p">:</span>
+            <span class="c1"># intersection found</span>
+            <span class="k">if</span> <span class="n">population_list</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">ref_pop</span><span class="p">:</span>
+                <span class="n">intersects</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">intersects</span><span class="p">:</span>
+            <span class="c1"># retrieve features of the other population</span>
+            <span class="n">other_pop</span><span class="p">,</span> <span class="n">other_attrib</span> <span class="o">=</span> <span class="n">population_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="c1"># compute intersections and differences</span>
+            <span class="n">inter</span> <span class="o">=</span> <span class="n">ref_pop</span> <span class="o">&amp;</span> <span class="n">other_pop</span>
+            <span class="n">new_ref</span> <span class="o">=</span>  <span class="n">ref_pop</span> <span class="o">-</span> <span class="n">inter</span>
+            <span class="n">new_other</span> <span class="o">=</span> <span class="n">other_pop</span> <span class="o">-</span> <span class="n">inter</span>
+            <span class="c1"># if empty populations, remove them else update the populations</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">new_other</span><span class="p">:</span>
+                <span class="n">population_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">population_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_other</span><span class="p">,</span> <span class="n">other_attrib</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">new_ref</span><span class="p">:</span>
+                <span class="n">population_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">population_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_ref</span><span class="p">,</span> <span class="n">ref_attrib</span><span class="p">)</span>
+            <span class="c1"># add the intersection as a new population with a</span>
+            <span class="c1"># concatenation of other properties</span>
+            <span class="n">population_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">inter</span><span class="p">,</span> <span class="n">ref_attrib</span> <span class="o">+</span> <span class="n">other_attrib</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># if no intersection was found, move to next item</span>
+            <span class="c1"># (otherwise keep the same and iterate again on other</span>
+            <span class="c1"># items)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="p">[((</span><span class="s1">&#39;agents&#39;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">agents</span><span class="p">),</span> <span class="kc">None</span><span class="p">),</span> <span class="n">attributes</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">agents</span><span class="p">,</span> <span class="n">attributes</span> <span class="ow">in</span> <span class="n">population_list</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="group_and_split_populations"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.functions.group_and_split_populations">[docs]</a><span class="k">def</span> <span class="nf">group_and_split_populations</span><span class="p">(</span><span class="n">transitions</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transform a list of transitions into a dictionary based on the</span>
+<span class="sd">    underlying populations.</span>
+
+<span class="sd">    `transitions` is a list of tuples (state, flux, value,</span>
+<span class="sd">    cond_result, actions) where:</span>
+<span class="sd">    - state is a possible state reachable from the current state flux</span>
+<span class="sd">    - is either &#39;rate&#39; or &#39;proba&#39; or &#39;amount&#39; or &#39;amount-all-but&#39;</span>
+<span class="sd">    - value is the corresponding rate or probability or amount</span>
+<span class="sd">    - cond_result is a couple (either (&#39;population&#39;, qty, esc) or (&#39;agents&#39;, list, None))</span>
+<span class="sd">      describing who fulfills the condition to cross the transition</span>
+<span class="sd">    - actions is the list of actions on cross</span>
+
+<span class="sd">    The goal of this function is to restructure all those elements for</span>
+<span class="sd">    disjoint sub-populations.</span>
+
+<span class="sd">    Return a list of tuples:</span>
+<span class="sd">      either ((&#39;population&#39;, qty, esc), attributes)</span>
+<span class="sd">      or     ((&#39;agents&#39;, list, None), attributes)</span>
+<span class="sd">    where attributes is a list of tuples (state, flux, value, actions)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">### 1st step: gather elements</span>
+    <span class="c1"># list_of_items is composed of pairs</span>
+    <span class="c1"># - the first element is a tuple either (&#39;population&#39;, qty) or</span>
+    <span class="c1">#   (&#39;agents&#39;, frozenset)</span>
+    <span class="c1"># - the second element is a list of tuples (state, flux, value,</span>
+    <span class="c1">#   actions) associated with the population/agents</span>
+    <span class="n">list_of_items</span> <span class="o">=</span> <span class="n">_group_by_populations</span><span class="p">(</span><span class="n">transitions</span><span class="p">)</span>
+    <span class="c1"># if based on population (not on agents) then we&#39;re done (assuming</span>
+    <span class="c1"># that all other values are based on populations)</span>
+    <span class="k">if</span> <span class="n">list_of_items</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;population&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">list_of_items</span>
+    <span class="c1"># otherwise we have true agents populations</span>
+    <span class="c1">### 2nd step: split sub-populations</span>
+    <span class="n">result</span> <span class="o">=</span>  <span class="n">_split_populations</span><span class="p">(</span><span class="n">list_of_items</span><span class="p">)</span>
+    <span class="c1">#print(result)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

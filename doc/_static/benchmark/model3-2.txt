@@ -1,0 +1,10 @@
+             EmulsionModel "stochastic_SIR_demo_structured"
+              ROLE OF PARAMETERS (AND CURRENT DEFINITION)
+------------------------------------------------------------------------
+force_infection_juveniles [parameter]:
+	force of infection experienced by juveniles
+	beta_W * total_I_J / (total_J + 1e-9) + beta_B * total_I_A / (total_A + 1e-9)
+force_infection_adults [parameter]:
+	force of infection experienced by adults
+	beta_W * total_I_A / (total_A + 1e-9) + beta_B * total_I_J / (total_J + 1e-9)
+------------------------------------------------------------------------

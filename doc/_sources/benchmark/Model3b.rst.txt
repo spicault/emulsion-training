@@ -1,0 +1,61 @@
+Model 3b (Model 3 transformed to IBM)
+***************************************************
+
+File with full comments: `model3b.yaml <../_static/benchmark/model3b.yaml>`_
+
+.. literalinclude:: ../_static/benchmark/model3b-short.yaml
+
+
+To run the model for 100 stochastic repetitions:
+
+.. code-block:: bash
+
+  emulsion run --plot model3b.yaml -r 100 --silent
+
+Which produces the following outputs:
+
+.. image:: ../_images/benchmark/model3b-output1.png
+   :width: 75%
+
+.. image:: ../_images/benchmark/model3b-output2.png
+   :width: 75%
+
+.. image:: ../_images/benchmark/model3b-output3.png
+   :width: 75%
+
+To produce the diagrams of the state machines which control health
+states and age groups:
+
+.. code-block:: bash
+
+   emulsion diagrams model3b.yaml
+
+Which gives:
+
+.. graphviz:: ../_images/benchmark/model3b-SIR.dot
+
+.. graphviz:: ../_images/benchmark/model3b-JA.dot
+
+
+To view model parameters:
+
+.. code-block:: bash
+
+   emulsion show model3b.yaml
+
+which produces:
+
+.. literalinclude:: ../_images/benchmark/model3b.txt
+
+
+It is also possible to view the description of the initial
+transmission rate and the forces of infection
+experienced by each group:
+
+.. code-block:: bash
+
+   emulsion describe model3b.yaml initial_beta_i force_infection_juveniles force_infection_adults
+
+which produces:
+
+.. literalinclude:: ../_images/benchmark/model3b-2.txt

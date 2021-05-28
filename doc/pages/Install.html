@@ -1,0 +1,457 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>2. Installation &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3. Getting started with EMULSION" href="Getting_started.html" />
+    <link rel="prev" title="1. Information" href="Information.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="installation">
+<h1>2. Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="requirements">
+<h2>2.1. Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>System</dt>
+<dd><p class="first">EMULSION has been designed under <strong>MacOS</strong> and <strong>Linux</strong>, and
+works (with minor limitations) with <strong>Windows 10</strong>. See the
+installation procedure specific to your system.</p>
+<p class="last">Also, in what follows, we assume that MacOS and Linux users are
+working with a <strong>bash</strong> shell. If you are not sure, typing: <code class="docutils literal notranslate"><span class="pre">echo</span>
+<span class="pre">$SHELL</span></code> in a terminal should print <code class="docutils literal notranslate"><span class="pre">/bin/bash</span></code>. Otherwise, please refer to
+the documentation of your shell to adapt the commands below.</p>
+</dd>
+<dt>Language</dt>
+<dd><p class="first">EMULSION is written in <strong>Python 3</strong> (version 3.6 or higher). In what
+follows, we assume that <code class="docutils literal notranslate"><span class="pre">python3</span></code> and <code class="docutils literal notranslate"><span class="pre">pip3</span></code> refer to your
+Python3 installation. If not, replace them by your own
+configuration in the commands below (e.g. with Windows:
+respectively <code class="docutils literal notranslate"><span class="pre">python.exe</span></code> and <code class="docutils literal notranslate"><span class="pre">pip.exe</span></code>).</p>
+<p class="last">To install Python on your system, please consult
+<a class="reference external" href="https://www.python.org/downloads/">Python website</a>. When
+installing on Windows, check the box “Add Python 3.x to PATH” to
+make python commands available from the terminal.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="install-with-pip-recommended">
+<h2>2.2. Install with <code class="docutils literal notranslate"><span class="pre">pip</span></code> (recommended)<a class="headerlink" href="#install-with-pip-recommended" title="Permalink to this headline">¶</a></h2>
+<img alt="https://img.shields.io/pypi/pyversions/emulsion.svg?logo=python&amp;logoColor=white" src="https://img.shields.io/pypi/pyversions/emulsion.svg?logo=python&amp;logoColor=white" />
+<img alt="https://img.shields.io/pypi/v/emulsion.svg?" src="https://img.shields.io/pypi/v/emulsion.svg?" />
+<img alt="https://img.shields.io/pypi/wheel/emulsion.svg?" src="https://img.shields.io/pypi/wheel/emulsion.svg?" />
+<img alt="https://img.shields.io/pypi/status/emulsion.svg?" src="https://img.shields.io/pypi/status/emulsion.svg?" />
+<img alt="https://img.shields.io/pypi/l/emulsion.svg?" src="https://img.shields.io/pypi/l/emulsion.svg?" />
+<img alt="https://img.shields.io/pypi/dm/emulsion.svg?" src="https://img.shields.io/pypi/dm/emulsion.svg?" />
+<div class="section" id="linux-and-macos">
+<h3>Linux and MacOS:<a class="headerlink" href="#linux-and-macos" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo pip3 install emulsion
+init_emulsion
+<span class="nb">source</span> <span class="nv">$HOME</span>/.bashrc
+</pre></div>
+</div>
+<p>Depending on how you installed Python, <code class="docutils literal notranslate"><span class="pre">sudo</span></code> is sometimes
+optional.</p>
+<p>The second command (<code class="docutils literal notranslate"><span class="pre">init_emulsion</span></code>) initializes command-line
+completion (available with a bash shell, under Linux or MacOS), which allows
+to use <code class="docutils literal notranslate"><span class="pre">TAB</span></code> key to get suggestions on what is expected (options,
+files, parameters…) in the command. It also creates (or modifies)
+the environment variable named <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code> to make EMULSION able to
+find code add-ons located in the same directory as your models.</p>
+<p>EMULSION <a class="reference external" href="https://sourcesup.renater.fr/www/emulsion-public">documentation</a>
+is provided on-line.</p>
+</div>
+<div class="section" id="windows">
+<h3>Windows<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h3>
+<p>Open a terminal (“Command Prompt” or “Windows Power Shell”), then
+type:</p>
+<div class="highlight-batch notranslate"><div class="highlight"><pre><span></span>pip.exe install emulsion
+</pre></div>
+</div>
+<p>To make EMULSION able to find code add-ons in the directory where your model
+files are located, you must declare (or modify) an environment
+variable named <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code> to add the current directory (“<code class="docutils literal notranslate"><span class="pre">.</span></code>”).</p>
+<p>To do so, you can use the graphical interface (from System
+Preferences), or the terminal. The syntax depends on the kind of
+terminal you are using:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">with the “Command Prompt” (<code class="docutils literal notranslate"><span class="pre">cmd.exe</span></code>), type:</p>
+<div class="highlight-batch notranslate"><div class="highlight"><pre><span></span>setx PYTHONPATH <span class="s2">&quot;.;</span><span class="nv">%PYTHONPATH%</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">with “Windows Power Shell”, type:</p>
+<div class="highlight-batch notranslate"><div class="highlight"><pre><span></span>setx PYTHONPATH <span class="s2">&quot;.;$Env:PYTHONPATH&quot;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="install-third-party-software">
+<h2>2.3. Install third-party software<a class="headerlink" href="#install-third-party-software" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://www.graphviz.org">Graphviz</a> is highly recommended
+(otherwise, simulations will run but you will not be able to get the
+nice diagrams representing model structure).</p>
+<div class="section" id="linux">
+<h3>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install graphviz
+</pre></div>
+</div>
+</div>
+<div class="section" id="macos">
+<h3>MacOS<a class="headerlink" href="#macos" title="Permalink to this headline">¶</a></h3>
+<p>To install on MacOS, use for instance <a class="reference external" href="https://brew.sh/">homebrew</a></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew install graphviz
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>Windows<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>To install on Windows, download the latest stable version from
+<a class="reference external" href="https://graphviz.gitlab.io/_pages/Download/Download_windows.html">Graphviz website</a>
+and update the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable according to where you
+installed the executable files (especially <code class="docutils literal notranslate"><span class="pre">dot.exe</span></code>). You also need
+to let Graphviz find the relevant plug-ins (especially for SVG, PDF,
+PNG diagram production) in the Windows environment.
+For instance, if <code class="docutils literal notranslate"><span class="pre">dot.exe</span></code> is located in
+<code class="docutils literal notranslate"><span class="pre">C:\Program</span> <span class="pre">Files</span> <span class="pre">(x86)\Graphviz\bin</span></code>, just type:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">in the “Command Prompt”:</p>
+<div class="highlight-batch notranslate"><div class="highlight"><pre><span></span>setx PATH <span class="s2">&quot;C:\Program Files (x86)\Graphviz\bin;</span><span class="nv">%PATH%</span><span class="s2">&quot;</span>
+dot -c
+</pre></div>
+</div>
+</li>
+<li><p class="first">in “Windows Power Shell”:</p>
+<div class="highlight-batch notranslate"><div class="highlight"><pre><span></span>setx PATH <span class="s2">&quot;C:\Program Files (x86)\Graphviz\bin;$Env:PATH&quot;</span>
+dot -c
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+<p>If you encounter any problem with the <code class="docutils literal notranslate"><span class="pre">dot</span></code> command (e.g. a message
+saying that some file does not have the proper writing permission),
+execute your shell (“Command Prompt” or “Windows Power Shell”) as an
+administrator and retry the command.</p>
+</div>
+</div>
+<div class="section" id="test-your-installation">
+<h2>2.4. Test your installation<a class="headerlink" href="#test-your-installation" title="Permalink to this headline">¶</a></h2>
+<p>Download <strong>model examples</strong> <a class="reference external" href="../models.zip">here.</a></p>
+<p>Extract the archive, open a terminal in the <code class="docutils literal notranslate"><span class="pre">models</span></code> directory, then type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> quickstart
+emulsion run --plot quickstart.yaml --view-model --silent
+</pre></div>
+</div>
+<p>This should produce the following output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Simulation</span> <span class="n">level</span><span class="p">:</span><span class="n">population</span>
+<span class="n">Generated</span> <span class="n">state</span> <span class="n">machine</span> <span class="n">diagram</span> <span class="n">img</span><span class="o">/</span><span class="n">Quickstart_age_group_machine</span><span class="o">.</span><span class="n">svg</span>
+<span class="n">Generated</span> <span class="n">state</span> <span class="n">machine</span> <span class="n">diagram</span> <span class="n">img</span><span class="o">/</span><span class="n">Quickstart_life_cycle_machine</span><span class="o">.</span><span class="n">svg</span>
+<span class="n">Generated</span> <span class="n">state</span> <span class="n">machine</span> <span class="n">diagram</span> <span class="n">img</span><span class="o">/</span><span class="n">Quickstart_health_state_machine</span><span class="o">.</span><span class="n">svg</span>
+<span class="mi">100</span><span class="o">%|*************************************************************|</span> <span class="mi">10</span><span class="o">/</span><span class="mi">10</span>
+<span class="n">Simulation</span> <span class="n">finished</span> <span class="ow">in</span> <span class="mf">12.37</span> <span class="n">s</span>
+<span class="n">Outputs</span> <span class="n">stored</span> <span class="ow">in</span> <span class="n">outputs</span><span class="o">/</span><span class="n">counts</span><span class="o">.</span><span class="n">csv</span>
+<span class="n">Outputs</span> <span class="n">plot</span> <span class="ow">in</span> <span class="n">file</span><span class="p">:</span> <span class="n">img</span><span class="o">/</span><span class="n">Quickstart</span><span class="o">.</span><span class="n">html</span>
+</pre></div>
+</div>
+<p>and the following figures should appear in your navigator:</p>
+<div align="center" class="align-center"><div class="graphviz"><object data="../_images/graphviz-e36a425fdef7370b251e8b9cae812272d7282e46.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;J&quot; [shape=&quot;Mrecord&quot;, label=&quot;{{\ J\ |&amp;#9670;}}&quot;, tooltip=&quot;J (Juvenile):
+	juvenile animals&quot;, fillcolor=orange, style=&quot;filled,rounded,bold&quot;] ;
+	&quot;A&quot; [shape=&quot;Mrecord&quot;, label=&quot;{{\ A\ |&amp;#9670;}}&quot;, tooltip=&quot;A (Adult):
+	adult animals&quot;, fillcolor=brown, style=&quot;filled,rounded&quot;] ;
+	&quot;J&quot; -&gt; &quot;A&quot; [label=&quot;proba: 1&quot;, labeltooltip=&quot;proba: 1&quot;, arrowtail=&quot;nonetee&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;COND: GreaterThan(age, adult_age)&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+</div>
+<img alt="../_images/Quickstart_JA.png" class="align-left" src="../_images/Quickstart_JA.png" />
+<div align="center" class="align-center"><div class="graphviz"><object data="../_images/graphviz-633772735fe57a94f9561f54e79c1b6f09d0e89d.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;G&quot; [shape=&quot;Mrecord&quot;, label=&quot;G&amp;nbsp;&amp;#9719;&quot;, tooltip=&quot;G (Gestating):
+	state for gestating animals&quot;, fillcolor=green, style=&quot;filled,rounded&quot;] ;
+	&quot;NG&quot; [shape=&quot;Mrecord&quot;, label=&quot;NG&amp;nbsp;&amp;#9719;&quot;, tooltip=&quot;NG (NonGestating):
+	state for empty animals&quot;, fillcolor=cyan, style=&quot;filled,rounded,bold&quot;] ;
+	&quot;G&quot; -&gt; &quot;NG&quot; [label=&quot;proba: 1&quot;, labeltooltip=&quot;proba: 1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnonediamond&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;G&quot; -&gt; &quot;NG&quot; [label=&quot;proba: daily_abortion&quot;, labeltooltip=&quot;daily_abortion [parameter]:
+	daily probability that an infected animal aborts during gestation       
+	1 - (1 - global_abortion)**(1/gestation_duration)&quot;, arrowtail=&quot;noneoinv&quot;, arrowhead=&quot;normalnonediamond&quot;, dir=both, tooltip=&quot;ESCAPE: is_I&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;NG&quot; -&gt; &quot;G&quot; [label=&quot;rate: reproduction&quot;, labeltooltip=&quot;reproduction [parameter]:
+	reproduction rate of the animals                                        
+	0.05&quot;, arrowtail=&quot;nonetee&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;COND: is_A&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+</div>
+<img alt="../_images/Quickstart_GNG.png" class="align-left" src="../_images/Quickstart_GNG.png" />
+<div align="center" class="align-center"><div class="graphviz"><object data="../_images/graphviz-e82977a425889b22f23031d7a33f81d23b054667.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+          charset=&quot;utf-8&quot;
+        	rankdir=LR;
+        
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;M&quot; [shape=&quot;Mrecord&quot;, label=&quot;M&amp;nbsp;&amp;#9719;&quot;, tooltip=&quot;M (Maternal protection):
+	animal protected by maternal antibodies&quot;, fillcolor=cyan, style=&quot;filled,rounded&quot;] ;
+	&quot;S&quot; [shape=&quot;Mrecord&quot;, label=&quot;S&quot;, tooltip=&quot;S (Susceptible):
+	suceptible of becoming infectious&quot;, fillcolor=wheat, style=&quot;filled,rounded,bold&quot;] ;
+	&quot;E&quot; [shape=&quot;Mrecord&quot;, label=&quot;E&amp;nbsp;&amp;#9719;&quot;, tooltip=&quot;E (Exposed):
+	already infected but not yet able to transmit the disease&quot;, fillcolor=lightcoral, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; [shape=&quot;Mrecord&quot;, label=&quot;I&quot;, tooltip=&quot;I (Infectious):
+	sick and able to transmit the disease&quot;, fillcolor=maroon, style=&quot;filled,rounded&quot;] ;
+	&quot;R&quot; [shape=&quot;Mrecord&quot;, label=&quot;R&quot;, tooltip=&quot;R (Resistant):
+	healthy again and resistant to infection&quot;, fillcolor=deepskyblue, style=&quot;filled,rounded&quot;] ;
+	&quot;Q&quot; [shape=&quot;Mrecord&quot;, label=&quot;Q&amp;nbsp;&amp;#9719;&quot;, tooltip=&quot;Q (Quarantine):
+	sick animals that are put aside for a while&quot;, fillcolor=green, style=&quot;filled,rounded&quot;] ;
+	&quot;D&quot; [shape=&quot;Mrecord&quot;, label=&quot;D&quot;, tooltip=&quot;D (Dead):
+	dead animals&quot;, fillcolor=white, style=&quot;filled,rounded,dotted&quot;] ;
+	&quot;E&quot; -&gt; &quot;D&quot; [label=&quot;rate: mortality_sick&quot;, labeltooltip=&quot;mortality_sick [parameter]:
+	mortality rate for sick animals (E / I / Q)                             
+	0.004&quot;, arrowtail=&quot;noneoinv&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;ESCAPE: True&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;E&quot; -&gt; &quot;I&quot; [label=&quot;rate: alpha&quot;, labeltooltip=&quot;alpha [parameter]:
+	rate for E-&gt;I transition                                                
+	0.3&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;I&quot; -&gt; &quot;D&quot; [label=&quot;rate: mortality_sick&quot;, labeltooltip=&quot;mortality_sick [parameter]:
+	mortality rate for sick animals (E / I / Q)                             
+	0.004&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;I&quot; -&gt; &quot;Q&quot; [label=&quot;rate: detection&quot;, labeltooltip=&quot;detection [parameter]:
+	rate at which animals are detected sick (falls to 0 if quarantine zone is full) 
+	0.01*room_in_quarantine&quot;, arrowtail=&quot;noneodot&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;WHEN: quarantine_period&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;I&quot; -&gt; &quot;R&quot; [label=&quot;rate: gamma&quot;, labeltooltip=&quot;gamma [parameter]:
+	recovery rate                                                           
+	0.01&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;M&quot; -&gt; &quot;D&quot; [label=&quot;rate: mortality_healthy&quot;, labeltooltip=&quot;mortality_healthy [parameter]:
+	mortality rate for healthy animals                                      
+	0.002&quot;, arrowtail=&quot;noneoinv&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;ESCAPE: True&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;M&quot; -&gt; &quot;S&quot; [label=&quot;rate: epsilon&quot;, labeltooltip=&quot;epsilon [parameter]:
+	maternal antibodies loss rate                                           
+	0.04&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;Q&quot; -&gt; &quot;D&quot; [label=&quot;rate: mortality_sick&quot;, labeltooltip=&quot;mortality_sick [parameter]:
+	mortality rate for sick animals (E / I / Q)                             
+	0.004&quot;, arrowtail=&quot;noneoinv&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;ESCAPE: True&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;Q&quot; -&gt; &quot;R&quot; [label=&quot;proba: 1&quot;, labeltooltip=&quot;proba: 1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;R&quot; -&gt; &quot;D&quot; [label=&quot;rate: mortality_healthy&quot;, labeltooltip=&quot;mortality_healthy [parameter]:
+	mortality rate for healthy animals                                      
+	0.002&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;R&quot; -&gt; &quot;S&quot; [label=&quot;rate: delta&quot;, labeltooltip=&quot;delta [parameter]:
+	resistance loss rate                                                    
+	0.01&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;D&quot; [label=&quot;rate: mortality_healthy&quot;, labeltooltip=&quot;mortality_healthy [parameter]:
+	mortality rate for healthy animals                                      
+	0.002&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;E&quot; [label=&quot;rate: f&quot;, labeltooltip=&quot;f [parameter]:
+	force of infection                                                      
+	beta * total_I / total_herd&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+</div>
+<img alt="../_images/Quickstart_MSEIRQ.png" class="align-left" src="../_images/Quickstart_MSEIRQ.png" />
+<img alt="../_images/Quickstart_others.png" class="align-left" src="../_images/Quickstart_others.png" />
+</div>
+<div class="section" id="alternative-1-install-with-git">
+<h2>2.5. Alternative 1: install with <code class="docutils literal notranslate"><span class="pre">git</span></code><a class="headerlink" href="#alternative-1-install-with-git" title="Permalink to this headline">¶</a></h2>
+<p>This procedure assumes that you have <code class="docutils literal notranslate"><span class="pre">git</span></code> already
+<a class="reference external" href="https://git-scm.com/downloads">installed on your system</a>.
+It is provided here for Linux or MacOS.</p>
+<ol class="arabic">
+<li><p class="first">Install (or update) required packages</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo pip3 install numpy scipy matplotlib pandas <span class="s1">&#39;sympy==1.1.1&#39;</span> mpmath networkx docopt jinja2 textx sortedcontainers tqdm pyyaml colorama bokeh sqlalchemy utm
+</pre></div>
+</div>
+</li>
+<li><p class="first">Clone the EMULSION repository</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://git.renater.fr/anonscm/git/emulsion-public/emulsion-public.git
+<span class="nb">cd</span> emulsion-public
+</pre></div>
+</div>
+</li>
+<li><p class="first">Add the local directory and <code class="docutils literal notranslate"><span class="pre">src</span></code> directory to your <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code> environment
+variable.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;export PYTHONPATH=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/src:.&quot;</span> &gt;&gt;<span class="nv">$HOME</span>/.bashrc
+</pre></div>
+</div>
+</li>
+<li><p class="first">Install command-line completion (optional but very convenient).</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;source </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="s2">/src/emulsion/scripts/emulsion-completion.sh&quot;</span> &gt;&gt;<span class="nv">$HOME</span>/.bashrc
+</pre></div>
+</div>
+<p>Command-line completion (available with a bash shell, under Linux
+or MacOS) allows to use <code class="docutils literal notranslate"><span class="pre">TAB</span></code> key to get suggestions on what is
+expected (options, files, parameters…) in the command.</p>
+</li>
+<li><p class="first">Create command <code class="docutils literal notranslate"><span class="pre">emulsion</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span> <span class="s2">&quot;alias emulsion=&#39;python3 -m emulsion&#39;&quot;</span> &gt;&gt;<span class="nv">$HOME</span>/.bashrc
+</pre></div>
+</div>
+</li>
+<li><p class="first">Force the shell to update your init file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> <span class="nv">$HOME</span>/.bashrc
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="alternative-2-install-development-version">
+<h2>2.6. Alternative 2: install development version<a class="headerlink" href="#alternative-2-install-development-version" title="Permalink to this headline">¶</a></h2>
+<p>Draft versions of EMULSION are periodically released, usually under
+the same license. They are available through <code class="docutils literal notranslate"><span class="pre">pip</span></code> from
+<a class="reference external" href="https://test.pypi.org">PyPI’s test server</a> as follows:</p>
+<ol class="arabic">
+<li><p class="first">Search for “emulsion” project on <a class="reference external" href="https://test.pypi.org">PyPI’s test website</a>
+to identify a development version that suits your needs</p>
+</li>
+<li><p class="first">Install the development version (replace <code class="docutils literal notranslate"><span class="pre">VERSION</span></code> below with the
+version number, e.g. <code class="docutils literal notranslate"><span class="pre">1.1rc5</span></code> or <code class="docutils literal notranslate"><span class="pre">1.2b1</span></code>):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo pip3 install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.python.org/simple/ <span class="nv">emulsion</span><span class="o">==</span>VERSION
+init_emulsion
+<span class="nb">source</span> <span class="nv">$HOME</span>/.bashrc
+</pre></div>
+</div>
+</li>
+<li><p class="first">The development version should be now installed (check version with
+<code class="docutils literal notranslate"><span class="pre">emulsion</span> <span class="pre">-V</span></code>). The documentation of the latest development
+version publicly available can be found <a class="reference external" href="https://sourcesup.renater.fr/www/emulsion-public/devel/">here</a>.</p>
+</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Information.html">1. Information</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">2. Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">2.1. Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-with-pip-recommended">2.2. Install with <code class="docutils literal notranslate"><span class="pre">pip</span></code> (recommended)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#linux-and-macos">Linux and MacOS:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#windows">Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#install-third-party-software">2.3. Install third-party software</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#linux">Linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#macos">MacOS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Windows</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#test-your-installation">2.4. Test your installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#alternative-1-install-with-git">2.5. Alternative 1: install with <code class="docutils literal notranslate"><span class="pre">git</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#alternative-2-install-development-version">2.6. Alternative 2: install development version</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="Information.html" title="previous chapter">1. Information</a></li>
+      <li>Next: <a href="Getting_started.html" title="next chapter">3. Getting started with EMULSION</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/pages/Install.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

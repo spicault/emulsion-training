@@ -1,0 +1,45 @@
+Model 5 (M4 + scale change)
+***************************
+
+The scale change by itself is rather straight:
+
+- the metapopulation is just another level with a specific aggregation
+  type
+- initialization relies on prototypes as previously, there are new
+  prototypes for populations
+- some parameters (e.g. initial prevalence) become variables attached
+  to populations
+
+The main changes here are the use of Python add-ons to specify processes
+which are not yet provided by generic features in EMULSION: here,
+selection and movement of hosts from one population to another. The
+corresponding levels (``population`` and ``metapop``) are explicitly
+linked with a python file (``model5.py``) and with class names
+(``Population`` and ``Metapop`` respectively).
+
+Processes which take place at a given level and do not relate to any
+grouping indentifier are assumed to be methods in the class linked to
+this level.
+
+File with full comments: `model5.yaml <../_static/benchmark/model5.yaml>`_
+
+YAML model file :
+
+.. literalinclude:: ../_static/benchmark/model5-short.yaml
+   :emphasize-lines: 17-23, 29-30, 47-48, 50, 54, 210-216, 219-227, 261-265
+
+Python add-on :
+
+.. literalinclude:: ../_static/benchmark/model5.py
+
+
+To run the model (one stochastic repetition):
+
+.. code-block:: bash
+
+  emulsion run --plot model5.yaml -r 1
+
+Which produces `the following outputs <../_static/benchmark/model5-outputs.html>`_
+
+
+State machine diagrams are the same as in Model 4.

@@ -1,0 +1,328 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.tools.plot &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.tools.plot</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A Python implementation of the EMuLSion framework (Epidemiologic</span>
+<span class="sd">MUlti-Level SImulatiONs).</span>
+
+<span class="sd">Plotting tools... to be improved!</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># [HEADER]</span>
+
+<span class="kn">from</span>   <span class="nn">pathlib</span>                      <span class="k">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">pandas</span>                       <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span>                        <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># from   scipy.misc                   import imread</span>
+<span class="kn">from</span>   <span class="nn">PIL</span>                          <span class="k">import</span> <span class="n">Image</span>
+<span class="kn">from</span>   <span class="nn">xml.etree</span>                    <span class="k">import</span> <span class="n">ElementTree</span>
+<span class="kn">from</span>   <span class="nn">bokeh.plotting</span>               <span class="k">import</span> <span class="n">figure</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">show</span>
+<span class="kn">from</span>   <span class="nn">bokeh.models</span>                 <span class="k">import</span> <span class="n">Legend</span><span class="p">,</span> <span class="n">ColumnDataSource</span><span class="p">,</span> <span class="n">Range1d</span>
+<span class="kn">from</span>   <span class="nn">bokeh.models.tools</span>           <span class="k">import</span> <span class="n">HoverTool</span><span class="p">,</span> <span class="n">CrosshairTool</span>
+<span class="kn">from</span>   <span class="nn">bokeh.models.glyphs</span>          <span class="k">import</span> <span class="n">ImageURL</span>
+<span class="kn">from</span>   <span class="nn">bokeh.models.widgets</span>         <span class="k">import</span> <span class="n">Div</span>
+<span class="kn">from</span>   <span class="nn">bokeh.layouts</span>                <span class="k">import</span> <span class="n">gridplot</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">widgetbox</span>
+<span class="kn">from</span>   <span class="nn">bokeh.palettes</span>               <span class="k">import</span> <span class="n">all_palettes</span>
+
+<span class="kn">from</span>   <span class="nn">emulsion.tools.debug</span>         <span class="k">import</span> <span class="n">debuginfo</span>
+
+
+<div class="viewcode-block" id="build_state_plot"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.plot.build_state_plot">[docs]</a><span class="k">def</span> <span class="nf">build_state_plot</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;quantity&#39;</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;state&#39;</span><span class="p">,</span>
+                     <span class="n">ylab</span><span class="o">=</span><span class="s1">&#39;Number of individuals&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a bokeh figure based on the representation of the states in</span>
+<span class="sd">    the *counts* dataframe, with the associated colors.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        counts: a Pandas dataframe containing the values to plot</span>
+<span class="sd">        cols (dict): dictionary which maps state/variable names to colors</span>
+<span class="sd">        machine: the state machine to which the states are related</span>
+<span class="sd">        model: the Emulsion model related to this plot</span>
+<span class="sd">        y (str): the name of the field containing y values in the dataframe</span>
+<span class="sd">        group (str): either &#39;state&#39; (default) or &#39;variables&#39;, name of</span>
+<span class="sd">          the field containing each legend items.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A bokeh gridplot (reduced to one figure a the herd level, one</span>
+<span class="sd">        figure per herd at metapopulation level).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">WIDTH</span><span class="p">,</span> <span class="n">HEIGHT</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">600</span>
+    <span class="n">NB_SIMU</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">counts</span><span class="o">.</span><span class="n">simu_id</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">NB_SIMU</span><span class="p">),</span> <span class="mf">0.05</span><span class="p">)</span>
+    <span class="n">all_plots</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ncols</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">leg_pos</span><span class="p">,</span> <span class="n">leg_orient</span> <span class="o">=</span> <span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span>
+    <span class="n">metapop</span> <span class="o">=</span> <span class="s1">&#39;population_id&#39;</span> <span class="ow">in</span> <span class="n">counts</span><span class="o">.</span><span class="n">columns</span>
+    <span class="k">if</span> <span class="n">metapop</span><span class="p">:</span>
+        <span class="n">pop_IDs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">population_id</span><span class="o">.</span><span class="n">values</span><span class="p">))</span>
+        <span class="n">ncols</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">WIDTH</span> <span class="o">=</span> <span class="mi">1200</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pop_IDs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">pop_id</span> <span class="ow">in</span> <span class="n">pop_IDs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">metapop</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[</span><span class="n">counts</span><span class="o">.</span><span class="n">population_id</span> <span class="o">==</span> <span class="n">pop_id</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">counts</span>
+        <span class="n">time_unit</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">time_unit</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">origin_date</span>
+        <span class="n">dur</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">step_duration</span>
+        <span class="c1"># df[time_unit] = pd.Series(model.delta_t * df[&#39;step&#39;], index=df.index)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">time_unit</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">delta_t</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)})</span>
+        <span class="c1"># df[&#39;date&#39;] = pd.Series(pd.to_datetime(origin + dur * df[&#39;step&#39;]), index=df.index)</span>
+        <span class="n">plot</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">plot_width</span><span class="o">=</span><span class="n">WIDTH</span> <span class="o">//</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="n">HEIGHT</span> <span class="o">//</span> <span class="n">ncols</span><span class="p">)</span>
+        <span class="n">legend_items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+            <span class="n">state_items</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">line_style</span> <span class="o">=</span> <span class="n">style</span><span class="p">[</span><span class="n">state</span><span class="p">]</span> <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;solid&#39;</span>
+            <span class="n">subdf</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">group</span><span class="p">]</span> <span class="o">==</span> <span class="n">state</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">NB_SIMU</span> <span class="o">&lt;=</span> <span class="mi">50</span><span class="p">:</span>   <span class="c1"># don&#39;t draw points if too many !</span>
+                <span class="n">ci</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">time_unit</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;quantity&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">subdf</span><span class="p">),</span>
+                                 <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="n">state</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+                <span class="n">state_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">simu_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;simu_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())):</span>
+                <span class="n">src</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">subdf</span><span class="p">[</span><span class="n">subdf</span><span class="o">.</span><span class="n">simu_id</span> <span class="o">==</span> <span class="n">simu_id</span><span class="p">])</span>
+                <span class="n">pl</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">time_unit</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;quantity&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cols</span><span class="p">[</span><span class="n">state</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">line_dash</span><span class="o">=</span><span class="n">line_style</span><span class="p">)</span>
+                <span class="n">state_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pl</span><span class="p">)</span>
+            <span class="n">legend_items</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">state</span><span class="p">,</span> <span class="n">state_items</span><span class="p">))</span>
+        <span class="n">plot</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Evolution of </span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">machine</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">),</span> <span class="n">model</span><span class="o">.</span><span class="n">model_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">metapop</span><span class="p">:</span>
+            <span class="n">plot</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39; - population ID: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pop_id</span><span class="p">)</span>
+        <span class="n">plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;Time (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_unit</span><span class="p">,)</span>
+        <span class="n">plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="n">ylab</span>
+        <span class="n">ylim</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;quantity&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">*</span><span class="mf">1.1</span><span class="p">)</span>
+        <span class="n">plot</span><span class="o">.</span><span class="n">y_range</span> <span class="o">=</span> <span class="n">Range1d</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ylim</span><span class="p">)</span>
+        <span class="n">hover</span> <span class="o">=</span> <span class="n">HoverTool</span><span class="p">()</span>
+        <span class="n">hover</span><span class="o">.</span><span class="n">tooltips</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span> <span class="s1">&#39;@</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">group</span><span class="p">,)),</span>
+            <span class="p">(</span><span class="s1">&#39;Quantity&#39;</span><span class="p">,</span> <span class="s1">&#39;@quantity&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">time_unit</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span> <span class="s1">&#39;@</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">time_unit</span><span class="p">,)),</span>
+            <span class="p">(</span><span class="s1">&#39;Step&#39;</span><span class="p">,</span> <span class="s1">&#39;@step&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;Simulation ID&#39;</span><span class="p">,</span> <span class="s1">&#39;@simu_id&#39;</span><span class="p">),</span>
+            <span class="c1"># (&#39;Population ID&#39;, pop_id)</span>
+        <span class="p">]</span>
+        <span class="n">plot</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hover</span><span class="p">)</span>
+        <span class="n">plot</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">CrosshairTool</span><span class="p">())</span>
+        <span class="n">legend</span> <span class="o">=</span> <span class="n">Legend</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">legend_items</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">legend</span><span class="o">.</span><span class="n">click_policy</span> <span class="o">=</span> <span class="s1">&#39;hide&#39;</span>
+        <span class="n">legend</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">leg_orient</span>
+        <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">legend</span><span class="p">,</span> <span class="n">leg_pos</span><span class="p">)</span>
+        <span class="n">all_plots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gridplot</span><span class="p">(</span><span class="n">all_plots</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="n">ncols</span><span class="p">,</span> <span class="n">toolbar_location</span><span class="o">=</span><span class="s2">&quot;above&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="build_machine_plot"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.plot.build_machine_plot">[docs]</a><span class="k">def</span> <span class="nf">build_machine_plot</span><span class="p">(</span><span class="n">machine_name</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a bokeh figure based on the representation of the state</span>
+<span class="sd">    machine, with the associated colors.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        machine: the state machine to which the states are related</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A bokeh gridplot.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># WIDTH, HEIGHT = 800, 600</span>
+    <span class="n">machine_url</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">model_name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">machine_name</span> <span class="o">+</span> <span class="s1">&#39;_machine.&#39;</span> <span class="o">+</span> <span class="n">params</span><span class="o">.</span><span class="n">img_format</span>
+    <span class="n">machine_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">figure_dir</span><span class="p">,</span> <span class="n">machine_url</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># img = imread(machine_path)</span>
+        <span class="c1"># height, width = img.shape[0:2]</span>
+        <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">img_format</span> <span class="o">==</span> <span class="s1">&#39;svg&#39;</span><span class="p">:</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">machine_path</span><span class="p">)</span>
+            <span class="n">root</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+            <span class="c1"># retrieve dimensions (in pts)</span>
+            <span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()))</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()))</span> <span class="o">+</span> <span class="mi">50</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">machine_path</span><span class="p">)</span>
+            <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: Could not retrieve image dimensions&quot;</span><span class="p">)</span>
+        <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">400</span>
+
+    <span class="n">div</span> <span class="o">=</span> <span class="n">Div</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;&#39;&#39;&lt;h1&gt;State machine for </span><span class="si">{}</span><span class="s1">&lt;/h1&gt;</span>
+<span class="s1">    &lt;P&gt;&lt;IMG SRC=&quot;</span><span class="si">{}</span><span class="s1">&quot;&gt;&lt;/P&gt;</span>
+<span class="s1">    &lt;H2&gt;Simulation outputs&lt;/H2&gt;</span>
+<span class="s1">    &#39;&#39;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">machine_name</span><span class="p">,</span> <span class="n">machine_url</span><span class="p">),</span>
+              <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="o">+</span><span class="mi">100</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">gridplot</span><span class="p">([</span><span class="n">widgetbox</span><span class="p">(</span><span class="n">div</span><span class="p">)],</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="plot_outputs"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.plot.plot_outputs">[docs]</a><span class="k">def</span> <span class="nf">plot_outputs</span><span class="p">(</span><span class="n">params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read outputs from previous runs and plot the corresponding</span>
+<span class="sd">    figures. In the *params* dictionary, `output_dir` is expected to</span>
+<span class="sd">    contain a `counts.csv` file; `figure_dir` is where the plot is</span>
+<span class="sd">    saved.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">countpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s1">&#39;counts.csv&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">countpath</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ERROR, output file not found: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">countpath</span><span class="p">,</span> <span class="p">))</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">model</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">countpath</span><span class="p">)</span>
+    <span class="nb">vars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;simu_id&#39;</span><span class="p">,</span> <span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">,</span> <span class="s1">&#39;agent_id&#39;</span><span class="p">]</span>
+    <span class="c1">## retrieve output level (TODO: improve method !)</span>
+    <span class="n">output_level</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;level&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">output_sm</span> <span class="o">=</span> <span class="p">[</span><span class="n">sm_name</span> <span class="k">for</span> <span class="n">sm_name</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">state_machines</span>
+                 <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">get_sublevels</span><span class="p">(</span><span class="n">output_level</span><span class="p">)</span>
+                 <span class="k">if</span> <span class="n">sm_name</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">statemachines_by_level</span><span class="p">[</span><span class="n">level</span><span class="p">]]</span>
+
+    <span class="k">if</span> <span class="s1">&#39;population_id&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="nb">vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;population_id&#39;</span><span class="p">)</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">all_figs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">figpath</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">figure_dir</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">model_name</span> <span class="o">+</span> <span class="s1">&#39;.html&#39;</span><span class="p">)</span>
+    <span class="n">output_file</span><span class="p">(</span><span class="n">figpath</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Emulsion Plot: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model_name</span><span class="p">,))</span>
+    <span class="k">for</span> <span class="n">sm_name</span> <span class="ow">in</span> <span class="n">output_sm</span><span class="p">:</span>
+        <span class="n">state_machine</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">state_machines</span><span class="p">[</span><span class="n">sm_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">view_machines</span><span class="p">:</span>
+            <span class="n">all_figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">build_machine_plot</span><span class="p">(</span><span class="n">sm_name</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">params</span><span class="p">))</span>
+        <span class="n">col_dict</span> <span class="o">=</span> <span class="n">state_machine</span><span class="o">.</span><span class="n">state_colors</span>
+        <span class="n">style_dict</span> <span class="o">=</span> <span class="n">state_machine</span><span class="o">.</span><span class="n">state_style</span>
+        <span class="c1"># col_dict.update(population=&quot;black&quot;)</span>
+        <span class="n">states</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">sorted</span><span class="p">(</span><span class="n">col_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="n">vals</span> <span class="o">+=</span> <span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">state_machine</span><span class="o">.</span><span class="n">states</span><span class="p">]</span>
+        <span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">id_vars</span><span class="o">=</span><span class="nb">vars</span><span class="p">,</span> <span class="n">value_vars</span><span class="o">=</span><span class="n">states</span><span class="p">,</span>
+                      <span class="n">var_name</span><span class="o">=</span><span class="s1">&#39;state&#39;</span><span class="p">,</span> <span class="n">value_name</span><span class="o">=</span><span class="s1">&#39;quantity&#39;</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">build_state_plot</span><span class="p">(</span><span class="n">df2</span><span class="p">,</span> <span class="n">col_dict</span><span class="p">,</span> <span class="n">sm_name</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style_dict</span><span class="p">)</span>
+        <span class="n">all_figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+        <span class="c1"># figpath = Path(params.figure_dir,</span>
+        <span class="c1">#                model.model_name + &#39;_&#39; + sm_name + &#39;.png&#39;)</span>
+        <span class="c1"># plot = build_state_plot(df2, cols, sm_name, model.model_name)</span>
+        <span class="c1"># plot.save(str(figpath))</span>
+        <span class="c1"># print(&#39;Saved figure %s&#39; % (figpath, ))</span>
+    <span class="n">extras</span> <span class="o">=</span> <span class="p">[</span><span class="n">variable</span> <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">vars</span> <span class="o">+</span> <span class="n">vals</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">extras</span><span class="p">:</span>
+        <span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">id_vars</span><span class="o">=</span><span class="nb">vars</span><span class="p">,</span> <span class="n">value_vars</span><span class="o">=</span><span class="n">extras</span><span class="p">,</span> <span class="n">value_name</span><span class="o">=</span><span class="s1">&#39;quantity&#39;</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">256</span> <span class="o">//</span> <span class="nb">len</span><span class="p">(</span><span class="n">extras</span><span class="p">))</span><span class="o">*</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">extras</span><span class="p">))]</span>
+        <span class="n">cols</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">extras</span><span class="p">,</span> <span class="p">[</span><span class="n">all_palettes</span><span class="p">[</span><span class="s1">&#39;Plasma&#39;</span><span class="p">][</span><span class="mi">256</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">]))</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">build_state_plot</span><span class="p">(</span><span class="n">df2</span><span class="p">,</span> <span class="n">cols</span><span class="p">,</span> <span class="s1">&#39;Additional variables&#39;</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span>
+                               <span class="n">y</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;variable&#39;</span><span class="p">,</span> <span class="n">ylab</span><span class="o">=</span><span class="s1">&#39;Value&#39;</span><span class="p">)</span>
+        <span class="c1"># plot = build_state_plot(df2, [], &#39;Additional variables&#39;,</span>
+        <span class="c1">#                         model.model_name, y=&#39;value&#39;, group=&#39;variable&#39;)</span>
+        <span class="c1"># plot.save(str(figpath))</span>
+        <span class="c1"># print(&#39;Saved figure %s&#39; % (figpath, ))</span>
+        <span class="n">all_figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="c1"># print(all_figs)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Outputs plot in file: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">figpath</span><span class="p">,))</span>
+    <span class="n">show</span><span class="p">(</span><span class="n">column</span><span class="p">(</span><span class="n">all_figs</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

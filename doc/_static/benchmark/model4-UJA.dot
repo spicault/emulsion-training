@@ -1,0 +1,28 @@
+digraph {
+          charset="utf-8"
+        	rankdir=LR;
+        
+        	node[fontsize=16, fontname=Arial, shape=box, style="filled,rounded"];
+        	edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip="", headtooltip=""];
+
+        	"J" [shape="Mrecord", label="J", tooltip="J (Juvenile):
+	juvenile individuals", fillcolor=orange, style="filled,rounded"] ;
+	"A" [shape="Mrecord", label="A", tooltip="A (Adult):
+	adult individuals (producing new juveniles)", fillcolor=brown, style="filled,rounded"] ;
+	"U" [shape="Mrecord", label="U", tooltip="U (Undefined):
+	no age group is defined for vectors", fillcolor=lightgray, style="filled,rounded"] ;
+	"D" [shape="Mrecord", label="D", tooltip="D (Dead):
+	compartment to put dead individuals", fillcolor=white, style="filled,rounded,dotted"] ;
+	"A" -> "D" [label="rate: mu_A * total_H / K_H", labeltooltip="rate: mu_A * total_H / K_H", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"A" -> "J" [label="rate: b_H", labeltooltip="b_H [parameter]:
+	the birth rate of hosts (/day)                                          
+	0.005", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="dashed"];
+	"J" -> "A" [label="rate: m", labeltooltip="m [parameter]:
+	maturation rate, at which juveniles become adults (/day)                
+	1/50", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"J" -> "D" [label="rate: mu_J * total_H / K_H", labeltooltip="rate: mu_J * total_H / K_H", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"U" -> "D" [label="rate: b_V * total_V / K_V", labeltooltip="rate: b_V * total_V / K_V", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"U" -> "U" [label="rate: b_V", labeltooltip="b_V [parameter]:
+	the birth rate of vectors (/day)                                        
+	0.05", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="dashed"];
+}

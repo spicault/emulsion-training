@@ -1,0 +1,196 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.agent.managers.metapop_process_manager &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.agent.managers.metapop_process_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: emulsion.agent.managers.functions</span>
+
+<span class="sd">.. moduleauthor:: Sébastien Picault &lt;sebastien.picault@inra.fr&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># [HEADER]</span>
+
+<span class="kn">from</span>   <span class="nn">collections</span>               <span class="k">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span>                    <span class="k">as</span> <span class="nn">pd</span>
+
+
+<span class="kn">from</span>   <span class="nn">emulsion.agent.managers.multi_process_manager</span>  <span class="k">import</span>  <span class="n">MultiProcessManager</span>
+
+<span class="c1">#  __  __      _</span>
+<span class="c1"># |  \/  |    | |</span>
+<span class="c1"># | \  / | ___| |_ __ _ _ __   ___  _ __</span>
+<span class="c1"># | |\/| |/ _ \ __/ _` | &#39;_ \ / _ \| &#39;_ \</span>
+<span class="c1"># | |  | |  __/ || (_| | |_) | (_) | |_) |</span>
+<span class="c1"># |_|  |_|\___|\__\__,_| .__/ \___/| .__/</span>
+<span class="c1">#                      | |         | |</span>
+<span class="c1">#                      |_|         |_|</span>
+
+<div class="viewcode-block" id="MetapopProcessManager"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.metapop_process_manager.MetapopProcessManager">[docs]</a><span class="k">class</span> <span class="nc">MetapopProcessManager</span><span class="p">(</span><span class="n">MultiProcessManager</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class is in charge of handling multiple populations.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MetapopProcessManager.get_populations"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.get_populations">[docs]</a>    <span class="k">def</span> <span class="nf">get_populations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_content</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MetapopProcessManager.evolve"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.metapop_process_manager.MetapopProcessManager.evolve">[docs]</a>    <span class="k">def</span> <span class="nf">evolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make the ProcessManager evolve as in AbstractProcessManager, then integrate new populations if created directly by a StateMachineProcess (as in IBM).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_agents</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">evolve</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="c1">## handle autoremove states</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">_is_active</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_new_population</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_agents</span><span class="p">)</span></div>
+            <span class="c1"># here was an &quot;update_count&quot; coming from IBMProcessManager, removed as there is no update_count in MetapopProcessManager</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a pandas DataFrame containing counts of each process if</span>
+<span class="sd">        existing.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sublevel_df</span> <span class="o">=</span> <span class="p">[</span><span class="n">population</span><span class="o">.</span><span class="n">counts</span> <span class="k">for</span> <span class="n">population</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">sublevel_df</span><span class="p">)</span></div>
+
+        <span class="c1"># result = None</span>
+        <span class="c1"># for population in self[&#39;MASTER&#39;]:</span>
+        <span class="c1">#     res = {}</span>
+        <span class="c1">#     for comp in population:</span>
+        <span class="c1">#         try:</span>
+        <span class="c1">#             res.update(comp.counts)</span>
+        <span class="c1">#             # print(comp, comp.counts)</span>
+        <span class="c1">#         except AttributeError:</span>
+        <span class="c1">#             pass</span>
+        <span class="c1">#         except Exception as exc:</span>
+        <span class="c1">#             raise exc</span>
+        <span class="c1">#     if not self.keep_history:</span>
+        <span class="c1">#         res.update({</span>
+        <span class="c1">#             &#39;level&#39;: population.level,</span>
+        <span class="c1">#             &#39;agent_id&#39;: population.agid,</span>
+        <span class="c1">#             # &#39;population&#39;: population.population,</span>
+        <span class="c1">#             &#39;population_id&#39;: population.statevars.population_id})</span>
+        <span class="c1">#         if population.level in population.model.outputs and\</span>
+        <span class="c1">#            &#39;extra_vars&#39; in population.model.outputs[population.level]:</span>
+        <span class="c1">#             res.update({name: population.get_model_value(name)\</span>
+        <span class="c1">#                         if name in population.model.parameters\</span>
+        <span class="c1">#                         else population.get_information(name)</span>
+        <span class="c1">#                         for name in population.model.outputs[population.level][&#39;extra_vars&#39;]})</span>
+        <span class="c1">#     result = pd.DataFrame(res, index=[0]) if result is None\</span>
+        <span class="c1">#                 else result.append(pd.DataFrame(res, index=[0]))</span>
+        <span class="c1"># return result</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

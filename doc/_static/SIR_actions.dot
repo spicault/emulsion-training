@@ -1,0 +1,18 @@
+digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style="filled,rounded"];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip="", headtooltip=""];
+
+        	"S" [shape="Mrecord", label="{&#9670;|{\ S\ }}", tooltip="S (Susceptible):
+	suceptible of becoming infected", fillcolor=wheat, style="filled,rounded"] ;
+	"I" [shape="Mrecord", label="{&#9670;|{\ I\ |&#9670;}}", tooltip="I (Infectious):
+	infected and able to transmit the disease", fillcolor=maroon, style="filled,rounded"] ;
+	"R" [shape="Mrecord", label="R", tooltip="R (Resistant):
+	healthy again and resistant to infection", fillcolor=deepskyblue, style="filled,rounded"] ;
+	"I" -> "R" [label="rate: recovery", labeltooltip="recovery [parameter]:
+	recovery rate (/day)                                                    
+	0.1", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"S" -> "I" [label="rate: force_of_infection", labeltooltip="force_of_infection [parameter]:
+	infection function                                                      
+	transmission_I * total_I / total_herd", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+}

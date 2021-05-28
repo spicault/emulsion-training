@@ -1,0 +1,12 @@
+digraph {
+          charset="utf-8"
+        	rankdir=TB;
+        
+        	node[fontsize=16, fontname=Arial, shape=box, style="filled,rounded"];
+        	edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip="", headtooltip=""];
+
+        	"H" [shape="Mrecord", label="H", tooltip="H (Host):
+	host individual", fillcolor=navy, style="filled,rounded"] ;
+	"V" [shape="Mrecord", label="V", tooltip="V (Vector):
+	vector animal", fillcolor=orange, style="filled,rounded"] ;
+}

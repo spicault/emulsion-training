@@ -1,0 +1,13 @@
+                      EmulsionModel "compart_SIR"
+              ROLE OF PARAMETERS (AND CURRENT DEFINITION)
+------------------------------------------------------------------------
+recovery [parameter]:
+	recovery rate (/day)
+	0.1
+delta_t [parameter]:
+	duration of the simulation time step
+	1.0
+transmission_I [parameter]:
+	transmission rate from infectious animals (/day)
+	0.5
+------------------------------------------------------------------------

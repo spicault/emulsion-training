@@ -1,0 +1,562 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.agent.managers.compart_process_manager &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.agent.managers.compart_process_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: emulsion.agent.managers.functions</span>
+
+<span class="sd">.. moduleauthor:: Sébastien Picault &lt;sebastien.picault@inrae.fr&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># [HEADER]</span>
+
+<span class="kn">import</span> <span class="nn">itertools</span>                 <span class="k">as</span> <span class="nn">it</span>
+<span class="kn">from</span>   <span class="nn">collections</span>               <span class="k">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>                     <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span>                    <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span>   <span class="nn">emulsion.agent.comparts</span>   <span class="k">import</span> <span class="n">Compartment</span>
+
+<span class="kn">from</span>   <span class="nn">emulsion.agent.managers.group_manager</span>  <span class="k">import</span>  <span class="n">GroupManager</span>
+<span class="kn">from</span>   <span class="nn">emulsion.agent.managers.abstract_process_manager</span>  <span class="k">import</span>  <span class="n">AbstractProcessManager</span>
+<span class="kn">from</span>   <span class="nn">emulsion.agent.exceptions</span> <span class="k">import</span> <span class="n">StateVarNotFoundException</span>
+<span class="kn">from</span>   <span class="nn">emulsion.model.exceptions</span> <span class="k">import</span> <span class="n">SemanticException</span>
+<span class="kn">from</span>   <span class="nn">emulsion.tools.misc</span>       <span class="k">import</span> <span class="n">load_class</span><span class="p">,</span> <span class="n">complement_key</span><span class="p">,</span> <span class="n">add_all_relative_population_getters</span><span class="p">,</span> <span class="n">add_all_test_properties</span>
+<span class="kn">from</span>   <span class="nn">emulsion.tools.debug</span>      <span class="k">import</span> <span class="n">debuginfo</span>
+
+<span class="c1">#   _____                                 _   _____</span>
+<span class="c1">#  / ____|                               | | |  __ \</span>
+<span class="c1"># | |     ___  _ __ ___  _ __   __ _ _ __| |_| |__) | __ ___   ___ ___  ___ ___</span>
+<span class="c1"># | |    / _ \| &#39;_ ` _ \| &#39;_ \ / _` | &#39;__| __|  ___/ &#39;__/ _ \ / __/ _ \/ __/ __|</span>
+<span class="c1"># | |___| (_) | | | | | | |_) | (_| | |  | |_| |   | | | (_) | (_|  __/\__ \__ \</span>
+<span class="c1">#  \_____\___/|_| |_| |_| .__/ \__,_|_|   \__|_|   |_|  \___/ \___\___||___/___/</span>
+<span class="c1">#                       | |</span>
+<span class="c1">#                       |_|</span>
+<span class="c1">#  __  __</span>
+<span class="c1"># |  \/  |</span>
+<span class="c1"># | \  / | __ _ _ __   __ _  __ _  ___ _ __</span>
+<span class="c1"># | |\/| |/ _` | &#39;_ \ / _` |/ _` |/ _ \ &#39;__|</span>
+<span class="c1"># | |  | | (_| | | | | (_| | (_| |  __/ |</span>
+<span class="c1"># |_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|</span>
+<span class="c1">#                            __/ |</span>
+<span class="c1">#                           |___/</span>
+
+<div class="viewcode-block" id="CompartProcessManager"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.compart_process_manager.CompartProcessManager">[docs]</a><span class="k">class</span> <span class="nc">CompartProcessManager</span><span class="p">(</span><span class="n">AbstractProcessManager</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A CompartProcessManager is aimed handling several independent</span>
+<span class="sd">    StructuredViews at the same time, for managing true compartments.</span>
+<span class="sd">    It can automatically allocate compartments for state machines</span>
+<span class="sd">    associated with a specific state variable or attribute.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CompartProcessManager.init_processes"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.compart_process_manager.CompartProcessManager.init_processes">[docs]</a>    <span class="k">def</span> <span class="nf">init_processes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Init the processes that the CompartProcessManager will undergo during each</span>
+<span class="sd">        time step, in order. In a compartment-based process manager, processes may be either:</span>
+
+<span class="sd">        - method processes based on the execution of the specified method name in a Python add-on</span>
+<span class="sd">        - state-machine driven processes based on the direct execution of a state machine at the population level</span>
+<span class="sd">        - grouping-based processes defined for the sublevel, based on the execution of a state machine on the MASTER grouping</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">        --------</span>
+<span class="sd">        processes:</span>
+<span class="sd">          individual:</span>
+<span class="sd">            - health_state: MASTER  ## grouping-based process</span>
+<span class="sd">            - age_group: MASTER     ## grouping-based process</span>
+<span class="sd">            - species: MASTER       ## grouping-based process</span>
+<span class="sd">          population:</span>
+<span class="sd">            - adhesion_to_GDS ## state-machine process</span>
+<span class="sd">            - python_method   ## method process</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">## TODO: dispatch in sub-classes</span>
+        <span class="c1">## 1 - in current level, search for possible method/statemachine processes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">processes</span><span class="p">:</span>
+            <span class="c1"># iterate over all process names defined at this level</span>
+            <span class="k">for</span> <span class="n">d_process</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">processes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">]:</span>
+                <span class="c1">## TODO: CHECK</span>
+                <span class="n">process_name</span><span class="p">,</span> <span class="n">grouping</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">d_process</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">process_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_machines</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">grouping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">add_statemachine_process</span><span class="p">(</span><span class="n">process_name</span><span class="p">)</span>
+                    <span class="c1"># otherwise this state machine should be handled by a compart process at upper level</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_method_process</span><span class="p">(</span><span class="n">process_name</span><span class="p">)</span>
+
+        <span class="c1">## 2 - in sublevels, search for possible grouping processes (which can only occur on the MASTER grouping)</span>
+        <span class="n">sublevel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_default_sublevel</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">sublevel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">processes</span><span class="p">:</span>
+            <span class="c1"># iterate over all process names defined at sublevel</span>
+            <span class="k">for</span> <span class="n">d_process</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">processes</span><span class="p">[</span><span class="n">sublevel</span><span class="p">]:</span>
+                <span class="c1">## TODO: CHECK</span>
+                <span class="n">process_name</span><span class="p">,</span> <span class="n">grouping</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">d_process</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">process_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_machines</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;Unconsistent process for level </span><span class="si">{}</span><span class="s1"> with method </span><span class="si">{}</span><span class="s1"> (compartment-based models cannot use specific code on individuals)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sublevel</span><span class="p">,</span> <span class="n">process_name</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">grouping</span> <span class="o">!=</span> <span class="s1">&#39;MASTER&#39;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;Unconsistent grouping </span><span class="si">{}</span><span class="s1"> used for level </span><span class="si">{}</span><span class="s1"> with process </span><span class="si">{}</span><span class="s1"> (do not associate processes with any specific grouping at individual level in compartment-based models)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">grouping</span><span class="p">,</span> <span class="n">sublevel</span><span class="p">,</span> <span class="n">process_name</span><span class="p">))</span>
+                <span class="c1">## add a compart prcess associated with the MASTER grouping</span>
+                <span class="n">compart_properties</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compartments</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">][</span><span class="n">grouping</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;compart_manager&#39;</span><span class="p">,</span> <span class="s1">&#39;compart_class&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">compart_properties</span><span class="p">:</span>
+                        <span class="n">class_desc</span> <span class="o">=</span> <span class="n">compart_properties</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span>
+                        <span class="n">compart_properties</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_class</span><span class="p">(</span><span class="o">**</span><span class="n">class_desc</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_compart_process</span><span class="p">(</span><span class="s1">&#39;MASTER&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">compart_properties</span><span class="p">)</span>
+
+        <span class="c1">## 3 - create aggregated variables for explicit groupings and relative counts in explicit grouping and for each state machine</span>
+        <span class="n">t_key_variables_MASTER</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compartments</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">][</span><span class="s1">&#39;MASTER&#39;</span><span class="p">][</span><span class="s1">&#39;key_variables&#39;</span><span class="p">]</span>
+        <span class="n">init_key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">t_key_variables_MASTER</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compartments</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">grouping_name</span><span class="p">,</span> <span class="n">d_grouping_desc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">compartments</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">grouping_name</span> <span class="o">==</span> <span class="s1">&#39;MASTER&#39;</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_properties_for_groups</span><span class="p">(</span><span class="s1">&#39;MASTER&#39;</span><span class="p">,</span> <span class="n">d_grouping_desc</span><span class="p">[</span><span class="s1">&#39;key_variables&#39;</span><span class="p">])</span>
+                <span class="n">add_all_relative_population_getters</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_content</span><span class="p">[</span><span class="n">init_key</span><span class="p">],</span> <span class="n">d_grouping_desc</span><span class="p">[</span><span class="s1">&#39;key_variables&#39;</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">variable_name</span> <span class="ow">in</span> <span class="n">t_key_variables_MASTER</span><span class="p">:</span>
+            <span class="n">add_all_relative_population_getters</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_content</span><span class="p">[</span><span class="n">init_key</span><span class="p">],</span> <span class="p">(</span><span class="n">variable_name</span><span class="p">,))</span>
+
+        <span class="c1">## ADD is_X and duration_in_machine properties for state</span>
+        <span class="c1">## machines used as StateMachineProcesses for the current</span>
+        <span class="c1">## population</span>
+        <span class="n">add_all_test_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CompartProcessManager.add_compart_process"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.compart_process_manager.CompartProcessManager.add_compart_process">[docs]</a>    <span class="k">def</span> <span class="nf">add_compart_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                            <span class="n">process_name</span><span class="p">,</span>
+                            <span class="n">key_variables</span><span class="p">,</span>
+                            <span class="n">compart_manager</span><span class="o">=</span><span class="p">(</span><span class="n">GroupManager</span><span class="p">,</span> <span class="p">{}),</span>
+                            <span class="n">state_machines</span><span class="o">=</span><span class="p">[],</span>
+                            <span class="n">compart_class</span><span class="o">=</span><span class="p">(</span><span class="n">Compartment</span><span class="p">,</span> <span class="p">{})):</span>
+        <span class="k">if</span> <span class="n">process_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_content</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_compart_process</span><span class="p">(</span><span class="n">process_name</span><span class="p">,</span> <span class="n">key_variables</span><span class="p">,</span> <span class="n">compart_manager</span><span class="o">=</span><span class="n">compart_manager</span><span class="p">,</span> <span class="n">state_machines</span><span class="o">=</span><span class="n">state_machines</span><span class="p">,</span> <span class="n">compart_class</span><span class="o">=</span><span class="n">compart_class</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CompartProcessManager.add_host"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.compart_process_manager.CompartProcessManager.add_host">[docs]</a>    <span class="k">def</span> <span class="nf">add_host</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add the specified host to the current Multiprocessmanager, associated</span>
+<span class="sd">        with the specified key.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_host</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">[</span><span class="n">host</span><span class="o">.</span><span class="n">keys</span><span class="p">]</span> <span class="o">=</span> <span class="n">host</span>
+        <span class="k">if</span> <span class="n">host</span><span class="o">.</span><span class="n">simulation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simulation</span> <span class="o">=</span> <span class="n">host</span><span class="o">.</span><span class="n">simulation</span>
+        <span class="c1">## ADDED to correct bug when adding populations during running simulation</span>
+        <span class="c1">## TODO: check if same problem with other paradigms AND if other statevars to update</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="n">host</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">step</span>
+        <span class="c1">## TODO: other problem : the lines below update the step in</span>
+        <span class="c1">## the group managers associated to the processes, but the</span>
+        <span class="c1">## step in the counts is already 0 (in the steps after, OK) =&gt;</span>
+        <span class="c1">## see the order between step assignation and count update</span>
+        <span class="k">for</span> <span class="n">proc</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_content</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">proc</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_compart</span><span class="p">:</span>
+                <span class="n">comp</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">step</span></div>
+
+<div class="viewcode-block" id="CompartProcessManager.apply_initial_conditions"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.compart_process_manager.CompartProcessManager.apply_initial_conditions">[docs]</a>    <span class="k">def</span> <span class="nf">apply_initial_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize level with initial conditions specified in the model.</span>
+
+<span class="sd">        As this agent is aimed at managing aggregated populations, &#39;prototypes&#39;</span>
+<span class="sd">        are taken into account to initialize sub-populations. Each prototype describes</span>
+<span class="sd">        how variables corresponding to state machines are initialized for each</span>
+<span class="sd">        sub-population.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">initial_conditions</span><span class="p">:</span>
+            <span class="n">conds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">initial_conditions</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">]</span>
+            <span class="n">to_add</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">l_protos</span><span class="p">,</span> <span class="n">qty</span><span class="p">,</span> <span class="n">l_probas</span> <span class="ow">in</span> <span class="n">conds</span><span class="p">:</span>
+                <span class="n">l_proba_values</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">l_probas</span><span class="p">]</span>
+                <span class="n">total_value</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">l_proba_values</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">total_value</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;When building initial conditions for level </span><span class="si">{}</span><span class="s1">, inconsistent sum of probabilities for prototypes </span><span class="si">{}</span><span class="s1">, amount </span><span class="si">{}</span><span class="s1">, probas </span><span class="si">{}</span><span class="s1">=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">,</span> <span class="n">l_protos</span><span class="p">,</span> <span class="n">qty</span><span class="p">,</span> <span class="n">l_probas</span><span class="p">,</span> <span class="n">l_proba_values</span><span class="p">))</span>
+                <span class="c1">## if sum of probas &lt; 1 add complement (even if</span>
+                <span class="c1">## proba_values same size as protos) to ensure that</span>
+                <span class="c1">## e.g. [0.1, 0.1] with amount 100 gives in average</span>
+                <span class="c1">## [10, 10] individuals</span>
+                <span class="k">if</span> <span class="n">total_value</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">l_proba_values</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="n">total_value</span><span class="p">]</span>
+                <span class="c1"># if qty is defined among statevars of current agent,</span>
+                <span class="c1"># use it ; otherwise get model parameter</span>
+                <span class="n">amount</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="p">[</span><span class="n">qty</span><span class="p">])</span> <span class="k">if</span> <span class="n">qty</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span>\
+                         <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="n">qty</span><span class="p">))</span>
+                <span class="n">l_qty_by_proto</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="n">l_proba_values</span><span class="p">)</span>
+                <span class="c1"># truncate qty_by_proto if size &gt; nb of protos actually used</span>
+                <span class="n">l_qty_by_proto</span> <span class="o">=</span> <span class="n">l_qty_by_proto</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">l_protos</span><span class="p">)]</span>
+
+                <span class="k">for</span> <span class="n">proto</span><span class="p">,</span> <span class="n">nb</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">l_protos</span><span class="p">,</span> <span class="n">l_qty_by_proto</span><span class="p">):</span>
+                    <span class="n">prototype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_prototype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_default_sublevel</span><span class="p">(),</span> <span class="n">proto</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="s1">&#39;simu_id&#39;</span><span class="p">))</span>
+                    <span class="n">l_keys</span> <span class="o">=</span> <span class="n">complement_key</span><span class="p">({},</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">l_state_machines</span><span class="p">,</span> <span class="n">prototype</span><span class="o">=</span><span class="n">prototype</span><span class="p">)</span>
+                    <span class="n">nb_keys</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">l_keys</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stochastic</span><span class="p">:</span>
+                        <span class="n">l_qty</span> <span class="o">=</span> <span class="p">[</span><span class="n">nb</span> <span class="o">/</span> <span class="n">nb_keys</span><span class="p">]</span> <span class="o">*</span> <span class="n">nb_keys</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># distribute randomly and equiprobably amount among all available compartments</span>
+                        <span class="n">l_qty</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">nb</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span> <span class="o">/</span> <span class="n">nb_keys</span><span class="p">]</span> <span class="o">*</span> <span class="n">nb_keys</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">qty</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">l_keys</span><span class="p">,</span> <span class="n">l_qty</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_add</span><span class="p">:</span>
+                            <span class="n">to_add</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="n">to_add</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">qty</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_population</span><span class="p">(</span><span class="n">to_add</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">proc</span><span class="p">,</span> <span class="n">group_manager</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_content</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">proc</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_compart</span><span class="p">:</span>
+                    <span class="n">group_manager</span><span class="o">.</span><span class="n">do_enter_actions_on_init</span><span class="p">()</span>
+                    <span class="n">group_manager</span><span class="o">.</span><span class="n">update_counts</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CompartProcessManager.add_new_population"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.compart_process_manager.CompartProcessManager.add_new_population">[docs]</a>    <span class="k">def</span> <span class="nf">add_new_population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add new individuals to the appropriate compartments&quot;&quot;&quot;</span>
+        <span class="n">to_add</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">target_state</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">proto</span> <span class="ow">in</span> <span class="n">population</span><span class="p">:</span>
+            <span class="n">sublevel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_default_sublevel</span><span class="p">()</span>
+            <span class="n">prototype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_prototype</span><span class="p">(</span><span class="n">sublevel</span><span class="p">,</span> <span class="n">proto</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="s1">&#39;simu_id&#39;</span><span class="p">))</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">proto</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span> <span class="k">else</span> <span class="n">proto</span>
+            <span class="k">if</span> <span class="n">target_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># change prototype to ensure that target_state is taken into account</span>
+                <span class="c1">## TODO: think about raising an exception in that case ? (not only compartments but also IBM, hybrid)</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="n">target_state</span><span class="p">)</span>
+                <span class="n">var</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">state_machine</span>
+                <span class="n">prototype</span><span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">machine_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="c1"># build all consistent keys for destination compartments</span>
+            <span class="n">l_keys</span> <span class="o">=</span> <span class="n">complement_key</span><span class="p">({},</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">l_state_machines</span><span class="p">,</span> <span class="n">prototype</span><span class="o">=</span><span class="n">prototype</span><span class="p">)</span>
+            <span class="n">nb_keys</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">l_keys</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stochastic</span><span class="p">:</span>
+                <span class="n">l_qty</span> <span class="o">=</span> <span class="p">[</span><span class="n">amount</span> <span class="o">/</span> <span class="n">nb_keys</span><span class="p">]</span> <span class="o">*</span> <span class="n">nb_keys</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># distribute randomly and equiprobably amount among all available compartments</span>
+                <span class="n">l_qty</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span> <span class="o">/</span> <span class="n">nb_keys</span><span class="p">]</span> <span class="o">*</span> <span class="n">nb_keys</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">qty</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">l_keys</span><span class="p">,</span> <span class="n">l_qty</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_add</span><span class="p">:</span>
+                    <span class="n">to_add</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">to_add</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">qty</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_population</span><span class="p">(</span><span class="n">to_add</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CompartProcessManager.clone_and_add"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.compart_process_manager.CompartProcessManager.clone_and_add">[docs]</a>    <span class="k">def</span> <span class="nf">clone_and_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_agent</span><span class="p">,</span> <span class="n">prototype</span><span class="p">,</span> <span class="n">quantity</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a new population of size *quantity* corresponding to the specified *prototype*. Parameter *source_agent* is present for compatibilities purpose, not used in compartment-based models.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_new_population</span><span class="p">([(</span><span class="kc">None</span><span class="p">,</span> <span class="n">quantity</span><span class="p">,</span> <span class="n">prototype</span><span class="p">)])</span></div>
+
+<div class="viewcode-block" id="CompartProcessManager.add_population"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.compart_process_manager.CompartProcessManager.add_population">[docs]</a>    <span class="k">def</span> <span class="nf">add_population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_population_spec</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add the specified population specification *d_population_spec* to the current</span>
+<span class="sd">        CompartProcessManager. *d_population_spec* is a dictionary keyed by tuples</span>
+<span class="sd">        indexing the compartments, associated with the quantity of individuals to add.</span>
+<span class="sd">        All keys are assumed to be composed of values for all state machines in the current</span>
+<span class="sd">        CompartProcessManager.</span>
+<span class="sd">        If *init* is True, the compartment managers counts the initial value of</span>
+<span class="sd">        the populations in each compartment.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">        --------</span>
+<span class="sd">            *d_population_spec* : {(S, A, V): 3, (R, A, V): 5, (I, J, H): 2}</span>
+<span class="sd">              when executing state machine health_state</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nb_added</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">group_manager</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]</span>
+        <span class="c1"># debuginfo(d_population_spec)</span>
+        <span class="n">default_key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">group_manager</span><span class="o">.</span><span class="n">keys</span><span class="p">)</span>
+        <span class="n">d_real_population_spec</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">qty</span> <span class="ow">in</span> <span class="n">d_population_spec</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">callable</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">key</span><span class="p">):</span>
+                <span class="n">d_real_population_spec</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">qty</span>
+                <span class="k">continue</span>
+            <span class="n">d_key_prefix</span> <span class="o">=</span> <span class="p">{</span> <span class="p">():</span> <span class="n">qty</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">state_spec</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">state_spec</span><span class="p">):</span> <span class="c1"># true state</span>
+                    <span class="n">d_key_prefix</span> <span class="o">=</span> <span class="p">{</span> <span class="n">key_prefix</span> <span class="o">+</span> <span class="p">(</span><span class="n">state_spec</span><span class="p">,):</span> <span class="n">amount</span> <span class="k">for</span> <span class="n">key_prefix</span><span class="p">,</span> <span class="n">amount</span> <span class="ow">in</span> <span class="n">d_key_prefix</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_d_key_prefix</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">key_prefix</span><span class="p">,</span> <span class="n">amount</span> <span class="ow">in</span> <span class="n">d_key_prefix</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="c1"># debuginfo(state_spec, key_prefix, amount)</span>
+                        <span class="n">d_states_amounts</span> <span class="o">=</span> <span class="n">state_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qty</span><span class="o">=</span><span class="n">amount</span><span class="p">)</span>
+                        <span class="c1"># debuginfo(d_states_amounts)</span>
+                        <span class="k">for</span> <span class="n">real_state</span><span class="p">,</span> <span class="n">nb</span> <span class="ow">in</span> <span class="n">d_states_amounts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="c1"># debuginfo(key_prefix, real_state)</span>
+                            <span class="n">new_d_key_prefix</span><span class="p">[</span> <span class="n">key_prefix</span> <span class="o">+</span> <span class="p">(</span><span class="n">real_state</span><span class="p">,)]</span> <span class="o">=</span> <span class="n">nb</span>
+                    <span class="n">d_key_prefix</span> <span class="o">=</span> <span class="n">new_d_key_prefix</span>
+            <span class="k">for</span> <span class="n">real_key</span><span class="p">,</span> <span class="n">amount</span> <span class="ow">in</span> <span class="n">d_key_prefix</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">real_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d_real_population_spec</span><span class="p">:</span>
+                    <span class="n">d_real_population_spec</span><span class="p">[</span><span class="n">real_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">amount</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">d_real_population_spec</span><span class="p">[</span><span class="n">real_key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">amount</span>
+        <span class="c1"># debuginfo(d_real_population_spec)</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">qty</span> <span class="ow">in</span> <span class="n">d_real_population_spec</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group_manager</span><span class="o">.</span><span class="n">_content</span><span class="p">:</span>
+                <span class="n">d_statevars</span> <span class="o">=</span> <span class="p">{</span><span class="n">state</span><span class="o">.</span><span class="n">state_machine</span><span class="o">.</span><span class="n">machine_name</span><span class="p">:</span> <span class="n">state</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">key</span><span class="p">}</span>
+                <span class="n">new_comp</span> <span class="o">=</span> <span class="n">group_manager</span><span class="p">[</span><span class="n">default_key</span><span class="p">]</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">population</span><span class="o">=</span><span class="n">qty</span><span class="p">,</span> <span class="o">**</span><span class="n">d_statevars</span><span class="p">)</span>
+                <span class="n">new_comp</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="n">key</span>
+                <span class="n">group_manager</span><span class="o">.</span><span class="n">_content</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_comp</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># debuginfo(&quot;&gt;&quot;*5, group_manager[key], key, qty)</span>
+                <span class="n">group_manager</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">qty</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="c1"># debuginfo(&#39;DOING ACTIONS ON ENTER FOR&#39;, group_manager[key], state.name, state.name)</span>
+                    <span class="n">group_manager</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">do_state_actions</span><span class="p">(</span><span class="s1">&#39;on_enter&#39;</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">state_machine</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="n">qty</span><span class="p">)</span>
+                    <span class="c1"># debuginfo(&#39;=&gt;&#39;, group_manager[key].times_to_exit)</span>
+            <span class="n">nb_added</span> <span class="o">+=</span> <span class="n">qty</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span> <span class="o">+=</span> <span class="n">nb_added</span>
+
+        <span class="k">if</span> <span class="n">init</span><span class="p">:</span>
+            <span class="n">group_manager</span><span class="o">.</span><span class="n">update_counts</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CompartProcessManager.remove_population"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.compart_process_manager.CompartProcessManager.remove_population">[docs]</a>    <span class="k">def</span> <span class="nf">remove_population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_population_spec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove the specified population specification from the current</span>
+<span class="sd">        CompartProcessManager. Dictionay *d_population_spec* is keyed by tuples</span>
+<span class="sd">        indexing the compartments, associated with the quantity of individuals</span>
+<span class="sd">        to remove. All keys are assumed to be composed of values for all</span>
+<span class="sd">        state machines of the current CompartProcessManager.</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">        --------</span>
+<span class="sd">            *d_population_spec* : {(S, A, V): 3, (R, A, V): 5, (I, J, H): 2}</span>
+<span class="sd">              when executing state machine health_state</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nb_removed</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">group_manager</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">qty</span> <span class="ow">in</span> <span class="n">d_population_spec</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group_manager</span><span class="o">.</span><span class="n">_content</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;When removing in </span><span class="si">{}</span><span class="s1">, key </span><span class="si">{}</span><span class="s1"> not found&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+            <span class="n">nb_removed</span> <span class="o">+=</span> <span class="n">group_manager</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">qty</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span> <span class="o">-=</span> <span class="n">nb_removed</span></div>
+
+<div class="viewcode-block" id="CompartProcessManager.remove"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.compart_process_manager.CompartProcessManager.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agents_or_population</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove from the current CompartProcessManager the specified</span>
+<span class="sd">        population.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">agents_or_population</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;population&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;Compartment-based models cannot remove non-numeric populations</span><span class="se">\n\t</span><span class="si">{}</span><span class="s1"> in </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">agents_or_population</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_population</span><span class="p">(</span><span class="n">agents_or_population</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="CompartProcessManager.remove_all"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.compart_process_manager.CompartProcessManager.remove_all">[docs]</a>    <span class="k">def</span> <span class="nf">remove_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove the whole population from the current</span>
+<span class="sd">        CompartProcessManager.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_randomly</span><span class="p">(</span><span class="n">proba</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CompartProcessManager.remove_randomly"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.compart_process_manager.CompartProcessManager.remove_randomly">[docs]</a>    <span class="k">def</span> <span class="nf">remove_randomly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proba</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">amount</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove random amounts of populations from this ProcessManager. If</span>
+<span class="sd">        *amount* is not None, a multinomial sampling is performed for</span>
+<span class="sd">        each compartment. Otherwise: *proba* can be either a probability applied</span>
+<span class="sd">        in a uniform way to all compartments, or a dictionary which specifies</span>
+<span class="sd">        the probabilities associated to specific states. Removed quantities are</span>
+<span class="sd">        returned by the method.</span>
+
+<span class="sd">        When probabilities are specified as a dictionary, keys must be</span>
+<span class="sd">        consistent, i.e. have the same size (e.g. 2 variables) and refer to</span>
+<span class="sd">        exactly the same state machines.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">amount</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">amount</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">dict</span><span class="p">:</span>
+                <span class="n">keys</span><span class="p">,</span> <span class="n">probs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[(</span><span class="n">key</span><span class="p">,</span> <span class="n">comp</span><span class="o">.</span><span class="n">population</span><span class="p">)</span>
+                                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>
+                <span class="n">probas</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="o">/</span> <span class="n">s</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">probs</span><span class="p">]</span>
+                <span class="n">amounts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span> <span class="n">probas</span><span class="p">)</span>
+                <span class="n">to_remove</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">amounts</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">remove_population</span><span class="p">(</span><span class="n">to_remove</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">to_remove</span>
+            <span class="c1">## check consistency of amount specifications</span>
+            <span class="c1"># debuginfo(amount)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">amount</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;When removing randomly from </span><span class="si">{}</span><span class="s1">, bad amount specification: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">))</span>
+            <span class="n">s_state_machines</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="n">var</span><span class="p">)</span><span class="o">.</span><span class="n">state_machine</span><span class="o">.</span><span class="n">machine_name</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">key</span><span class="p">)</span>
+                                   <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">amount</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_state_machines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;When removing randomly from </span><span class="si">{}</span><span class="s1">, bad amount specification: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amount</span><span class="p">))</span>
+            <span class="c1">## associate each key of available compartments to the relevant key in amount</span>
+            <span class="c1"># debuginfo(self[&#39;MASTER&#39;]._content.keys(), amount.keys())</span>
+            <span class="n">key_matching</span> <span class="o">=</span> <span class="p">{</span> <span class="n">key</span><span class="p">:</span> <span class="n">amount_key</span>
+                             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_content</span>
+                             <span class="k">for</span> <span class="n">amount_key</span> <span class="ow">in</span> <span class="n">amount</span>
+                             <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">amount_key</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="p">}</span>
+            <span class="n">to_remove</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c1"># debuginfo(key_matching)</span>
+            <span class="k">for</span> <span class="n">amount_key</span><span class="p">,</span> <span class="n">qty</span> <span class="ow">in</span> <span class="n">amount</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">keys</span><span class="p">,</span> <span class="n">probs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">population</span><span class="p">)</span>
+                                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">key_matching</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                                    <span class="k">if</span> <span class="n">amount_key</span> <span class="o">==</span> <span class="n">match</span><span class="p">])</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>
+                <span class="n">probas</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="o">/</span> <span class="n">s</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">probs</span><span class="p">]</span>
+                <span class="n">amounts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">qty</span><span class="p">,</span> <span class="n">probas</span><span class="p">)</span>
+                <span class="n">to_remove</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">amounts</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_population</span><span class="p">(</span><span class="n">to_remove</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">to_remove</span>
+
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">proba</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="n">to_remove</span> <span class="o">=</span> <span class="p">{</span> <span class="n">key</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span><span class="p">,</span> <span class="n">proba</span><span class="p">)</span>
+                          <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_population</span><span class="p">(</span><span class="n">to_remove</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">to_remove</span>
+
+        <span class="c1">## check consistency of proba specifications</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">proba</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;When removing randomly from </span><span class="si">{}</span><span class="s1">, bad probability specification: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proba</span><span class="p">))</span>
+        <span class="n">s_state_machines</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="n">var</span><span class="p">)</span><span class="o">.</span><span class="n">state_machine</span><span class="o">.</span><span class="n">machine_name</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">key</span><span class="p">)</span>
+                             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">proba</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_state_machines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;When removing randomly from </span><span class="si">{}</span><span class="s1">, bad probability specification: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proba</span><span class="p">))</span>
+        <span class="c1">## associate each key of available compartments to the relevant key in proba</span>
+        <span class="n">key_matching</span> <span class="o">=</span> <span class="p">{</span> <span class="n">key</span><span class="p">:</span> <span class="n">proba_key</span>
+                         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]</span>
+                         <span class="k">for</span> <span class="n">proba_key</span> <span class="ow">in</span> <span class="n">proba</span>
+                         <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">proba_key</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="p">}</span>
+        <span class="n">to_remove</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;MASTER&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">pop</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span>
+            <span class="n">to_remove</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="n">pop</span><span class="p">,</span> <span class="n">proba</span><span class="p">[</span><span class="n">key_matching</span><span class="p">[</span><span class="n">key</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_population</span><span class="p">(</span><span class="n">to_remove</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">to_remove</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a pandas DataFrame containing counts of each process if existing.</span>
+<span class="sd">        TODO: column steps need to be with one of process</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">comp</span><span class="o">.</span><span class="n">counts</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">exc</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_history</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">,</span>
+                <span class="s1">&#39;agent_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">agid</span><span class="p">,</span>
+                <span class="c1"># &#39;population&#39;: self.population}</span>
+            <span class="p">})</span>
+            <span class="k">if</span> <span class="s1">&#39;population_id&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="p">:</span>
+                <span class="n">res</span><span class="p">[</span><span class="s1">&#39;population_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population_id</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">outputs</span> <span class="ow">and</span>\
+               <span class="s1">&#39;extra_vars&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">][</span><span class="s1">&#39;extra_vars&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+                        <span class="n">res</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_model_value</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="n">StateVarNotFoundException</span><span class="p">:</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                        <span class="n">res</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

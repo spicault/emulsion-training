@@ -1,0 +1,8 @@
+Model 6b (M6 + vector diffusion)
+********************************
+
+At this stage this exercise requires to add a large amount of specific
+code to EMULSION since the simulation engine does not provide generic
+mechanisms for spatially explicit models.
+
+Hence, we did not implement this exercise within EMULSION.

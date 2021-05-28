@@ -1,0 +1,808 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.model.state_machines &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.model.state_machines</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: emulsion.model.state_machines</span>
+
+<span class="sd">.. moduleauthor:: Sébastien Picault &lt;sebastien.picault@inra.fr&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># [HEADER]</span>
+
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span>   <span class="nn">functools</span>               <span class="k">import</span> <span class="n">partial</span>
+<span class="kn">from</span>   <span class="nn">collections</span>             <span class="k">import</span> <span class="n">Counter</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>                   <span class="k">as</span>     <span class="nn">np</span>
+<span class="kn">from</span>   <span class="nn">sympy</span>                   <span class="k">import</span> <span class="n">sympify</span>
+
+<span class="kn">from</span>   <span class="nn">sortedcontainers</span>        <span class="k">import</span> <span class="n">SortedSet</span>
+
+<span class="kn">import</span> <span class="nn">emulsion.tools.graph</span>    <span class="k">as</span>     <span class="nn">enx</span>
+<span class="kn">from</span>   <span class="nn">emulsion.agent.action</span>   <span class="k">import</span> <span class="n">AbstractAction</span>
+<span class="kn">from</span>   <span class="nn">emulsion.tools.state</span>    <span class="k">import</span> <span class="n">StateVarDict</span><span class="p">,</span> <span class="n">EmulsionEnum</span>
+
+<span class="kn">from</span>   <span class="nn">emulsion.model.functions</span> <span class="k">import</span> <span class="n">AGGREG_COMP</span><span class="p">,</span> <span class="n">ACTION_SYMBOL</span><span class="p">,</span> <span class="n">WHEN_SYMBOL</span><span class="p">,</span> <span class="n">ESCAPE_SYMBOL</span><span class="p">,</span>\
+    <span class="n">COND_SYMBOL</span><span class="p">,</span> <span class="n">CROSS_SYMBOL</span><span class="p">,</span> <span class="n">EDGE_KEYWORDS</span><span class="p">,</span> <span class="n">CLOCK_SYMBOL</span><span class="p">,</span>\
+    <span class="n">make_when_condition</span><span class="p">,</span> <span class="n">make_duration_condition</span><span class="p">,</span> <span class="n">make_duration_init_action</span>
+
+<span class="kn">from</span>   <span class="nn">emulsion.model.exceptions</span>     <span class="k">import</span> <span class="n">SemanticException</span>
+<span class="kn">from</span>   <span class="nn">emulsion.tools.debug</span>          <span class="k">import</span> <span class="n">debuginfo</span>
+
+
+<span class="c1">#   _____ _        _       __  __            _     _</span>
+<span class="c1">#  / ____| |      | |     |  \/  |          | |   (_)</span>
+<span class="c1"># | (___ | |_ __ _| |_ ___| \  / | __ _  ___| |__  _ _ __   ___</span>
+<span class="c1">#  \___ \| __/ _` | __/ _ \ |\/| |/ _` |/ __| &#39;_ \| | &#39;_ \ / _ \</span>
+<span class="c1">#  ____) | || (_| | ||  __/ |  | | (_| | (__| | | | | | | |  __/</span>
+<span class="c1"># |_____/ \__\__,_|\__\___|_|  |_|\__,_|\___|_| |_|_|_| |_|\___|</span>
+
+
+
+<div class="viewcode-block" id="StateMachine"><a class="viewcode-back" href="../../../emulsion.model.html#emulsion.model.state_machines.StateMachine">[docs]</a><span class="k">class</span> <span class="nc">StateMachine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class in charge of the description of biological or economical</span>
+<span class="sd">    processes, modeled as Finite State Machines. The formalism</span>
+<span class="sd">    implemented here is based on UML state machine diagrams, with</span>
+<span class="sd">    adaptations to biology.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="StateMachine.__init__"><a class="viewcode-back" href="../../../emulsion.model.html#emulsion.model.state_machines.StateMachine.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">aggregation_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build a State Machine within the specified model, based on</span>
+<span class="sd">        the specified description (dictionary).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            machine_name: str</span>
+<span class="sd">                name of the state machine</span>
+<span class="sd">            description: dict</span>
+<span class="sd">                dictionary corresponding to the YAML description of the state machine</span>
+<span class="sd">            model: EmulsionModel</span>
+<span class="sd">                the EMULSION model which the state machine belongs to</span>
+<span class="sd">            aggregation_type: str</span>
+<span class="sd">                type of aggregation (IBM, hybrid...) between the level</span>
+<span class="sd">                at which this state machine will be executed and the</span>
+<span class="sd">                upper level - necessary to handle durations properly</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span> <span class="o">=</span> <span class="n">machine_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_type</span> <span class="o">=</span> <span class="n">aggregation_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">description</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_reset_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">enx</span><span class="o">.</span><span class="n">MultiDiGraph</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stateprops</span> <span class="o">=</span> <span class="n">StateVarDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_actions</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="c1">#        self.edge_actions = {}</span>
+
+<div class="viewcode-block" id="StateMachine.parse"><a class="viewcode-back" href="../../../emulsion.model.html#emulsion.model.state_machines.StateMachine.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build the State Machine from the specified dictionary</span>
+<span class="sd">        (expected to come from a YAML configuration file).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_all</span><span class="p">()</span>
+        <span class="c1"># keep an exhaustive description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="c1"># build the enumeration of the states</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_states</span><span class="p">()</span>
+        <span class="c1"># build the graph based on the states and the transitions between them</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_graph</span><span class="p">()</span>
+        <span class="c1"># build actions associated with the state machine (states or edges)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_actions</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="StateMachine.get_property"><a class="viewcode-back" href="../../../emulsion.model.html#emulsion.model.state_machines.StateMachine.get_property">[docs]</a>    <span class="k">def</span> <span class="nf">get_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_name</span><span class="p">,</span> <span class="n">property_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the property associated to the specified state.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">state_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateprops</span> <span class="ow">or</span>\
+           <span class="n">property_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateprops</span><span class="p">[</span><span class="n">state_name</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">state_name</span><span class="p">][</span><span class="n">property_name</span><span class="p">]</span>\
+                <span class="k">if</span> <span class="n">property_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">state_name</span><span class="p">]</span>\
+                   <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateprops</span><span class="p">[</span><span class="n">state_name</span><span class="p">][</span><span class="n">property_name</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="StateMachine.build_states"><a class="viewcode-back" href="../../../emulsion.model.html#emulsion.model.state_machines.StateMachine.build_states">[docs]</a>    <span class="k">def</span> <span class="nf">build_states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse the description of the state machine and extract the existing</span>
+<span class="sd">        states. States are described as list items, endowed with</span>
+<span class="sd">        key-value properties. Only one state per list item is allowed</span>
+<span class="sd">        (to ensure that states are always stored in the same order in</span>
+<span class="sd">        all executions).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">states</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">default_state</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># retrieve information for each state</span>
+        <span class="k">for</span> <span class="n">statedict</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="p">[</span><span class="s1">&#39;states&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">statedict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="c1"># provide a default fillcolor</span>
+                <span class="k">if</span> <span class="s1">&#39;fillcolor&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">value</span><span class="p">[</span><span class="s1">&#39;fillcolor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;lightgray&#39;</span>
+                <span class="c1"># provide a default dashed</span>
+                <span class="k">if</span> <span class="s1">&#39;line_style&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">value</span><span class="p">[</span><span class="s1">&#39;line_style&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;solid&#39;</span>
+                <span class="c1"># if properties are provided, add the corresponding</span>
+                <span class="c1"># expression to the model</span>
+                <span class="k">if</span> <span class="s1">&#39;properties&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">value</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="c1"># store special property: &quot;autoremove: yes&quot;</span>
+                <span class="n">value</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;autoremove&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;autoremove&#39;</span><span class="p">]</span>\
+                                                    <span class="k">if</span> <span class="s1">&#39;autoremove&#39;</span> <span class="ow">in</span> <span class="n">value</span> <span class="k">else</span> <span class="kc">False</span>
+                <span class="c1"># store special property: &quot;default: yes&quot;</span>
+                <span class="c1"># if several states are marked &quot;default&quot;, take the first one</span>
+                <span class="n">value</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;default&#39;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">default_state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">value</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;default&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">default_state</span> <span class="o">=</span> <span class="n">name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stateprops</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_expression</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                                         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+                <span class="c1"># store special properties: &quot;next: aState&quot; and</span>
+                <span class="c1"># &quot;previous: aState&quot; which define</span>
+                <span class="c1"># successor/predecessor when using &quot;next_state&quot; and</span>
+                <span class="c1"># &quot;previous_state&quot; in prototype definition (otherwise,</span>
+                <span class="c1"># next and previous are defined as non-autoremove</span>
+                <span class="c1"># states after and before in the list)</span>
+                <span class="k">if</span> <span class="s1">&#39;next&#39;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">value</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;next&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;next&#39;</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">stateprops</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;next&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;next&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s1">&#39;previous&#39;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">value</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;previous&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;previous&#39;</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">stateprops</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;previous&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;previous&#39;</span><span class="p">]</span>
+                <span class="c1"># store other information</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="c1"># and retrieve available actions if any</span>
+                <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;on_enter&#39;</span><span class="p">,</span> <span class="s1">&#39;on_stay&#39;</span><span class="p">,</span> <span class="s1">&#39;on_exit&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_add_state_actions</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">keyword</span><span class="p">,</span> <span class="n">value</span><span class="p">[</span><span class="n">keyword</span><span class="p">])</span>
+        <span class="c1"># build the enumeration of the states</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="o">=</span> <span class="n">EmulsionEnum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span>
+                                   <span class="n">states</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">)</span>
+        <span class="c1"># link the states to their state machine</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">state_machine</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="c1"># define the default value for &quot;autoremove&quot; at the enumeration level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">autoremove</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="c1"># check that state names are unique</span>
+            <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+                <span class="n">other_machine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+                <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span>
+                    <span class="s1">&#39;Conflict: State </span><span class="si">%s</span><span class="s1"> found in statemachines </span><span class="si">%s</span><span class="s1"> and </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">other_machine</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="c1"># check that state names are not parameters</span>
+            <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span>
+                    <span class="s1">&#39;Conflict: State </span><span class="si">%s</span><span class="s1"> of statemachines </span><span class="si">%s</span><span class="s1"> found in parameters&#39;</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="c1"># associate the state with the state name in the model</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span>
+            <span class="c1"># update the autoremove value if the state is defined as such</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateprops</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;autoremove&#39;</span><span class="p">]:</span>
+                <span class="n">state</span><span class="o">.</span><span class="n">autoremove</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="c1"># set next and previous to the state itself (to ensure</span>
+            <span class="c1"># that all states have a predecessor/successor)</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">predecessor</span> <span class="o">=</span> <span class="n">state</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">successor</span> <span class="o">=</span> <span class="n">state</span>
+
+        <span class="c1"># handle default states</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">is_default</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># if a default state is defined, store it and limit the list</span>
+        <span class="c1"># of &quot;available&quot; states</span>
+        <span class="k">if</span> <span class="n">default_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">default_state</span><span class="p">]</span><span class="o">.</span><span class="n">is_default</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">default_state</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">available</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">default</span><span class="p">,)</span>
+        <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># otherwise the list of available states is simply those which</span>
+        <span class="c1"># are not autoremove</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">available</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">autoremove</span><span class="p">)</span>
+
+        <span class="c1"># define &quot;successor&quot; and &quot;predecessor&quot; properties</span>
+        <span class="c1"># start from the list of non-autoremove states</span>
+        <span class="n">usable</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">autoremove</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">usable</span><span class="p">:</span>
+            <span class="c1"># if the state has a &quot;predecessor&quot; state, use it</span>
+            <span class="k">if</span> <span class="s1">&#39;previous&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateprops</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">]:</span>
+                <span class="n">state</span><span class="o">.</span><span class="n">predecessor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">stateprops</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;previous&#39;</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># otherwise use the previous state in the list, the</span>
+                <span class="c1"># first one being its own previous state</span>
+                <span class="n">state</span><span class="o">.</span><span class="n">predecessor</span> <span class="o">=</span> <span class="n">usable</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">usable</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span>
+            <span class="c1"># if the state has a &quot;successor&quot; state, use it</span>
+            <span class="k">if</span> <span class="s1">&#39;next&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stateprops</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">]:</span>
+                <span class="n">state</span><span class="o">.</span><span class="n">successor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">stateprops</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;next&#39;</span><span class="p">]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># otherwise use the next state in the list, the</span>
+                <span class="c1"># last one being its own next state</span>
+                <span class="n">state</span><span class="o">.</span><span class="n">successor</span> <span class="o">=</span> <span class="n">usable</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">usable</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">usable</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+
+        <span class="c1"># define function used from model to provide a random state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="s1">&#39;_random_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_random_state</span>
+        <span class="c1"># define function used from model to provide the default state</span>
+        <span class="c1"># if any, otherwise a random state among non-autoremove ones</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">default</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="s1">&#39;_default_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_default_state</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="s1">&#39;_default_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_random_state</span></div>
+
+
+<div class="viewcode-block" id="StateMachine.get_random_state"><a class="viewcode-back" href="../../../emulsion.model.html#emulsion.model.state_machines.StateMachine.get_random_state">[docs]</a>    <span class="k">def</span> <span class="nf">get_random_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">caller</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qty</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a random state for this state machine.&quot;&quot;&quot;</span>
+        <span class="n">l_available_states</span> <span class="o">=</span> <span class="p">[</span><span class="n">state</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">autoremove</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">qty</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">l_available_states</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Counter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">l_available_states</span><span class="p">,</span> <span class="n">qty</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="StateMachine.get_default_state"><a class="viewcode-back" href="../../../emulsion.model.html#emulsion.model.state_machines.StateMachine.get_default_state">[docs]</a>    <span class="k">def</span> <span class="nf">get_default_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">caller</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">qty</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the default state for this state machine.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">default</span> <span class="k">if</span> <span class="n">qty</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">default</span><span class="p">:</span> <span class="n">qty</span><span class="p">}</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">state_colors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a dictionary of state names associated with fill colors.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;fillcolor&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">autoremove</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">state_style</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a dictionary of state names associated with dashed state.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;line_style&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">autoremove</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="StateMachine.build_graph"><a class="viewcode-back" href="../../../emulsion.model.html#emulsion.model.state_machines.StateMachine.build_graph">[docs]</a>    <span class="k">def</span> <span class="nf">build_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse the description of the state machine and extract the</span>
+<span class="sd">        graph of the transitions between the states. Since a</span>
+<span class="sd">        MultiDiGraph is used, each pair of nodes can be bound by</span>
+<span class="sd">        several transitions if needed (beware the associated</span>
+<span class="sd">        semantics).</span>
+
+<span class="sd">        Example of YAML specification:</span>
+<span class="sd">        ------------------------------</span>
+<span class="sd">        transitions:</span>
+<span class="sd">          - {from: S, to: I-, proba: p, cond: not_vaccinated}</span>
+<span class="sd">          - {from: I-, to: S, proba: m}</span>
+<span class="sd">          - {from: I-, to: I+m, proba: &#39;q*plp&#39;}</span>
+<span class="sd">          - {from: I-, to: I+, proba: &#39;q*(1-plp)&#39;}</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># add a node for each state</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;tooltip&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">describe_state</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="c1"># build edges between states according to specified transitions</span>
+        <span class="k">if</span> <span class="s1">&#39;transitions&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parse_edges</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="p">[</span><span class="s1">&#39;transitions&#39;</span><span class="p">],</span>
+                              <span class="n">type_id</span><span class="o">=</span><span class="n">enx</span><span class="o">.</span><span class="n">EdgeTypes</span><span class="o">.</span><span class="n">TRANSITION</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;productions&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parse_edges</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="p">[</span><span class="s1">&#39;productions&#39;</span><span class="p">],</span>
+                              <span class="n">type_id</span><span class="o">=</span><span class="n">enx</span><span class="o">.</span><span class="n">EdgeTypes</span><span class="o">.</span><span class="n">PRODUCTION</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_parse_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">type_id</span><span class="o">=</span><span class="n">enx</span><span class="o">.</span><span class="n">EdgeTypes</span><span class="o">.</span><span class="n">TRANSITION</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse the description of edges, with the difference</span>
+<span class="sd">        transitions/productions</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">:</span>
+            <span class="n">from_</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="s1">&#39;from&#39;</span><span class="p">]</span>
+            <span class="n">to_</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="s1">&#39;to&#39;</span><span class="p">]</span>
+            <span class="n">others</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">edge</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                      <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;from&#39;</span> <span class="ow">and</span> <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;to&#39;</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">kwd</span> <span class="ow">in</span> <span class="n">EDGE_KEYWORDS</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">kwd</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
+                    <span class="c1"># parm = pretty(sympify(others[kwd], locals=self.model._namespace))</span>
+                    <span class="n">parm</span> <span class="o">=</span> <span class="n">others</span><span class="p">[</span><span class="n">kwd</span><span class="p">]</span>
+                    <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kwd</span><span class="p">,</span> <span class="n">parm</span><span class="p">)</span>
+            <span class="c1"># label = &#39;, &#39;.join([pretty(sympify(x, locals=self.model._namespace))</span>
+            <span class="c1">#                    for x in others.values()])</span>
+                    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
+                        <span class="n">others</span><span class="p">[</span><span class="s1">&#39;labeltooltip&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">describe_parameter</span><span class="p">(</span><span class="n">parm</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">others</span><span class="p">[</span><span class="s1">&#39;labeltooltip&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+            <span class="c1"># others[&#39;labeltooltip&#39;] = &#39;, &#39;.join([self.model.describe_parameter(x)</span>
+            <span class="c1">#                                     for x in others.values()</span>
+            <span class="c1">#                                     if str(x) in self.model.parameters])</span>
+            <span class="c1"># handle conditions if any on the edge</span>
+            <span class="n">cond</span><span class="p">,</span> <span class="n">esc_cond</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="s1">&#39;cond&#39;</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
+                <span class="n">cond</span> <span class="o">=</span> <span class="n">others</span><span class="p">[</span><span class="s1">&#39;cond&#39;</span><span class="p">]</span>
+                <span class="n">others</span><span class="p">[</span><span class="s1">&#39;truecond&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">others</span><span class="p">[</span><span class="s1">&#39;cond&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;escape&#39;</span> <span class="ow">in</span> <span class="n">others</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">type_id</span> <span class="o">==</span> <span class="n">enx</span><span class="o">.</span><span class="n">EdgeTypes</span><span class="o">.</span><span class="n">TRANSITION</span><span class="p">):</span>
+                <span class="n">esc_cond</span> <span class="o">=</span> <span class="n">others</span><span class="p">[</span><span class="s1">&#39;escape&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">cond</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1">### WARNING the operation below is not completely</span>
+                <span class="c1">### safe... it is done to replace conditions of the form</span>
+                <span class="c1">### &#39;x == y&#39; by &#39;Eq(x, y)&#39;, but it is a simple</span>
+                <span class="c1">### substitution instead of parsing the syntax</span>
+                <span class="c1">### tree... Thus it is *highly* recommended to express</span>
+                <span class="c1">### conditions directly with Eq(x, y)</span>
+                <span class="k">if</span> <span class="s1">&#39;==&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">cond</span><span class="p">):</span>
+                    <span class="n">cond</span> <span class="o">=</span> <span class="s1">&#39;Eq(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cond</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;==&#39;</span><span class="p">)))</span>
+                    <span class="c1"># others[&#39;label&#39;] = &#39;, &#39;.join(others.values())</span>
+            <span class="k">if</span> <span class="n">esc_cond</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;==&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">esc_cond</span><span class="p">):</span>
+                    <span class="n">esc_cond</span> <span class="o">=</span> <span class="s1">&#39;Eq(</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">esc_cond</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;==&#39;</span><span class="p">)))</span>
+            <span class="c1"># if duration specified for this state, handle it as an</span>
+            <span class="c1"># additional condition</span>
+            <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;duration&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="p">[</span><span class="n">from_</span><span class="p">])</span> <span class="ow">and</span> <span class="p">(</span><span class="n">type_id</span> <span class="o">==</span> <span class="n">enx</span><span class="o">.</span><span class="n">EdgeTypes</span><span class="o">.</span><span class="n">TRANSITION</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_type</span> <span class="o">!=</span> <span class="n">AGGREG_COMP</span><span class="p">:</span>
+                    <span class="c1">## build condition for testing time spent by individuals in the state</span>
+                    <span class="c1"># duration_cond: _time_to_exit_statemachine &gt;= step</span>
+                    <span class="n">duration_cond</span> <span class="o">=</span> <span class="n">make_duration_condition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">esc_cond</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="c1"># escape conditions allow to exit state before _time_to_exit_statemachine</span>
+                        <span class="c1"># =&gt; _time_to_exit_statemachine &lt; step AND escape condition fulfilled</span>
+                        <span class="n">exit_cond</span> <span class="o">=</span> <span class="s1">&#39;AND(Not(</span><span class="si">{}</span><span class="s1">),</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">duration_cond</span><span class="p">,</span> <span class="n">esc_cond</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># without escape condition, use duration condition as a basis to allow to leave the state</span>
+                        <span class="n">exit_cond</span> <span class="o">=</span> <span class="n">duration_cond</span>
+                    <span class="k">if</span> <span class="n">cond</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">cond</span> <span class="o">=</span> <span class="n">exit_cond</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># if true conditions are specified, add them to the conjunction</span>
+                        <span class="n">cond</span> <span class="o">=</span> <span class="s1">&#39;AND(</span><span class="si">{}</span><span class="s1">,</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">exit_cond</span><span class="p">,</span> <span class="n">cond</span><span class="p">)</span>
+                    <span class="n">others</span><span class="p">[</span><span class="s1">&#39;cond&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cond</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># in compartment-based models, escape conditions are allowed but &#39;cond&#39; are not</span>
+                    <span class="k">if</span> <span class="s1">&#39;cond&#39;</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;In transition from </span><span class="si">{}</span><span class="s1"> to </span><span class="si">{}</span><span class="s1">, individual conditions (</span><span class="si">{}</span><span class="s1">) are not allowed (compartmental model !)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">from_</span><span class="p">,</span> <span class="n">to_</span><span class="p">,</span> <span class="n">others</span><span class="p">[</span><span class="s1">&#39;cond&#39;</span><span class="p">]))</span>
+                    <span class="k">if</span> <span class="n">esc_cond</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">others</span><span class="p">[</span><span class="s1">&#39;escape&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">esc_cond</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_expressions</span><span class="p">[</span><span class="n">esc_cond</span><span class="p">]</span> <span class="o">=</span> <span class="n">sympify</span><span class="p">(</span><span class="n">esc_cond</span><span class="p">,</span> <span class="nb">locals</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_namespace</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">cond</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_expressions</span><span class="p">[</span><span class="n">cond</span><span class="p">]</span> <span class="o">=</span> <span class="n">sympify</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span>
+                                                      <span class="nb">locals</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_namespace</span><span class="p">)</span>
+            <span class="c1"># handle &#39;when&#39; clause if any on the edge</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_parse_when</span><span class="p">(</span><span class="n">others</span><span class="p">)</span>
+            <span class="c1"># # handle &#39;duration&#39;, &#39;escape&#39; and &#39;condition&#39; clauses if</span>
+            <span class="c1"># # any on the edge</span>
+            <span class="c1"># parse actions on cross if any</span>
+            <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;on_cross&#39;</span> <span class="ow">in</span> <span class="n">others</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">type_id</span> <span class="o">==</span> <span class="n">enx</span><span class="o">.</span><span class="n">EdgeTypes</span><span class="o">.</span><span class="n">TRANSITION</span><span class="p">):</span>
+                <span class="n">l_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_action_list</span><span class="p">(</span><span class="n">others</span><span class="p">[</span><span class="s1">&#39;on_cross&#39;</span><span class="p">])</span>
+                <span class="n">others</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_actions</span>
+            <span class="n">others</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+            <span class="n">others</span><span class="p">[</span><span class="s1">&#39;type_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">type_id</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">from_</span><span class="p">,</span> <span class="n">to_</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">)</span>
+            <span class="c1"># register rate/proba/amount expressions in the model</span>
+            <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">EDGE_KEYWORDS</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_expression</span><span class="p">(</span><span class="n">others</span><span class="p">[</span><span class="n">keyword</span><span class="p">])</span>
+
+
+    <span class="k">def</span> <span class="nf">_parse_when</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge_desc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse the edge description in search for a &#39;when&#39;</span>
+<span class="sd">        clause. This special condition is aimed at globally assessing</span>
+<span class="sd">        a time period within the whole simulation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;when&#39;</span> <span class="ow">in</span> <span class="n">edge_desc</span><span class="p">:</span>
+            <span class="n">expression</span> <span class="o">=</span> <span class="n">sympify</span><span class="p">(</span><span class="n">edge_desc</span><span class="p">[</span><span class="s1">&#39;when&#39;</span><span class="p">],</span>
+                                 <span class="nb">locals</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_event_namespace</span><span class="p">)</span>
+            <span class="n">edge_desc</span><span class="p">[</span><span class="s1">&#39;when&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">expression</span><span class="p">)]</span> <span class="o">=</span> <span class="n">make_when_condition</span><span class="p">(</span>
+                <span class="n">expression</span><span class="p">,</span> <span class="n">modules</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span>
+
+    <span class="c1"># def _parse_conditions_durations(self, from_, edge_desc):</span>
+    <span class="c1">#     &quot;&quot;&quot;Parse the edge description in search for durations,</span>
+    <span class="c1">#     escapement and conditions specifications. Durations</span>
+    <span class="c1">#     (&#39;duration&#39; clause )are handled as an additional condition</span>
+    <span class="c1">#     (agents entering the state are given a &#39;time to live&#39; in the</span>
+    <span class="c1">#     state, then they are not allowed to leave the state until</span>
+    <span class="c1">#     their stay reaches that value). Escapements (&#39;escape&#39; clause)</span>
+    <span class="c1">#     are also translated as a condition, allowing the agent to</span>
+    <span class="c1">#     leave the state when the expression is true, only while the</span>
+    <span class="c1">#     stay duration is below its nominal value.</span>
+    <span class="c1">#</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     cond, escape = None, False</span>
+    <span class="c1">#     if &#39;cond&#39; in edge_desc:</span>
+    <span class="c1">#         cond = edge_desc[&#39;cond&#39;]</span>
+    <span class="c1">#     if &#39;escape&#39; in edge_desc:</span>
+    <span class="c1">#         cond = edge_desc[&#39;escape&#39;]</span>
+    <span class="c1">#         escape = True</span>
+    <span class="c1">#     if cond is not None:</span>
+    <span class="c1">#         ### WARNING the operation below is not completely</span>
+    <span class="c1">#         ### safe... it is done to replace conditions of the form</span>
+    <span class="c1">#         ### &#39;x == y&#39; by &#39;Eq(x, y)&#39;, but it is a simple</span>
+    <span class="c1">#         ### substitution instead of parsing the syntax</span>
+    <span class="c1">#         ### tree... Thus it is *highly* recommended to express</span>
+    <span class="c1">#         ### conditions directly with Eq(x, y)</span>
+    <span class="c1">#         if &#39;==&#39; in str(cond):</span>
+    <span class="c1">#             cond = &#39;Eq({})&#39;.format(&#39;,&#39;.join(cond.split(&#39;==&#39;)))</span>
+    <span class="c1">#             # edge_desc[&#39;label&#39;] = &#39;, &#39;.join(edge_desc.values()) if</span>
+    <span class="c1">#     # duration specified for this state, handle it as an</span>
+    <span class="c1">#     # additional condition</span>
+    <span class="c1">#     if &#39;duration&#39; in self._statedesc[from_]:</span>
+    <span class="c1">#         duration_cond = make_duration_condition(self.model, self.machine_name)</span>
+    <span class="c1">#         if cond is None:</span>
+    <span class="c1">#             cond = duration_cond</span>
+    <span class="c1">#         elif escape:</span>
+    <span class="c1">#             cond = &#39;AND(Not({}),{})&#39;.format(duration_cond, cond)</span>
+    <span class="c1">#         else:</span>
+    <span class="c1">#             cond = &#39;AND({},{})&#39;.format(duration_cond, cond)</span>
+    <span class="c1">#         edge_desc[&#39;cond&#39;] = cond</span>
+    <span class="c1">#     if cond is not None:</span>
+    <span class="c1">#         # self.model.conditions[cond] = sympify(cond, locals=self.model._namespace)</span>
+    <span class="c1">#         self.model._expressions[cond] = sympify(cond, locals=self.model._namespace)</span>
+
+<div class="viewcode-block" id="StateMachine.build_actions"><a class="viewcode-back" href="../../../emulsion.model.html#emulsion.model.state_machines.StateMachine.build_actions">[docs]</a>    <span class="k">def</span> <span class="nf">build_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse the description of the state machine and extract the</span>
+<span class="sd">        actions that agents running this state machine must have.</span>
+
+<span class="sd">        Example of YAML specification:</span>
+<span class="sd">        ------------------------------</span>
+<span class="sd">        actions:</span>
+<span class="sd">          say_hello:</span>
+<span class="sd">            desc: action performed when entering the S state</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;on_enter&#39;</span><span class="p">,</span> <span class="s1">&#39;on_stay&#39;</span><span class="p">,</span> <span class="s1">&#39;on_exit&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_add_state_actions</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">keyword</span><span class="p">,</span> <span class="n">value</span><span class="p">[</span><span class="n">keyword</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s1">&#39;duration&#39;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_add_state_duration_actions</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="StateMachine.get_value"><a class="viewcode-back" href="../../../emulsion.model.html#emulsion.model.state_machines.StateMachine.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the value associated with the specified name.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_add_state_duration_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_name</span><span class="p">,</span> <span class="n">duration_value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add implicit actions to manage stay duration in the specified state</span>
+<span class="sd">        name. The `duration_value` can be either a parameter, a</span>
+<span class="sd">        &#39;statevar&#39; or a distribution.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># initialize the actions associated to the state if none</span>
+        <span class="k">if</span> <span class="n">state_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_actions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state_actions</span><span class="p">[</span><span class="n">state_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># retrieve the list of actions on enter for this state, if any</span>
+        <span class="n">lenter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_actions</span><span class="p">[</span><span class="n">state_name</span><span class="p">][</span><span class="s1">&#39;on_enter&#39;</span><span class="p">]</span>\
+                   <span class="k">if</span> <span class="s1">&#39;on_enter&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_actions</span><span class="p">[</span><span class="n">state_name</span><span class="p">]</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregation_type</span> <span class="o">==</span> <span class="n">AGGREG_COMP</span><span class="p">:</span>
+            <span class="n">init_action</span> <span class="o">=</span> <span class="n">AbstractAction</span><span class="o">.</span><span class="n">build_action</span><span class="p">(</span><span class="s1">&#39;sample_durations&#39;</span><span class="p">,</span> <span class="n">state_machine</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_expression</span><span class="p">(</span><span class="n">duration_value</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># build a partial function based on the current state machine name</span>
+            <span class="n">enter_action</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">make_duration_init_action</span><span class="p">,</span>
+                                   <span class="n">machine_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="p">)</span>
+            <span class="c1"># set the name of the action</span>
+            <span class="n">enter_action</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="s1">&#39;init_duration&#39;</span>
+            <span class="c1"># set the action parameters (the expression associated to the duration)</span>
+            <span class="n">enter_params</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_expression</span><span class="p">(</span><span class="n">duration_value</span><span class="p">)]</span>
+            <span class="c1"># instantiate the action</span>
+            <span class="n">init_action</span> <span class="o">=</span> <span class="n">AbstractAction</span><span class="o">.</span><span class="n">build_action</span><span class="p">(</span><span class="s1">&#39;duration&#39;</span><span class="p">,</span>
+                                                      <span class="n">function</span><span class="o">=</span><span class="n">enter_action</span><span class="p">,</span>
+                                                      <span class="n">l_params</span><span class="o">=</span><span class="n">enter_params</span><span class="p">,</span>
+                                                      <span class="n">state_machine</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># and insert it at the beginning of the list of actions</span>
+        <span class="n">lenter</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">init_action</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_init_action</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_name</span><span class="p">,</span>
+                                   <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="n">state_name</span><span class="p">],</span>
+                                   <span class="n">init_action</span><span class="p">)</span>
+        <span class="c1"># lstay = self.state_actions[name][&#39;on_stay&#39;]\</span>
+        <span class="c1">#           if &#39;on_stay&#39; in self.state_actions[name] else []</span>
+        <span class="c1"># stay_action = partial(make_TTL_increase_action,</span>
+        <span class="c1">#                       machine_name=self.machine_name)</span>
+        <span class="c1"># stay_action.__name__ = &#39;+_time_spent&#39;</span>
+        <span class="c1"># lstay.insert(0, AbstractAction.build_action(&#39;duration&#39;,</span>
+        <span class="c1">#                                             function=stay_action,</span>
+        <span class="c1">#                                             state_machine=self))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_actions</span><span class="p">[</span><span class="n">state_name</span><span class="p">][</span><span class="s1">&#39;on_enter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lenter</span>
+        <span class="c1"># self.state_actions[name][&#39;on_stay&#39;] = lstay</span>
+
+    <span class="k">def</span> <span class="nf">_add_state_actions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add the specified actions for the state with the given</span>
+<span class="sd">        name, associated with the event (e.g. &#39;on_stay&#39;, &#39;on_enter&#39;,</span>
+<span class="sd">        &#39;on_exit&#39;). Expressions contained in the parameters lists or</span>
+<span class="sd">        dicts are automatically expanded.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_actions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state_actions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">l_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_action_list</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_actions</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="n">event</span><span class="p">]</span> <span class="o">=</span> <span class="n">l_actions</span>
+
+    <span class="k">def</span> <span class="nf">_parse_action_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse the list of actions associated with a state.&quot;&quot;&quot;</span>
+        <span class="n">l_actions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">d_action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;action&#39;</span> <span class="ow">in</span> <span class="n">d_action</span><span class="p">:</span>
+                <span class="n">action</span> <span class="o">=</span> <span class="n">d_action</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">]</span>
+                <span class="n">l_params</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_expression</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">expr</span> <span class="ow">in</span> <span class="n">d_action</span><span class="p">[</span><span class="s1">&#39;l_params&#39;</span><span class="p">]]</span>\
+                                <span class="k">if</span> <span class="s1">&#39;l_params&#39;</span> <span class="ow">in</span> <span class="n">d_action</span>\
+                                <span class="k">else</span> <span class="p">[]</span>
+                <span class="n">d_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_expression</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">expr</span> <span class="ow">in</span> <span class="n">d_action</span><span class="p">[</span><span class="s1">&#39;d_params&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>\
+                                <span class="k">if</span> <span class="s1">&#39;d_params&#39;</span> <span class="ow">in</span> <span class="n">d_action</span>\
+                                <span class="k">else</span> <span class="p">{}</span>
+                <span class="n">l_actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">AbstractAction</span><span class="o">.</span><span class="n">build_action</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span>
+                                                <span class="n">method</span><span class="o">=</span><span class="n">action</span><span class="p">,</span>
+                                                <span class="n">l_params</span><span class="o">=</span><span class="n">l_params</span><span class="p">,</span>
+                                                <span class="n">d_params</span><span class="o">=</span><span class="n">d_params</span><span class="p">,</span>
+                                                <span class="n">state_machine</span><span class="o">=</span><span class="bp">self</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c1">#TODO: dispatch through AbstractAction (factory),</span>
+                  <span class="c1">#make subclasses responsible for parameter parsing</span>
+                <span class="n">understood</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;increase&#39;</span><span class="p">,</span> <span class="s1">&#39;decrease&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;increase_stoch&#39;</span><span class="p">,</span> <span class="s1">&#39;decrease_stoch&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">d_action</span><span class="p">:</span>
+                        <span class="c1"># assume that increase statevar with rate</span>
+                        <span class="n">l_actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">AbstractAction</span><span class="o">.</span><span class="n">build_action</span><span class="p">(</span>
+                                <span class="n">keyword</span><span class="p">,</span>
+                                <span class="n">statevar_name</span><span class="o">=</span><span class="n">d_action</span><span class="p">[</span><span class="n">keyword</span><span class="p">],</span>
+                                <span class="n">parameter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_expression</span><span class="p">(</span><span class="n">d_action</span><span class="p">[</span><span class="s1">&#39;rate&#39;</span><span class="p">]),</span>
+                                <span class="n">delta_t</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">delta_t</span><span class="p">,</span>
+                                <span class="n">state_machine</span><span class="o">=</span><span class="bp">self</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="n">understood</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;set_var&#39;</span><span class="p">,</span> <span class="s1">&#39;set_upper_var&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">d_action</span><span class="p">:</span>
+                        <span class="c1"># assume that increase statevar with rate</span>
+                        <span class="n">l_actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">AbstractAction</span><span class="o">.</span><span class="n">build_action</span><span class="p">(</span>
+                                <span class="n">keyword</span><span class="p">,</span>
+                                <span class="n">statevar_name</span><span class="o">=</span><span class="n">d_action</span><span class="p">[</span><span class="n">keyword</span><span class="p">],</span>
+                                <span class="n">parameter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_expression</span><span class="p">(</span><span class="n">d_action</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]),</span>
+                                <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="n">understood</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;become&#39;</span><span class="p">,</span> <span class="s1">&#39;clone&#39;</span><span class="p">,</span> <span class="s1">&#39;produce_offspring&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">d_action</span><span class="p">:</span>
+                        <span class="n">amount</span> <span class="o">=</span> <span class="n">d_action</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;amount&#39;</span> <span class="ow">in</span> <span class="n">d_action</span> <span class="k">else</span> <span class="kc">None</span>
+                        <span class="n">probas</span> <span class="o">=</span> <span class="n">d_action</span><span class="p">[</span><span class="s1">&#39;proba&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;proba&#39;</span> <span class="ow">in</span> <span class="n">d_action</span> <span class="k">else</span> <span class="kc">None</span>
+                        <span class="n">l_actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">AbstractAction</span><span class="o">.</span><span class="n">build_action</span><span class="p">(</span>
+                                <span class="n">keyword</span><span class="p">,</span>
+                                <span class="n">prototypes</span><span class="o">=</span><span class="n">d_action</span><span class="p">[</span><span class="n">keyword</span><span class="p">],</span>
+                                <span class="n">amount</span> <span class="o">=</span> <span class="n">amount</span><span class="p">,</span>
+                                <span class="n">probas</span> <span class="o">=</span> <span class="n">probas</span><span class="p">,</span>
+                                <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="n">understood</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;log_vars&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">d_action</span><span class="p">:</span>
+                        <span class="nb">vars</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_expression</span><span class="p">(</span><span class="n">varname</span><span class="p">)</span>
+                                <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">d_action</span><span class="p">[</span><span class="n">keyword</span><span class="p">]]</span>
+                        <span class="n">l_actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">AbstractAction</span><span class="o">.</span><span class="n">build_action</span><span class="p">(</span>
+                                <span class="n">keyword</span><span class="p">,</span>
+                                <span class="n">parameter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">l_params</span><span class="o">=</span><span class="nb">vars</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="n">understood</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="s1">&#39;record_change&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">d_action</span><span class="p">:</span>
+                        <span class="n">l_actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">AbstractAction</span><span class="o">.</span><span class="n">build_action</span><span class="p">(</span>
+                                <span class="n">keyword</span><span class="p">,</span>
+                                <span class="n">parameter</span><span class="o">=</span><span class="n">d_action</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="n">understood</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">understood</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;ERROR !!!! action </span><span class="si">{}</span><span class="s1"> not understood&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d_action</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">l_actions</span>
+
+
+
+
+    <span class="c1">#----------------------------------------------------------------</span>
+    <span class="c1"># Output facilities</span>
+
+<div class="viewcode-block" id="StateMachine.describe_state"><a class="viewcode-back" href="../../../emulsion.model.html#emulsion.model.state_machines.StateMachine.describe_state">[docs]</a>    <span class="k">def</span> <span class="nf">describe_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the description of the state with the specified</span>
+<span class="sd">        name.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">desc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">):</span><span class="se">\n\t</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">desc</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">desc</span><span class="p">[</span><span class="s1">&#39;desc&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="StateMachine.write_dot"><a class="viewcode-back" href="../../../emulsion.model.html#emulsion.model.state_machines.StateMachine.write_dot">[docs]</a>    <span class="k">def</span> <span class="nf">write_dot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">view_actions</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write the graph of the current state machine in the</span>
+<span class="sd">        specified filename, according to the dot/graphviz format.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">rankdir</span> <span class="o">=</span> <span class="s2">&quot;LR&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;TB&quot;</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;digraph {</span>
+<span class="s1">          charset=&quot;utf-8&quot;</span>
+<span class="s1">        &#39;&#39;&#39;</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="s1">&#39;&#39;&#39;</span><span class="se">\t</span><span class="s1">rankdir=</span><span class="si">{}</span><span class="s1">;</span>
+<span class="s1">        &#39;&#39;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rankdir</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">        </span><span class="se">\t</span><span class="s1">node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];</span>
+<span class="s1">        </span><span class="se">\t</span><span class="s1">edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];</span>
+
+<span class="s1">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">name_lab</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="k">if</span> <span class="s1">&#39;duration&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="p">[</span><span class="n">name</span><span class="p">]:</span>
+                <span class="n">name_lab</span> <span class="o">+=</span> <span class="s1">&#39;&amp;nbsp;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">CLOCK_SYMBOL</span><span class="p">)</span>
+            <span class="n">actions</span> <span class="o">=</span> <span class="s1">&#39;shape=&quot;Mrecord&quot;, label=&quot;</span><span class="si">{}</span><span class="s1">&quot;, &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name_lab</span><span class="p">)</span>
+            <span class="n">nodestyle</span> <span class="o">=</span> <span class="s2">&quot;filled,rounded&quot;</span>
+            <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">is_default</span><span class="p">:</span>
+                <span class="n">nodestyle</span> <span class="o">+=</span> <span class="s2">&quot;,bold&quot;</span>
+            <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">autoremove</span><span class="p">:</span>
+                <span class="n">nodestyle</span> <span class="o">+=</span> <span class="s2">&quot;,dotted&quot;</span>
+            <span class="k">if</span> <span class="n">view_actions</span><span class="p">:</span>
+                <span class="n">onenter</span> <span class="o">=</span> <span class="n">ACTION_SYMBOL</span><span class="o">+</span><span class="s1">&#39;|&#39;</span>\
+                          <span class="k">if</span> <span class="s1">&#39;on_enter&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+                <span class="n">onstay</span> <span class="o">=</span> <span class="s1">&#39;|&#39;</span><span class="o">+</span><span class="n">ACTION_SYMBOL</span>\
+                         <span class="k">if</span> <span class="s1">&#39;on_stay&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+                <span class="n">onexit</span> <span class="o">=</span> <span class="s1">&#39;|&#39;</span><span class="o">+</span><span class="n">ACTION_SYMBOL</span>\
+                         <span class="k">if</span> <span class="s1">&#39;on_exit&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">if</span> <span class="n">onenter</span> <span class="ow">or</span> <span class="n">onstay</span> <span class="ow">or</span> <span class="n">onexit</span><span class="p">:</span>
+                    <span class="n">actions</span> <span class="o">=</span> <span class="s1">&#39;shape=&quot;Mrecord&quot;, label=&quot;{</span><span class="si">%s</span><span class="s1">{\ </span><span class="si">%s</span><span class="s1">\ </span><span class="si">%s</span><span class="s1">}</span><span class="si">%s</span><span class="s1">}&quot;, &#39;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="n">onenter</span><span class="p">,</span> <span class="n">name_lab</span><span class="p">,</span> <span class="n">onstay</span><span class="p">,</span> <span class="n">onexit</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&quot;</span><span class="si">{}</span><span class="s1">&quot; [</span><span class="si">{}</span><span class="s1">tooltip=&quot;</span><span class="si">{}</span><span class="s1">&quot;, fillcolor=&quot;</span><span class="si">{}</span><span class="s1">&quot;, style=&quot;</span><span class="si">{}</span><span class="s1">&quot;] ;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">name</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;tooltip&#39;</span><span class="p">],</span>
+                <span class="c1"># &#39;\n\tON ENTER: {}&#39;.format(self.state_actions[name][&#39;on_enter&#39;])\</span>
+                <span class="c1"># if onenter else &#39;&#39; +\</span>
+                <span class="c1"># &#39;\n\tON STAY: {}&#39;.format(self.state_actions[name][&#39;on_stay&#39;])\</span>
+                <span class="c1"># if onstay else &#39;&#39; +\</span>
+                <span class="c1"># &#39;\n\tON EXIT: {}&#39;.format(self.state_actions[name][&#39;on_exit&#39;])\</span>
+                <span class="c1"># if onexit else &#39;&#39;,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_statedesc</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;fillcolor&#39;</span><span class="p">],</span>
+                <span class="n">nodestyle</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">from_</span><span class="p">,</span> <span class="n">to_</span> <span class="ow">in</span> <span class="n">SortedSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edge</span><span class="p">[</span><span class="n">from_</span><span class="p">][</span><span class="n">to_</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">edgetip</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="n">tail</span> <span class="o">=</span> <span class="s1">&#39;none&#39;</span>
+                <span class="k">if</span> <span class="s1">&#39;when&#39;</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">:</span>
+                    <span class="n">tail</span> <span class="o">+=</span> <span class="n">WHEN_SYMBOL</span>
+                    <span class="n">edgetip</span> <span class="o">+=</span> <span class="s1">&#39;WHEN: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">desc</span><span class="p">[</span><span class="s1">&#39;when&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="s1">&#39;escape&#39;</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">:</span>
+                    <span class="n">tail</span> <span class="o">+=</span> <span class="n">ESCAPE_SYMBOL</span>
+                    <span class="n">edgetip</span> <span class="o">+=</span> <span class="s1">&#39;ESCAPE: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">desc</span><span class="p">[</span><span class="s1">&#39;escape&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="s1">&#39;truecond&#39;</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">:</span>
+                    <span class="n">tail</span> <span class="o">+=</span> <span class="n">COND_SYMBOL</span>
+                    <span class="n">edgetip</span> <span class="o">+=</span> <span class="s1">&#39;COND: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">desc</span><span class="p">[</span><span class="s1">&#39;truecond&#39;</span><span class="p">])</span>
+                <span class="n">head</span> <span class="o">=</span> <span class="s1">&#39;normalnone&#39;</span>
+                <span class="k">if</span> <span class="s1">&#39;on_cross&#39;</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">:</span>
+                    <span class="n">head</span> <span class="o">+=</span> <span class="n">CROSS_SYMBOL</span>
+                    <span class="c1"># edgetip += &#39;ON CROSS: {}\\n&#39;.format(desc[&#39;on_cross&#39;])</span>
+                <span class="n">output</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&quot;</span><span class="si">{}</span><span class="s1">&quot; -&gt; &quot;</span><span class="si">{}</span><span class="s1">&quot; [label=&quot;</span><span class="si">{}</span><span class="s1">&quot;, labeltooltip=&quot;</span><span class="si">{}</span><span class="s1">&quot;, &#39;</span>
+                           <span class="s1">&#39;arrowtail=&quot;</span><span class="si">{}</span><span class="s1">&quot;, arrowhead=&quot;</span><span class="si">{}</span><span class="s1">&quot;, dir=both, &#39;</span>
+                           <span class="s1">&#39;tooltip=&quot;</span><span class="si">{}</span><span class="s1">&quot;, minlen=3, style=&quot;</span><span class="si">{}</span><span class="s1">&quot;];</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                               <span class="n">from_</span><span class="p">,</span> <span class="n">to_</span><span class="p">,</span> <span class="n">desc</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">],</span> <span class="n">desc</span><span class="p">[</span><span class="s1">&#39;labeltooltip&#39;</span><span class="p">],</span>
+                               <span class="n">tail</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">edgetip</span><span class="p">,</span> <span class="n">desc</span><span class="p">[</span><span class="s1">&#39;type_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">linestyle</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="s1">&#39;}&#39;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

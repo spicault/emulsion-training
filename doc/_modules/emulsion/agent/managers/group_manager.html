@@ -1,0 +1,366 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.agent.managers.group_manager &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.agent.managers.group_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: emulsion.agent.managers.functions</span>
+
+<span class="sd">.. moduleauthor:: Sébastien Picault &lt;sebastien.picault@inra.fr&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># [HEADER]</span>
+
+<span class="kn">from</span>   <span class="nn">collections</span>               <span class="k">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span>   <span class="nn">sortedcontainers</span>          <span class="k">import</span> <span class="n">SortedDict</span>
+
+<span class="kn">from</span>   <span class="nn">emulsion.agent.views</span>      <span class="k">import</span> <span class="n">StructuredView</span>
+<span class="kn">from</span>   <span class="nn">emulsion.tools.misc</span>       <span class="k">import</span> <span class="n">count_population</span><span class="p">,</span> <span class="n">rewrite_keys</span>
+<span class="kn">from</span>   <span class="nn">emulsion.tools.debug</span>      <span class="k">import</span> <span class="n">debuginfo</span>
+
+<span class="kn">from</span>   <span class="nn">emulsion.agent.managers.functions</span> <span class="k">import</span> <span class="n">group_and_split_populations</span>
+
+<span class="c1">#   _____                       __  __</span>
+<span class="c1">#  / ____|                     |  \/  |</span>
+<span class="c1"># | |  __ _ __ ___  _   _ _ __ | \  / | __ _ _ __   __ _  __ _  ___ _ __</span>
+<span class="c1"># | | |_ | &#39;__/ _ \| | | | &#39;_ \| |\/| |/ _` | &#39;_ \ / _` |/ _` |/ _ \ &#39;__|</span>
+<span class="c1"># | |__| | | | (_) | |_| | |_) | |  | | (_| | | | | (_| | (_| |  __/ |</span>
+<span class="c1">#  \_____|_|  \___/ \__,_| .__/|_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|</span>
+<span class="c1">#                        | |                              __/ |</span>
+<span class="c1">#                        |_|                             |___/</span>
+
+<div class="viewcode-block" id="GroupManager"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.group_manager.GroupManager">[docs]</a><span class="k">class</span> <span class="nc">GroupManager</span><span class="p">(</span><span class="n">StructuredView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An GroupManager is able to make its content</span>
+<span class="sd">    evolve according to specific state machines, the state of each</span>
+<span class="sd">    subcompartment being stored in a specific state variable or</span>
+<span class="sd">    attribute.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="GroupManager.__init__"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.group_manager.GroupManager.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">l_state_machines</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">others</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a GroupManager based on the specified list of state machines</span>
+<span class="sd">        (*l_state_machines*).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">### WARNING: strange bug found sometimes when content={} not</span>
+        <span class="c1">### explicitly specified, another content (from another</span>
+        <span class="c1">### instance ???) may be used instead !!!!</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">others</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_content</span> <span class="o">=</span> <span class="n">SortedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l_state_machines</span> <span class="o">=</span> <span class="n">l_state_machines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_counts</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GroupManager.init_counts"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.group_manager.GroupManager.init_counts">[docs]</a>    <span class="k">def</span> <span class="nf">init_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the counts.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">counts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l_state_machines</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">machine</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_state_machines</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">counts</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">[]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_history</span> <span class="k">else</span> <span class="mi">0</span>
+                                    <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">machine</span><span class="o">.</span><span class="n">states</span><span class="p">})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">counts</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_history</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">init_counts</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GroupManager.update_counts"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.group_manager.GroupManager.update_counts">[docs]</a>    <span class="k">def</span> <span class="nf">update_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the number of atoms for each state of the state</span>
+<span class="sd">        machine (TODO: for each value of the key[index] enum).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l_state_machines</span><span class="p">):</span>
+            <span class="n">total</span> <span class="o">=</span> <span class="p">{</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">machine</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_state_machines</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">machine</span><span class="o">.</span><span class="n">states</span><span class="p">}</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">compartment</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_content</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">state</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">total</span><span class="p">:</span>
+                        <span class="n">total</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">+=</span> <span class="n">compartment</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="s1">&#39;population&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_history</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">counts</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">machine</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">counts</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">counts</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">step</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">counts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">total</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update_counts</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GroupManager.do_enter_actions_on_init"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.group_manager.GroupManager.do_enter_actions_on_init">[docs]</a>    <span class="k">def</span> <span class="nf">do_enter_actions_on_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Force all Compartment agents of this group manager to execute the actions on_enter for each state for their initial population (if any actions on enter). WARNING: this method is intended only for compartment-based models.&quot;&quot;&quot;</span>
+        <span class="n">l_states_with_actions_on_enter</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">state_machine</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_state_machines</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">state_machine</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">state_machine</span><span class="o">.</span><span class="n">state_actions</span> <span class="ow">and</span> <span class="s1">&#39;on_enter&#39;</span> <span class="ow">in</span> <span class="n">state_machine</span><span class="o">.</span><span class="n">state_actions</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">]:</span>
+                    <span class="n">l_states_with_actions_on_enter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">compartment</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_content</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">compartment</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">l_states_with_actions_on_enter</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">compartment</span><span class="o">.</span><span class="n">do_state_actions</span><span class="p">(</span><span class="s1">&#39;on_enter&#39;</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">state_machine</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">population</span><span class="o">=</span><span class="n">compartment</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">population</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GroupManager.apply_changes"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.group_manager.GroupManager.apply_changes">[docs]</a>    <span class="k">def</span> <span class="nf">apply_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_transitions</span><span class="p">,</span> <span class="n">state_machine</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Apply modifications to the compartments contained in the current</span>
+<span class="sd">        GroupManager, according to *d_transitions*. Dictionary *d_transitions*</span>
+<span class="sd">        is keyed by a tuple of variables and associated with a list of tuples.</span>
+<span class="sd">        Each of theses tuples is composed of the key of the target compartment</span>
+<span class="sd">        and a dictionary, either</span>
+<span class="sd">        {&#39;population&#39;: (qty, esc), &#39;actions&#39;: list} or {&#39;agents&#39;: list, &#39;actions&#39;: list}.</span>
+<span class="sd">        Parameter *state_machine* indicates which state machine produced</span>
+<span class="sd">        d_transitions, in order to perform adequate actions on</span>
+<span class="sd">        entering/exiting states or on crossing edges.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">source</span><span class="p">,</span> <span class="n">t_evolutions</span> <span class="ow">in</span> <span class="n">d_transitions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">d_population_or_agents</span> <span class="ow">in</span> <span class="n">t_evolutions</span><span class="p">:</span>
+                <span class="n">target_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_or_build</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="p">[</span><span class="n">source</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_content</span><span class="p">[</span><span class="n">source</span><span class="p">]</span><span class="o">.</span><span class="n">move_to</span><span class="p">(</span><span class="n">target_group</span><span class="p">,</span> <span class="n">state_machine</span><span class="o">=</span><span class="n">state_machine</span><span class="p">,</span> <span class="o">**</span><span class="n">d_population_or_agents</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GroupManager.evolve"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.group_manager.GroupManager.evolve">[docs]</a>    <span class="k">def</span> <span class="nf">evolve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ask each group to make its content evolve, then remove population or</span>
+<span class="sd">        agents from autoremove groups and update counts.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">evolve</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">statevars</span><span class="o">.</span><span class="n">_is_active</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">new_population</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">machine</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_state_machines</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">evolve_states</span><span class="p">(</span><span class="n">machine</span><span class="o">=</span><span class="n">machine</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_content</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">comp</span><span class="o">.</span><span class="n">autoremove</span><span class="p">:</span>
+                        <span class="n">agents_or_population</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">get_content</span><span class="p">()</span>
+                        <span class="c1">## removing populations in compartment-based models applies</span>
+                        <span class="c1">## to &#39;MASTER&#39; grouping</span>
+                        <span class="k">if</span> <span class="n">agents_or_population</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;population&#39;</span><span class="p">:</span>
+                            <span class="n">agents_or_population</span> <span class="o">=</span> <span class="p">(</span>
+                              <span class="n">agents_or_population</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                              <span class="p">{</span> <span class="n">key</span><span class="p">:</span> <span class="n">agents_or_population</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">}</span>
+                              <span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">agents_or_population</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_counts</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_content</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="c1"># debuginfo(self.statevars.step, comp.statevars.step)</span>
+            <span class="n">comp</span><span class="o">.</span><span class="n">shift_times_to_exit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GroupManager.evolve_states"><a class="viewcode-back" href="../../../../emulsion.agent.managers.html#emulsion.agent.managers.group_manager.GroupManager.evolve_states">[docs]</a>    <span class="k">def</span> <span class="nf">evolve_states</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ask each group to make its content evolve according</span>
+<span class="sd">        to its current state and the specified state_machine.</span>
+
+<span class="sd">        List *l_productions* contains tuples (target, {&#39;population&#39;: qty}, None)</span>
+<span class="sd">        or (target, {&#39;agents&#39;: list}, prototype), representing individuals</span>
+<span class="sd">        produced by `productions` edges in the state machine, and to be added to</span>
+<span class="sd">        the population at the end of the current time step.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d_transitions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evolve_transitions</span><span class="p">(</span><span class="n">machine</span><span class="p">)</span>
+        <span class="n">l_productions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evolve_productions</span><span class="p">(</span><span class="n">machine</span><span class="p">)</span>
+        <span class="c1"># apply changes due to transitions for this state machine</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">apply_changes</span><span class="p">(</span><span class="n">d_transitions</span><span class="p">,</span> <span class="n">machine</span><span class="p">)</span>
+        <span class="c1"># add newly created individuals into the list of new populations</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">l_productions</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">new_population</span> <span class="o">+=</span> <span class="n">l_productions</span></div>
+
+    <span class="k">def</span> <span class="nf">_evolve_transitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine</span><span class="p">):</span>
+        <span class="c1"># init empty dictionary for all changes to perform</span>
+        <span class="n">future</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="c1"># iterate over all compartments</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">compart</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_content</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">future</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># compute the current population of each source compartment</span>
+            <span class="n">current_pop</span> <span class="o">=</span> <span class="n">compart</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="s1">&#39;population&#39;</span><span class="p">)</span>
+            <span class="c1"># no action if current pop &lt;= 0</span>
+            <span class="k">if</span> <span class="n">current_pop</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># compute all possible transitions from the current state</span>
+            <span class="n">current_state</span> <span class="o">=</span> <span class="n">compart</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="n">machine</span><span class="o">.</span><span class="n">machine_name</span><span class="p">)</span>
+            <span class="c1"># execute actions on stay for current state</span>
+            <span class="n">compart</span><span class="o">.</span><span class="n">do_state_actions</span><span class="p">(</span><span class="s1">&#39;on_stay&#39;</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">current_state</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">([</span><span class="n">compart</span><span class="o">.</span><span class="n">get_content</span><span class="p">()]))</span>
+            <span class="c1"># get the possible transitions from the current state</span>
+            <span class="c1"># i.e. a list of tuples (state, flux, value, cond_result,</span>
+            <span class="c1"># actions) where:</span>
+            <span class="c1"># - state is a possible state reachable from the current state</span>
+            <span class="c1"># - flux is either &#39;rate&#39; or &#39;proba&#39; or &#39;amount&#39; or &#39;amount-all-but&#39;</span>
+            <span class="c1"># - value is the corresponding rate or probability or amount</span>
+            <span class="c1"># - cond_result is a tuple (either (&#39;population&#39;, qty) or</span>
+            <span class="c1"># (&#39;agents&#39;, list)) describing who fulfills the condition to cross</span>
+            <span class="c1"># the transition</span>
+            <span class="c1"># - actions is the list of actions on cross</span>
+            <span class="n">transitions</span> <span class="o">=</span> <span class="n">compart</span><span class="o">.</span><span class="n">next_states_from</span><span class="p">(</span><span class="n">current_state</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">machine</span><span class="p">)</span>
+            <span class="c1"># nothing to do if no transitions</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">transitions</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1">### REWRITE TRANSITIONS TO HAVE DISJOINT SUB-POPULATIONS</span>
+            <span class="n">transitions_by_pop</span> <span class="o">=</span> <span class="n">group_and_split_populations</span><span class="p">(</span><span class="n">transitions</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ref_pop</span><span class="p">,</span> <span class="n">properties</span> <span class="ow">in</span> <span class="n">transitions_by_pop</span><span class="p">:</span>
+                <span class="c1"># retrieve the list of states, the list of flux, the</span>
+                <span class="c1"># list of values, the list of populations affected by</span>
+                <span class="c1"># each possible transition</span>
+                <span class="n">states</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">actions</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">properties</span><span class="p">)</span>
+                <span class="c1"># add the current state to the possible destination states...</span>
+                <span class="n">states</span> <span class="o">=</span> <span class="n">states</span> <span class="o">+</span> <span class="p">(</span><span class="n">current_state</span><span class="o">.</span><span class="n">name</span><span class="p">,)</span>
+                <span class="c1"># ... with no action</span>
+                <span class="n">actions</span> <span class="o">=</span> <span class="n">actions</span> <span class="o">+</span> <span class="p">([],</span> <span class="p">)</span>
+                <span class="c1">#</span>
+                <span class="n">values</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_values_for_unique_population</span><span class="p">(</span>
+                    <span class="n">values</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">ref_pop</span><span class="p">,</span> <span class="n">compart</span><span class="o">.</span><span class="n">stochastic</span><span class="p">)</span>
+                <span class="n">change_list</span> <span class="o">=</span> <span class="n">compart</span><span class="o">.</span><span class="n">next_states</span><span class="p">(</span><span class="n">states</span><span class="p">,</span>
+                                                  <span class="n">values</span><span class="p">,</span>
+                                                  <span class="p">[</span><span class="n">ref_pop</span><span class="p">],</span>
+                                                  <span class="n">actions</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+                <span class="n">future</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">+=</span> <span class="n">rewrite_keys</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">current_state</span><span class="p">),</span>
+                                              <span class="n">change_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">future</span>
+
+
+    <span class="k">def</span> <span class="nf">_evolve_productions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine</span><span class="p">):</span>
+        <span class="c1"># init empty list for all changes to perform</span>
+        <span class="n">future</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># iterate over all compartments</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">compart</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_content</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># compute the current population of each source compartment</span>
+            <span class="n">current_pop</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">compart</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="s1">&#39;population&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="c1"># no action if &quot;fake&quot; compartment</span>
+            <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="kc">None</span><span class="p">}:</span>
+                <span class="k">continue</span>
+            <span class="c1"># if current pop == 0, productions are still possible (e.g. amounts)</span>
+            <span class="c1"># compute all possible transitions from the current state</span>
+            <span class="n">current_state</span> <span class="o">=</span> <span class="n">compart</span><span class="o">.</span><span class="n">get_information</span><span class="p">(</span><span class="n">machine</span><span class="o">.</span><span class="n">machine_name</span><span class="p">)</span>
+            <span class="c1"># get the possible productions from the current state</span>
+            <span class="c1"># i.e. a list of tuples (state, flux, value, cond_result,</span>
+            <span class="c1"># prototype) where:</span>
+            <span class="c1"># - state is a possible state producible from the current state</span>
+            <span class="c1"># - flux is either &#39;rate&#39; or &#39;proba&#39; or &#39;amount&#39; or &#39;amount-all-but&#39;</span>
+            <span class="c1"># - value is the corresponding rate or probability or amount</span>
+            <span class="c1"># - cond_result is a tuple (either (&#39;population&#39;, qty) or</span>
+            <span class="c1"># (&#39;agents&#39;, list)) describing who fulfills the condition to cross</span>
+            <span class="c1"># the transition</span>
+            <span class="c1"># - prototype is the prototype for creating new agents</span>
+            <span class="n">productions</span> <span class="o">=</span> <span class="n">compart</span><span class="o">.</span><span class="n">production_from</span><span class="p">(</span><span class="n">current_state</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">machine</span><span class="p">)</span>
+            <span class="c1"># nothing to do if no transitions</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">productions</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1">### HERE WE ASSUME THAT AN AGENT CAN PRODUCE SEVERAL OTHER</span>
+            <span class="c1">### AGENTS SIMULTANEOUSLY (OTHERWISE USE CONDITIONS)</span>
+            <span class="c1">### REWRITE TRANSITIONS TO HAVE DISJOINT SUB-POPULATIONS</span>
+            <span class="k">for</span> <span class="n">target_state</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">ref_pop</span><span class="p">,</span> <span class="n">proto</span> <span class="ow">in</span> <span class="n">productions</span><span class="p">:</span>
+                <span class="n">pop_size</span> <span class="o">=</span> <span class="n">count_population</span><span class="p">(</span><span class="n">ref_pop</span><span class="p">)</span>
+                <span class="n">amount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_production</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">pop_size</span><span class="p">,</span> <span class="n">compart</span><span class="o">.</span><span class="n">stochastic</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">amount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">future</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">target_state</span><span class="p">,</span> <span class="n">amount</span><span class="p">,</span> <span class="n">proto</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">future</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

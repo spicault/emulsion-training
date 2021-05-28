@@ -1,0 +1,690 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.tools.misc &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../../../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for emulsion.tools.misc</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;.. module:: emulsion.tools.misc</span>
+
+<span class="sd">Collection of various useful functions used in EMULSION framework,</span>
+<span class="sd">especially regarding introspection.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># [HEADER]</span>
+
+
+<span class="kn">from</span>   <span class="nn">functools</span>                 <span class="k">import</span> <span class="n">partial</span>
+<span class="kn">from</span>   <span class="nn">importlib</span>                 <span class="k">import</span> <span class="n">import_module</span>
+<span class="kn">from</span>   <span class="nn">typing</span>                    <span class="k">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span>   <span class="nn">collections</span>               <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span>   <span class="nn">operator</span>                  <span class="k">import</span> <span class="n">itemgetter</span>
+<span class="kn">import</span> <span class="nn">itertools</span>                 <span class="k">as</span> <span class="nn">it</span>
+
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>                     <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span>   <span class="nn">sortedcontainers</span>          <span class="k">import</span> <span class="n">SortedSet</span>
+<span class="kn">from</span>   <span class="nn">emulsion.model.exceptions</span> <span class="k">import</span> <span class="n">SemanticException</span>
+<span class="kn">from</span>   <span class="nn">emulsion.tools.getters</span>    <span class="k">import</span> <span class="n">create_duration_getter</span><span class="p">,</span> <span class="n">create_state_tester</span><span class="p">,</span> <span class="n">create_relative_population_getter</span>
+<span class="kn">from</span>   <span class="nn">emulsion.tools.debug</span>      <span class="k">import</span> <span class="n">debuginfo</span>
+
+<span class="n">AGENTS</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="sd">&quot;&quot;&quot;Constant value for the index where list of agents are stored in</span>
+<span class="sd">&#39;populations&#39; tuples.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">POPULATION</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="sd">&quot;&quot;&quot;Constant value for the index where population amounts are stored in</span>
+<span class="sd">&#39;populations&#39; tuples.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1">## TODO split module according to functions usage</span>
+
+<div class="viewcode-block" id="load_class"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.misc.load_class">[docs]</a><span class="k">def</span> <span class="nf">load_class</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;Dynamically load the class with the specified *class_name* from the</span>
+<span class="sd">    given *module*.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module:</span>
+<span class="sd">        a Python module, where the class is expected to be located.</span>
+<span class="sd">    class_name: str</span>
+<span class="sd">        the name of the class to load</span>
+<span class="sd">    options:</span>
+<span class="sd">        some options</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple:</span>
+<span class="sd">        a tuple composed of the class (type) and the options.</span>
+
+<span class="sd">    Todo</span>
+<span class="sd">    ----</span>
+<span class="sd">    - clarify the role of *options*</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">class_name</span><span class="p">),</span> <span class="n">options</span></div>
+
+<div class="viewcode-block" id="load_module"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.misc.load_module">[docs]</a><span class="k">def</span> <span class="nf">load_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Dynamically load the module with the specified *module_name* and</span>
+<span class="sd">    return it.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module_name: str</span>
+<span class="sd">        the name of a valid Python module (accessible in the</span>
+<span class="sd">        ``PYTHONPATH`` environment variable).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ref:</span>
+<span class="sd">        A reference to the Python module.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="rates_to_probabilities"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.misc.rates_to_probabilities">[docs]</a><span class="k">def</span> <span class="nf">rates_to_probabilities</span><span class="p">(</span><span class="n">total_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">rate_values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+                           <span class="n">delta_t</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Transform the specified list of *rate_values*, interpreted as</span>
+<span class="sd">    outgoing rates, into probabilities, according to the specified</span>
+<span class="sd">    time step (*delta_t*) and normalized by *total_rate*.</span>
+
+<span class="sd">    For exit rates :math:`\\rho_i` (one of the *rate_values*), the</span>
+<span class="sd">    probability to stay in current state is given by:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        p_0 = e^{-\\delta t.\\sum_i \\rho_i}</span>
+
+<span class="sd">    Thus, each rate :math:`\\rho_i` corresponds to a probability</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        p_i = \\frac{\\rho_i}{\\sum_i \\rho_i} (1 - p_0)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    total_rate: float</span>
+<span class="sd">        the total exit rate, used for normalization purposes. If</span>
+<span class="sd">        *rate_values* represent all possible exit rates, *total_rate*</span>
+<span class="sd">        is their sum.</span>
+<span class="sd">    rate_values: list</span>
+<span class="sd">        the list of rates to transform</span>
+<span class="sd">    delta_t: float</span>
+<span class="sd">        the value of the time step (expressed in time units)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list:</span>
+<span class="sd">        the list of probabilities corresponding to the *rate_values*.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">        `emulsion.tools.misc.probabilities_to_rates`_</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># compute the exit probability</span>
+    <span class="n">base_proba</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span> <span class="n">total_rate</span> <span class="o">*</span> <span class="n">delta_t</span><span class="p">)</span>
+    <span class="c1"># normalize values proportionnally to the rate</span>
+    <span class="n">proba_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">base_proba</span> <span class="o">*</span> <span class="n">rate</span> <span class="o">/</span> <span class="n">total_rate</span>
+                    <span class="k">for</span> <span class="n">rate</span> <span class="ow">in</span> <span class="n">rate_values</span><span class="p">]</span>
+    <span class="c1"># add the probability to stay in the current state</span>
+    <span class="n">proba_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">base_proba</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">proba_values</span></div>
+
+<span class="c1"># This function is useful to modellers for the following purposes:</span>
+<span class="n">rates_to_probabilities</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Rates / probabilities&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="aggregate_probability"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.misc.aggregate_probability">[docs]</a><span class="k">def</span> <span class="nf">aggregate_probability</span><span class="p">(</span><span class="n">probability</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">delta_t</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Transform the specified *probability* value, intended to represent</span>
+<span class="sd">    a probability for events tested each time unit, into the</span>
+<span class="sd">    probability for the specified time step (*delta_t*).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    probability: float</span>
+<span class="sd">        the probability value of an event (during 1 time unit)</span>
+<span class="sd">    delta_t: float</span>
+<span class="sd">        the value of the time step (expressed in time units)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float:</span>
+<span class="sd">        the probability of the event during *delta_t* time units.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">probability</span><span class="p">)</span><span class="o">**</span><span class="n">delta_t</span></div>
+
+<span class="c1"># This function is useful to modellers for the following purposes:</span>
+<span class="n">aggregate_probability</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Rates / probabilities&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="aggregate_probabilities"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.misc.aggregate_probabilities">[docs]</a><span class="k">def</span> <span class="nf">aggregate_probabilities</span><span class="p">(</span><span class="n">probability_values</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+                            <span class="n">delta_t</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;From the specified *probability_values*, intended to represent</span>
+<span class="sd">    probabilities of events duting one time unit, compute the</span>
+<span class="sd">    probabilities for the specified time step (*delta_t*).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    probability_values: list</span>
+<span class="sd">        a list of probability values for several events (during 1 time unit)</span>
+<span class="sd">    delta_t: float</span>
+<span class="sd">        the value of the time step (expressed in time units)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list:</span>
+<span class="sd">        the probabilities of the same events during *delta_t* time units.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">probability_values</span> <span class="k">if</span> <span class="n">delta_t</span> <span class="o">==</span> <span class="mi">1</span>\
+        <span class="k">else</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">aggregate_probability</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">delta_t</span><span class="p">)</span>
+                   <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">probability_values</span><span class="p">)</span></div>
+
+<span class="c1"># This function is useful to modellers for the following purposes:</span>
+<span class="n">aggregate_probabilities</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Rates / probabilities&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="probabilities_to_rates"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.misc.probabilities_to_rates">[docs]</a><span class="k">def</span> <span class="nf">probabilities_to_rates</span><span class="p">(</span><span class="n">probability_values</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Transform a list of probabilities into a list of rates. The</span>
+<span class="sd">    last value is expected to represent the probability of staying in</span>
+<span class="sd">    the current state.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    probability_values: list</span>
+<span class="sd">        a list of probabilities, the last one representing the</span>
+<span class="sd">        probability to stay in the current state</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list:</span>
+<span class="sd">        a list of rates corresponding to those probabilities.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">        `emulsion.tools.misc.rates_to_probabilities`_</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">probability_values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">probability_values</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">sum_of_rates</span> <span class="o">=</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">probability_values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">proba_change</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">probability_values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="o">*</span> <span class="n">sum_of_rates</span> <span class="o">/</span> <span class="n">proba_change</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">probability_values</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">values</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<span class="c1"># This function is useful to modellers for the following purposes:</span>
+<span class="n">probabilities_to_rates</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Rates / probabilities&#39;</span><span class="p">]</span>
+
+
+<span class="c1"># internal usage (TODO: make private to relevant module)</span>
+<div class="viewcode-block" id="rewrite_keys"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.misc.rewrite_keys">[docs]</a><span class="k">def</span> <span class="nf">rewrite_keys</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">change_list</span><span class="p">):</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="n">position</span><span class="p">]</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="n">position</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="p">[(</span><span class="n">prefix</span> <span class="o">+</span> <span class="p">(</span><span class="n">key</span><span class="p">,)</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">change_list</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="complement_key"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.misc.complement_key">[docs]</a><span class="k">def</span> <span class="nf">complement_key</span><span class="p">(</span><span class="n">d_initial_key</span><span class="p">,</span> <span class="n">l_state_machines</span><span class="p">,</span> <span class="n">prototype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Ensure that all values are assigned to build a consistent key based on *d_initial_key* to identify a compartment (values for the variables corresponding to the expected state machines which operate on the compartment) according to the following rules:</span>
+
+<span class="sd">    1. if a *prototype* is given, the state machine values specified in the prototype are applied</span>
+<span class="sd">    2. missing value for each state machine in *l_state_machines* are replaced with the default state if any</span>
+<span class="sd">    3. remaining missing values are all non-autoremove states, which leads to building all possible consistent combinations</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    list:</span>
+<span class="sd">        list of tuples which correspond to valid keys for this specification</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d_result_key</span> <span class="o">=</span> <span class="p">{</span> <span class="n">key</span><span class="p">:</span> <span class="p">(</span><span class="n">value</span><span class="p">,)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">d_initial_key</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="k">if</span> <span class="n">prototype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">state_machine</span> <span class="ow">in</span> <span class="n">l_state_machines</span><span class="p">:</span>
+            <span class="n">state_machine_name</span> <span class="o">=</span> <span class="n">state_machine</span><span class="o">.</span><span class="n">machine_name</span>
+            <span class="k">if</span> <span class="n">state_machine_name</span> <span class="ow">in</span> <span class="n">prototype</span><span class="p">:</span>
+                <span class="n">d_result_key</span><span class="p">[</span><span class="n">state_machine_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">prototype</span><span class="p">[</span><span class="n">state_machine_name</span><span class="p">],)</span>
+    <span class="k">for</span> <span class="n">state_machine</span> <span class="ow">in</span> <span class="n">l_state_machines</span><span class="p">:</span>
+        <span class="n">state_machine_name</span> <span class="o">=</span> <span class="n">state_machine</span><span class="o">.</span><span class="n">machine_name</span>
+        <span class="k">if</span> <span class="n">state_machine_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d_result_key</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">state_machine</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">d_result_key</span><span class="p">[</span><span class="n">state_machine_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">state_machine</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">default</span><span class="p">,)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">d_result_key</span><span class="p">[</span><span class="n">state_machine_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">state_machine</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">available</span>
+    <span class="n">l_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">d_result_key</span><span class="p">[</span><span class="n">state_machine</span><span class="o">.</span><span class="n">machine_name</span><span class="p">]</span> <span class="k">for</span> <span class="n">state_machine</span> <span class="ow">in</span> <span class="n">l_state_machines</span><span class="p">]</span>
+    <span class="n">l_result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">l_values</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">l_result</span></div>
+
+
+<div class="viewcode-block" id="count_population"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.misc.count_population">[docs]</a><span class="k">def</span> <span class="nf">count_population</span><span class="p">(</span><span class="n">agents_or_pop</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Return the amount of atoms represented in *agents_or_pop*.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    agents_or_pop: tuple</span>
+<span class="sd">      either (&#39;population&#39;, qty, esc) or (&#39;agents&#39;, list of agents, None)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int or float:</span>
+<span class="sd">        the amount corresponding to the population: generally, an int</span>
+<span class="sd">        value, but deterministic models produce float values.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">agents_or_pop</span><span class="p">[</span><span class="n">POPULATION</span><span class="p">]</span>\
+      <span class="k">if</span> <span class="s1">&#39;population&#39;</span> <span class="ow">in</span> <span class="n">agents_or_pop</span>\
+      <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">agents_or_pop</span><span class="p">[</span><span class="n">AGENTS</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="select_random"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.misc.select_random">[docs]</a><span class="k">def</span> <span class="nf">select_random</span><span class="p">(</span><span class="n">origin</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">quantity</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                  <span class="n">exclude</span><span class="p">:</span> <span class="n">SortedSet</span> <span class="o">=</span> <span class="n">SortedSet</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return a random selection of *quantity* agents from the *origin*</span>
+<span class="sd">    group, avoiding those explicitly in the *exclude* set. If the</span>
+<span class="sd">    *origin* population proves too small, all available agents are</span>
+<span class="sd">    taken, irrespective to the *quantity*.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    origin: iterable</span>
+<span class="sd">        the population where agents must be selected</span>
+<span class="sd">    quantity: int</span>
+<span class="sd">        the number of agents to select in the population</span>
+<span class="sd">    exclude: set</span>
+<span class="sd">        agents which are not available for the selection</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list:</span>
+<span class="sd">        a list of randomly selected agents according to the above constraints.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="p">[</span><span class="n">unit</span> <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="n">origin</span> <span class="k">if</span> <span class="n">unit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">]</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">content</span><span class="p">[:</span><span class="nb">min</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="n">size</span><span class="p">)]</span></div>
+
+<span class="c1"># This function is useful to modellers for the following purposes:</span>
+<span class="n">select_random</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Selecting agents&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="read_from_file"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.misc.read_from_file">[docs]</a><span class="k">def</span> <span class="nf">read_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read the specified YAML *filename* and return the corresponding</span>
+<span class="sd">    Python document.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename: str</span>
+<span class="sd">        the name of the YAML file to load</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    object:</span>
+<span class="sd">        a Python object built by parsing of the YAML file, i.e. either</span>
+<span class="sd">        a dict, list, or even str/int/etc... (Most YAML document will</span>
+<span class="sd">        produce dictionaries.)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fil</span><span class="p">:</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">fil</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">description</span></div>
+
+
+<div class="viewcode-block" id="retrieve_value"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.misc.retrieve_value">[docs]</a><span class="k">def</span> <span class="nf">retrieve_value</span><span class="p">(</span><span class="n">value_or_function</span><span class="p">,</span> <span class="n">agent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a value either directly given by parameter</span>
+<span class="sd">    *value_or_function* if it is a true value, or computed from this</span>
+<span class="sd">    parameter seen as a function, with the specified *agent* as argument.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    value_or_function:</span>
+<span class="sd">        either a callable (function that applies to an agent to</span>
+<span class="sd">        retrieve an individual value), or the value itself</span>
+<span class="sd">    agent:</span>
+<span class="sd">        the agent to use as parameter of the callable if necessary</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    value:</span>
+<span class="sd">        the expected value (agent-based or not).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">value_or_function</span><span class="p">(</span><span class="n">agent</span><span class="p">)</span>\
+        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">value_or_function</span><span class="p">)</span>\
+        <span class="k">else</span> <span class="n">value_or_function</span></div>
+
+
+<div class="viewcode-block" id="moving_average"><a class="viewcode-back" href="../../../emulsion_for_modellers.html#emulsion.tools.misc.moving_average">[docs]</a><span class="k">def</span> <span class="nf">moving_average</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;same&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute a moving average of the specified *values* with respect to</span>
+<span class="sd">    the *window_size* on which the average is calculated. The return</span>
+<span class="sd">    moving average has the same size as the original values. To avoid</span>
+<span class="sd">    boundary effects, use ``mode=&#39;valid&#39;``, which produce a result of</span>
+<span class="sd">    size ``len(values) - window_size + 1``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    values: array-like</span>
+<span class="sd">        contains the values for moving average computation</span>
+<span class="sd">    window_size: int</span>
+<span class="sd">        width of the moving average window</span>
+<span class="sd">    mode: str</span>
+<span class="sd">        a parameter for `numpy.convolve`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    nd_array:</span>
+<span class="sd">        a numpy ``nd_array`` containing the values of the moving average.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window_size</span><span class="p">))</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span></div>
+
+<span class="c1"># This function is useful to modellers for the following purposes:</span>
+<span class="n">moving_average</span><span class="o">.</span><span class="n">__USER_FUNCTION__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Computations&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="add_new_property"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.misc.add_new_property">[docs]</a><span class="k">def</span> <span class="nf">add_new_property</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">property_name</span><span class="p">,</span> <span class="n">getter_function</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add a new property to an agent.</span>
+
+<span class="sd">    Actually, the property is added to the class of the agent, as</span>
+<span class="sd">    Python properties are descriptors. Yet, the dynamic attribution of</span>
+<span class="sd">    properties must me done through instances rather than classes,</span>
+<span class="sd">    since agents must add the name of the property to their</span>
+<span class="sd">    ``_mbr_cache`` attribute.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    agent: AbstractAgent</span>
+<span class="sd">        the agent to which the property must be added</span>
+<span class="sd">    property_name: str</span>
+<span class="sd">        the name of the property</span>
+<span class="sd">    getter_function: callable</span>
+<span class="sd">        the callable class upon which the property is built</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">property_name</span><span class="p">,</span> <span class="nb">property</span><span class="p">(</span><span class="n">getter_function</span><span class="p">))</span>
+    <span class="n">agent</span><span class="o">.</span><span class="n">_mbr_cache</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">property_name</span><span class="p">)</span></div>
+    <span class="c1"># debuginfo(&#39;Agent {} adding property {} to class {}&#39;.format(agent, property_name, agent.__class__))</span>
+
+
+<div class="viewcode-block" id="add_all_test_properties"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.misc.add_all_test_properties">[docs]</a><span class="k">def</span> <span class="nf">add_all_test_properties</span><span class="p">(</span><span class="n">agent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Endow the agent with individuals properties: ``duration_in_&lt;a state</span>
+<span class="sd">    machine&gt;`` for all state machines, and ``is_X`` for all states.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">l_machines</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">statemachines_by_level</span><span class="p">[</span><span class="n">agent</span><span class="o">.</span><span class="n">level</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">l_machines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get_sublevels</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">upper_level</span><span class="p">()</span><span class="o">.</span><span class="n">level</span><span class="p">):</span>
+            <span class="n">l_machines</span> <span class="o">+=</span> <span class="n">agent</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">statemachines_by_level</span><span class="p">[</span><span class="n">level</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">machine_name</span> <span class="ow">in</span> <span class="n">l_machines</span><span class="p">:</span>
+        <span class="n">add_new_property</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="s1">&#39;duration_in_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">machine_name</span><span class="p">),</span>
+                         <span class="n">create_duration_getter</span><span class="p">(</span><span class="n">machine_name</span><span class="p">))</span>
+        <span class="n">machine</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_machines</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">machine</span><span class="o">.</span><span class="n">states</span><span class="p">:</span>
+            <span class="n">add_new_property</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="s1">&#39;is_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                             <span class="n">create_state_tester</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">name</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="add_all_relative_population_getters"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.misc.add_all_relative_population_getters">[docs]</a><span class="k">def</span> <span class="nf">add_all_relative_population_getters</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">t_key_variables</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Endow the agent with individual properties of the form ``total_X_Y``</span>
+<span class="sd">    where ``X`` and ``Y`` are either states of two different states</span>
+<span class="sd">    machines used in a grouping, or keywords built upon a state</span>
+<span class="sd">    machine name ``M`` of the form ``my_M`` or ``other_M``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    agent: EmulsionAgent (AdaptiveView or AtomAgent)</span>
+<span class="sd">        the agent which will be endowed with the new properties</span>
+<span class="sd">    key_variables: tuple</span>
+<span class="sd">        string of tuple containing the names of the state machines</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># compute all relevant combinations between states of the state</span>
+    <span class="c1"># machines and &#39;my_statemachine&#39;, &#39;other_statemachine&#39;</span>
+    <span class="c1">## example: t_key_variables = (&#39;species&#39;, &#39;health_state&#39;)</span>
+    <span class="n">s_all_combinations</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">[</span><span class="c1">## concatenate the list of states for each state machine, eg. [&#39;Vector&#39;, &#39;Host&#39;] ...</span>
+          <span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span>
+           <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_machines</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span><span class="o">.</span><span class="n">states</span>
+           <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">autoremove</span><span class="p">]</span> <span class="o">+</span>\
+           <span class="c1">## ... with [&#39;my_species&#39;, &#39;other_species&#39;] ...</span>
+          <span class="p">[</span><span class="s1">&#39;my_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">machine_name</span><span class="p">),</span> <span class="s1">&#39;other_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">machine_name</span><span class="p">)]</span>
+          <span class="c1">## ... and do that for all state machines</span>
+          <span class="k">for</span> <span class="n">machine_name</span> <span class="ow">in</span> <span class="n">t_key_variables</span><span class="p">]))</span>
+    <span class="c1">## =&gt; provides a set composed e.g. of {(&#39;Vector&#39;, &#39;S&#39;), (&#39;Vector&#39;, &#39;I&#39;), (&#39;Vector&#39;, &#39;R&#39;), (&#39;Host&#39;, &#39;S&#39;), ..., (&#39;my_species&#39;, &#39;S&#39;), ..., (&#39;other_species&#39;, &#39;S&#39;), ..., (&#39;Vector&#39;, &#39;my_health_state&#39;), (&#39;Vector&#39;, &#39;other_health_state&#39;), (&#39;Host&#39;, &#39;my_health_state&#39;), (&#39;Host&#39;, &#39;other_health_state&#39;), (&#39;my_species&#39;, &#39;my_health_state&#39;), (&#39;my_species&#39;, &#39;other_health_state&#39;), (&#39;other_species&#39;, &#39;my_health_state&#39;),(&#39;other_species&#39;, &#39;other_health_state&#39;),}</span>
+    <span class="c1">## generate set of fully specified combinations e.g. (&#39;Vector&#39;, &#39;S&#39;) which are already handled by existing properties</span>
+    <span class="n">s_state_combinations</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+        <span class="o">*</span><span class="p">[[</span><span class="n">state</span><span class="o">.</span><span class="n">name</span>
+           <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_machines</span><span class="p">[</span><span class="n">machine_name</span><span class="p">]</span><span class="o">.</span><span class="n">states</span>
+           <span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">autoremove</span><span class="p">]</span>
+          <span class="k">for</span> <span class="n">machine_name</span> <span class="ow">in</span> <span class="n">t_key_variables</span><span class="p">]))</span>
+    <span class="n">s_combinations</span> <span class="o">=</span> <span class="n">s_all_combinations</span> <span class="o">-</span> <span class="n">s_state_combinations</span>
+
+    <span class="c1"># add corresponding properties to specified agent</span>
+    <span class="k">for</span> <span class="n">t_combination</span> <span class="ow">in</span> <span class="n">s_combinations</span><span class="p">:</span>
+        <span class="n">prop_name</span> <span class="o">=</span> <span class="s1">&#39;total_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">t_combination</span><span class="p">))</span>
+        <span class="c1"># debuginfo(&#39;Adding property for&#39;, t_combination)</span>
+        <span class="n">add_new_property</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">,</span>
+                         <span class="n">create_relative_population_getter</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">t_combination</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="serial"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.misc.serial">[docs]</a><span class="k">def</span> <span class="nf">serial</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A very simple serial number generator.&quot;&quot;&quot;</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">start</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">value</span>
+        <span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">end</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">start</span></div>
+
+
+<div class="viewcode-block" id="read_csv_prototypes"><a class="viewcode-back" href="../../../emulsion.tools.html#emulsion.tools.misc.read_csv_prototypes">[docs]</a><span class="k">def</span> <span class="nf">read_csv_prototypes</span><span class="p">(</span><span class="n">collection_name</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weight_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="p">[],</span> <span class="n">exclude</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot;Read the definitions of prototypes contained in file *filename* and</span>
+<span class="sd">    return a dictionary representing the collection.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    collection_name: str</span>
+<span class="sd">        the name of the prototypes collection</span>
+<span class="sd">    filename: Path</span>
+<span class="sd">        the path to the CSV file to read</span>
+<span class="sd">    method: str</span>
+<span class="sd">        method used to select prototypes in the collection</span>
+<span class="sd">    condition: callable</span>
+<span class="sd">        a callable class which can be called on a CSV line, returning</span>
+<span class="sd">        1 if the line fulfils the condition, 0 otherwise</span>
+<span class="sd">    weight_column: str</span>
+<span class="sd">        the name of the column to use to weight prototypes in random</span>
+<span class="sd">        sampling. If None, all prototypes are given the same weight</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list:</span>
+<span class="sd">        A prototype collection, as a list of tuples composed of the</span>
+<span class="sd">        prototype frequency, the prototype name, and the dictionary</span>
+<span class="sd">        describing the prototype itself</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The CSV file is expected to contain a description of the</span>
+<span class="sd">    prototypes. Prototypes define how to set variables in agents that</span>
+<span class="sd">    belong to the same organization level. The CSV header is expected</span>
+<span class="sd">    to contain the names of the variables. A column named</span>
+<span class="sd">    *prototype_name* can be used to associate each combination of</span>
+<span class="sd">    variable values to a specific identifier (built from the</span>
+<span class="sd">    collection name followed by the prototype name, e.g. collection</span>
+<span class="sd">    `default_herd` and *prototype_name* `small` gives</span>
+<span class="sd">    `default_herd-small`). If not specified, the prototype names will</span>
+<span class="sd">    be generated automatically based on the filename and line</span>
+<span class="sd">    numbers. The resulting prototypes are named after this initial</span>
+<span class="sd">    prototype name (automatically generated or specified) and the</span>
+<span class="sd">    collection name (`collection_name-prototype_name`).  A *filter*</span>
+<span class="sd">    can be used in the prototype section to select only lines that</span>
+<span class="sd">    fulfil a given condition (provided as a function here).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">freqs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">protos</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">default_proto_name</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">stem</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
+        <span class="n">csvreader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">csvreader</span><span class="o">.</span><span class="n">fieldnames</span>
+        <span class="k">if</span> <span class="n">weight_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">weight_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SemanticException</span><span class="p">(</span><span class="s1">&#39;Column </span><span class="si">{}</span><span class="s1"> used to weight prototypes not found in file </span><span class="si">{}</span><span class="s1">.format(weight_column, filename)&#39;</span><span class="p">)</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span> <span class="k">if</span> <span class="n">f</span> <span class="o">!=</span> <span class="s1">&#39;prototype_name&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">line_number</span><span class="p">,</span>  <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">csvreader</span><span class="p">):</span>
+            <span class="c1"># manage explicit list of inclusion values</span>
+            <span class="c1"># (row kept only if at least one value in the row is in inclusions list)</span>
+            <span class="k">if</span> <span class="n">include</span><span class="p">:</span>
+               <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">v</span> <span class="ow">in</span> <span class="n">include</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                   <span class="k">continue</span>
+            <span class="c1"># manage explicit list of exclusion values</span>
+            <span class="c1"># (row discarded if at least one value in the row is in the exclusion list)</span>
+            <span class="k">if</span> <span class="n">exclude</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">v</span> <span class="ow">in</span> <span class="n">exclude</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                    <span class="k">continue</span>
+            <span class="c1"># manage filtering conditions</span>
+            <span class="k">if</span> <span class="n">condition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">condition</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+                    <span class="k">continue</span>
+            <span class="c1"># if prototype_name is given, use it</span>
+            <span class="k">if</span> <span class="s1">&#39;prototype_name&#39;</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">collection_name</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;prototype_name&#39;</span><span class="p">]))</span>
+                <span class="k">del</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;prototype_name&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># otherwise generate prototype name from file name and line number</span>
+                <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">-</span><span class="si">{}{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">collection_name</span><span class="p">,</span> <span class="n">default_proto_name</span><span class="p">,</span> <span class="n">line_number</span><span class="p">))</span>
+            <span class="c1"># if prototype_frequency provided, use it</span>
+            <span class="k">if</span> <span class="n">weight_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">freqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">weight_column</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># otherwise consider all prototypes equiprobable</span>
+                <span class="n">freqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="n">proto</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">key</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">])</span>
+            <span class="n">protos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">proto</span><span class="p">)</span>
+    <span class="c1"># normalize frequencies</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span>
+    <span class="n">freqs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">freq</span> <span class="o">/</span> <span class="n">s</span> <span class="k">for</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">freqs</span><span class="p">]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">protos</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;random_replace&#39;</span><span class="p">:</span>
+        <span class="c1"># if method is &#39;ordered&#39;, sort prototypes according to weight_column</span>
+        <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ordered&#39;</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

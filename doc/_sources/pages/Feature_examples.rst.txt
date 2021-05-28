@@ -1,0 +1,837 @@
+****************
+Feature examples
+****************
+
+Directory ``models/features`` provides a collection of EMULSION models
+which demonstrate EMULSION features in their simplest usage.
+
+
+SIR model
+*********
+
+.. admonition:: Files
+
+   - compartment-based: `compart_SIR.yaml <../_static/models/features/compart_SIR.yaml>`_
+   - individual-based: `IBM_SIR.yaml <../_static/models/features/IBM_SIR.yaml>`_
+   - hybrid model: `hybrid_SIR.yaml <../_static/models/features/hybrid_SIR.yaml>`_
+
+**Move cursor over diagram states and transitions to see the tooltip**
+
+.. graphviz:: ../_images/SIR.dot
+
+.. note::
+
+   Variables ``total_I`` and ``total_population`` used in force of infection
+   (see tooltip when moving your mouse above ``force_of_infection`` in
+   the diagram above) are computed automatically because of the
+   existence of a level ``population`` and a state ``I``.
+
+.. seealso::
+
+   :ref:`Model structure`,
+   :ref:`Compartments, IBM or hybrid models?`,
+   :ref:`Automatic variables`
+
+SEIRS model
+***********
+
+.. admonition:: Files
+
+   - `compart_SEIRS.yaml <../_static/models/features/compart_SEIRS.yaml>`_
+   - `IBM_SEIRS.yaml <../_static/models/features/IBM_SEIRS.yaml>`_
+   - `hybrid_SEIRS.yaml <../_static/models/features/hybrid_SEIRS.yaml>`_
+
+
+.. graphviz:: ../_images/SEIRS.dot
+
+
+Differences with previous model (SIR):
+
+.. code-block:: yaml
+   :emphasize-lines: 5, 10, 11, 13
+
+   state_machines:
+     health_state:
+       states:
+       ...
+         - E:
+             name: 'Latent'
+             desc: 'infected but not yet able to transmit the disease'
+             fillcolor: 'orange'
+       transitions:
+         - {from: S, to: E, rate: 'force_of_infection'}
+	 - {from: E, to: I, rate: '1/incubation'}
+	 - {from: I, to: R, rate: 'recovery'}
+	 - {from: R, to: S, rate: 'waning'}
+   ...
+   parameters:
+     ...
+       incubation:
+       desc: 'mean duration of latent state (days, assuming exponential
+	 distribution of durations in the state)'
+	 value: 5
+       waning:
+         desc: 'rate at which individuals lose immunity (/day)'
+	 value: 0.05
+       'prevalence (%)':
+         desc: 'proportion of infected+infectious individuals'
+	 value: '100 * (total_I + total_E) / total_population'
+
+.. seealso::
+
+   :ref:`Model structure`,
+   :ref:`Compartments, IBM or hybrid models?`
+
+SIRS model with periodic external risk
+**************************************
+
+.. admonition:: Files
+
+   - `compart_SIRS_periodic_risk.yaml <../_static/models/features/compart_SIRS_periodic_risk.yaml>`_
+   - `hybrid_SIRS_periodic_risk.yaml <../_static/models/features/hybrid_SIRS_periodic_risk.yaml>`_
+   - `IBM_SIRS_periodic_risk.yaml <../_static/models/features/IBM_SIRS_periodic_risk.yaml>`_
+
+.. image:: ../_images/SIRS1.png
+    :width: 90%
+
+.. image:: ../_images/SIRS2.png
+    :width: 90%
+
+
+.. graphviz:: ../_images/SIRS.dot
+
+.. note::
+
+   - this model is initialized with a healthy population only
+   - external risk is modelled through a periodic forcing variable::
+
+       transmission_I * (1 + sin(time * 2 * pi / external_risk_period))
+
+     where ``time`` represents the time elapsed since the beginning of
+     simulation (in time units - here days)
+
+.. seealso::
+
+   :ref:`Automatic variables`,
+   :ref:`Built-in functions`
+
+
+Custom state durations
+**********************
+
+.. admonition:: Files
+
+   - `compart_duration.yaml <../_static/models/features/compart_duration.yaml>`_
+   - `hybrid_duration.yaml <../_static/models/features/hybrid_duration.yaml>`_
+   - `IBM_duration.yaml <../_static/models/features/IBM_duration.yaml>`_
+
+.. image:: ../_images/duration.png
+   :width: 90%
+
+.. graphviz:: ../_images/duration.dot
+
+.. code-block:: yaml
+   :emphasize-lines: 6, 9, 13, 15
+
+   state_machines:
+     health_state:
+       states:
+         - N:
+             name: 'Newborn'
+             duration: 'juvenile_age'
+         - J:
+             name: 'Juvenile'
+             duration: 'adult_age - juvenile_age'
+	 ...
+   parameters:
+     juvenile_age:
+       value: 20
+     adult_age:
+       value: 'random_uniform(50, 70)'
+
+.. note::
+
+   - Duration in ``N`` is constant (20 days)
+   - Duration in ``J`` depends on a distribution (parameter
+     ``adult_age``), hence each individual gets a duration based on a
+     random sample
+   - Transitions use ``proba: 1`` to ensure that all individuals that
+     have spent the required duration in their state move to the next
+     one.
+   - On state machine diagrams, a clock appears next to the state name
+     when a duration is explicitly specified.
+
+.. seealso::
+
+   :ref:`Set states attributes`,
+   :ref:`Built-in functions`
+
+SIR model with basic demography (births/deaths)
+***********************************************
+
+.. admonition:: Files
+
+   - `compart_SIR_demo.yaml <../_static/models/features/compart_SIR_demo.yaml>`_
+   - `hybrid_SIR_demo.yaml <../_static/models/features/hybrid_SIR_demo.yaml>`_
+   - `IBM_SIR_demo.yaml <../_static/models/features/IBM_SIR_demo.yaml>`_
+
+.. graphviz:: ../_images/SIR_demo.dot
+
+.. code-block:: yaml
+   :emphasize-lines: 9, 15
+
+   state_machines:
+     health_state:
+       states:
+         ...
+	 - D:
+             name: 'Dead'
+             desc: 'compartment to put dead individuals'
+             fillcolor: white
+             autoremove: yes
+     transitions:
+     ...
+       - {from: S, to: D, rate: death}
+       - {from: I, to: D, rate: death}
+       - {from: R, to: D, rate: death}
+     productions:
+       - {from: S, to: S, rate: birth, prototype: newborn}
+       - {from: I, to: S, rate: birth, prototype: newborn}
+       - {from: R, to: S, rate: birth, prototype: newborn}
+
+   ...
+   parameters:
+     juvenile_age:
+       value: 20
+     adult_age:
+       value: 'random_uniform(50, 70)'
+
+
+.. note::
+
+   - State ``D`` with ``autoremove: yes`` represents the state of
+     deceased individuals: all individuals sent to ``D`` are
+     automatically removed from simulation. On the state machine
+     diagram, this state appears as a dotted box.
+   - Section ``productions`` in ``state_machines``: production links
+     specify from which state groups new individuals are
+     produced and which prototype describes the new individuals.
+     Here for instance all health states are able to produce
+     ``newborn`` individuals.
+     On the diagram, productions links appear as dashed arrows.
+
+.. seealso::
+
+   :ref:`Set states attributes`,
+   :ref:`Produce new individuals`
+
+
+SIR model with age groups
+*************************
+
+.. admonition:: Files
+
+   - `compart_SIR_JA_demo.yaml <../_static/models/features/compart_SIR_JA_demo.yaml>`_
+   - `hybrid_SIR_JA_demo.yaml <../_static/models/features/hybrid_SIR_JA_demo.yaml>`_
+   - `IBM_SIR_JA_demo.yaml <../_static/models/features/IBM_SIR_JA_demo.yaml>`_
+
+
+.. graphviz:: ../_images/dSIR.dot
+
+.. graphviz:: ../_images/JA.dot
+
+.. image:: ../_images/JA.png
+   :width: 90%
+
+.. note::
+
+   - **Two state machines** and corresponding groupings/processes are
+     defined: one for the progression of infection (``health_state``),
+     the other for the maturation of individuals and demography
+     (``age_group``).
+   - State ``S`` with property ``default: yes`` (hence, in bold on the diagram)
+     allows to use keyword ``default`` as value for ``health_state``
+     in the prototype for ``newborn`` individuals. If the health state
+     of new individuals has to be revised in further evolutions of the
+     model, the corresponding state has to be labelled as ``default``
+     to replace ``S``.
+   - The prototypes now initialize the values for both state
+     machines. Especially, for prototypes used in initial conditions,
+     age groups are set to ``random``, which means an equiprobable
+     choice between states of state machine ``age_group`` (except
+     autoremove states).
+
+.. seealso::
+
+   :ref:`Set states attributes`
+
+SIR model with age groups and random initialization
+***************************************************
+
+.. admonition:: Files
+
+   - `compart_SIR_JA_demo_random.yaml <../_static/models/features/compart_SIR_JA_demo_random.yaml>`_
+   - `hybrid_SIR_JA_demo_random.yaml <../_static/models/features/hybrid_SIR_JA_demo_random.yaml>`_
+   - `IBM_SIR_JA_demo_random.yaml <../_static/models/features/IBM_SIR_JA_demo_random.yaml>`_
+
+.. image:: ../_images/JA2.png
+   :width: 90%
+
+
+.. note::
+
+   - Prototypes ``healthy`` and ``infected`` define the ``age_group``
+     using a multinomial sampling between possible states (``J`` and
+     ``A``), to ensure a given proportion of juveniles among healthy
+     individuals in average:
+
+     .. code-block:: yaml
+        :emphasize-lines: 6
+
+        prototypes:
+  	    individuals:
+   	      - healthy:
+                  desc: 'healthy individuals'
+  	 	  health_state: S
+  		  age_group: 'random(init_prop_juveniles, 1-init_prop_juveniles)'
+
+   - Similarly, initial conditions use a multinomial sampling between
+     two prototypes (``healthy`` and ``infected``) to make the
+     initial prevalence vary stochastically according to the initial
+     probability of being infected (``initial_proba_infection``):
+
+     .. code-block:: yaml
+        :emphasize-lines: 3, 5, 7
+
+	initial_conditions:
+          population:
+            - prototype: [infected, healthy]
+              # two possible prototypes for individual initially in the population
+              amount: initial_population_size
+              # drawn among a population of size initial_population_size
+              proba: [initial_proba_infection, 1-initial_proba_infection]
+              # with respective probabilities initial_proba_infection and
+              # 1-initial_proba_infection
+
+.. seealso::
+
+   :ref:`Design prototypes for typical individuals or populations`
+
+
+SIR model with age groups and data-based prototypes
+***************************************************
+
+.. warning::
+
+   This feature is still experimental and likely to evolve in further versions.
+
+.. admonition:: Files
+
+   - `hybrid_SIR_JA_demo_prototypes.yaml <../_static/models/features/hybrid_SIR_JA_demo_prototypes.yaml>`_
+   - `IBM_SIR_JA_demo_prototypes.yaml <../_static/models/features/IBMx@_SIR_JA_demo_prototypes.yaml>`_
+   - `data/initial_individuals.csv <../_static/models/features/data/initial_individuals.csv>`_
+   - `data/population_size.csv <../_static/models/features/data/population_size.csv>`_
+
+.. image:: ../_images/pop_struct1.png
+   :width: 49%
+.. image:: ../_images/pop_struct2.png
+   :width: 49%
+
+.. image:: ../_images/pop_struct3.png
+   :width: 49%
+.. image:: ../_images/pop_struct4.png
+   :width: 49%
+
+In above figures, 50 stochastic repetitions with data-based population
+sizes are run. The metapopulation contains 4 populations, which size
+is defined in ``data/population_size.csv``. Each population is
+composed of individuals defined in ``data/initial_individuals.csv``.
+
+
+.. note::
+
+   - Prototype ``initial_individuals`` is actually a collection defined in
+     CSV file ``data/initial_individuals.csv``: each time this prototype
+     is used (here, in initial conditions), a concrete prototype is
+     sampled randomly among those defined in the CSV file:
+
+     .. literalinclude:: ../_static/models/features/data/initial_individuals.csv
+
+   - Similarly, prototype ``data_based_population`` is a collection defined
+     in a CSV file ``data/population_size.csv`` as follows:
+
+     .. literalinclude:: ../_static/models/features/data/population_size.csv
+
+
+.. seealso::
+
+   :ref:`Design prototypes for typical individuals or populations`,
+   :ref:`Data-based prototype collections`
+
+
+SIR model with cumulative incidence
+***********************************
+
+.. admonition:: Files
+
+   - `compart_SIR_cumul_inc.yaml <../_static/models/features/compart_SIR_cumul_inc.yaml>`_
+   - `hybrid_SIR_cumul_inc.yaml <../_static/models/features/hybrid_SIR_cumul_inc.yaml>`_
+   - `IBM_SIR_cumul_inc.yaml <../_static/models/features/IBM_SIR_cumul_inc.yaml>`_
+
+
+.. image:: ../_images/cum_inc.png
+   :width: 90%
+
+.. code-block:: yaml
+   :emphasize-lines: 5-6
+
+   - I:
+       name: 'Infectious'
+       desc: 'infected and able to transmit the disease'
+       fillcolor: 'maroon'
+       on_enter:
+         - record_change: cumulative_incidence
+
+.. note::
+
+   Cumulative incidence is obtained through the built-in action
+   ``record_change`` executed when entering infecious state. This
+   action adds the number of individuals currently executing the action
+   to a variable, here ``cumulative_incidence``.
+
+
+
+.. seealso::
+
+   :ref:`Built-in actions`
+
+
+SIR model with individual actions and variable aggregation
+**********************************************************
+
+.. admonition:: Files
+
+   - `hybrid_SIR_aggreg.yaml <../_static/models/features/hybrid_SIR_aggreg.yaml>`_
+   - `IBM_SIR_aggreg.yaml <../_static/models/features/IBM_SIR_aggreg.yaml>`_
+
+.. graphviz:: ../_images/SIR_actions.dot
+
+.. image:: ../_images/aggreg.png
+   :width: 90%
+
+.. code-block:: yaml
+   :emphasize-lines: 7-13,18-24,31-32
+
+   levels:
+     population:
+       desc: 'level of the population'
+       aggregation_type: 'hybrid'
+       contains:
+         - individuals
+       aggregate_vars:
+         - name: population_affected_over_time
+           collect: nb_episodes
+           operator: 'sum'
+         - name: average_infection_duration
+           collect: duration_infected
+           operator: 'mean'
+    ...
+      - I:
+          name: 'Infectious'
+    ...
+          on_enter:
+            - set_var: nb_episodes
+              value: 1
+            - message: 'I have a bad feeling about this...'
+          on_stay:
+            - set_var: duration_infected
+              value: 'duration_infected + 1'
+     ...
+     prototypes:
+       individuals:
+         - healthy:
+             desc: 'healthy individuals'
+             health_state: S
+             nb_episodes: 0
+             duration_infected: 0
+
+.. note::
+
+   - On state machine diagrams, black lozenges (left to, below or
+     right to the state name) mark the specification of actions
+     (respectively on enter, on stay and on exit).
+   - Look at messages in the terminal (beware, printing messages
+     increases computation time!)
+   - Variables at population scale are created by aggregating
+     variables at individual scale, which are updated in the
+     convenient states.
+
+
+.. seealso::
+
+   :ref:`Built-in actions`,
+   :ref:`Aggregate variables`
+
+
+SIR model with age groups and explicit age
+******************************************
+
+.. admonition:: Files
+
+   - `hybrid_SIR_age_demo.yaml <../_static/models/features/hybrid_SIR_age_demo.yaml>`_
+   - `IBM_SIR_age_demo.yaml <../_static/models/features/IBM_SIR_age_demo.yaml>`_
+
+.. graphviz:: ../_images/SIR_age.dot
+
+.. graphviz:: ../_images/JA_age.dot
+
+.. image:: ../_images/explicit_age.png
+   :width: 90%
+
+
+.. code-block:: yaml
+   :emphasize-lines: 5-7, 10-12, 17, 22, 26-28, 36, 39-40
+
+   state_machines:
+     age_group:
+       - J:
+	   ...
+	   on_stay:
+             - set_var: age
+               value: 'age + delta_t'
+       - A:
+  	   ...
+ 	   on_stay:
+             - set_var: age
+               value: 'age + delta_t'
+       ...
+     transitions:
+       - from: J
+	 to: A
+	 cond: 'age >= adult_age'
+	 proba: 1
+   ...
+   grouping:
+     population:
+       details: [age_group, health_state]
+   ...
+   parameters:
+     ...
+     init_age_distrib:
+       desc: 'distribution of initial ages'
+       value: 'random_integers(0, adult_age-1)'
+   ...
+   prototypes:
+     individuals:
+       - healthy:
+           desc: 'healthy individuals'
+           health_state: S
+           age_group: J
+           age: init_age_distrib
+       ...
+   statevars:
+     age:
+       desc: 'age of the individual'
+
+
+.. note::
+   - the individual variable ``age`` is sampled in a distribution, and
+     incremented while individuals are in states ``J`` and
+     ``A``. Incrementation of age is based on built-in value
+     ``delta_t`` to ensure consistency whatever the simulation time step
+   - ``cond`` in transition from J to A: since ages are initially distributed
+     randomly within the limits of J group, becoming adult does not
+     rely on a duration but on an explicit verification of age. (An
+     alternative would be to define a duration in J as the difference
+     between adult age and individual age.)
+   - ``statevars`` section to declare variable ``age``, which is
+     initialized in prototypes, modified by actions in J and A states,
+     and used to define the condition in transition from J to A.
+   - the grouping ``details`` based on both variables ``age_group``
+     and ``health_state``: it automatically provides variables siche
+     as ``total_A_I`` (number of infectious adults) and, in hybrid
+     model, a variable ``max_age_A_I`` (the highest age in
+     infected adults) based on the aggregate variable defined in ``levels``.
+
+.. seealso::
+
+   :ref:`Customize transitions`,
+   :ref:`Built-in actions`,
+   :ref:`Aggregate variables`
+
+
+SIR model with explicit gestation
+*********************************
+
+.. admonition:: Files
+
+   - `hybrid_gest.yaml <../_static/models/features/hybrid_gest.yaml>`_
+   - `IBM_gest.yaml <../_static/models/features/IBM_gest.yaml>`_
+
+
+.. graphviz:: ../_images/gest_sex.dot
+
+.. graphviz:: ../_images/gest_parity.dot
+
+.. graphviz:: ../_images/gest_age.dot
+
+.. image:: ../_images/gest.png
+   :width: 90%
+
+.. code-block:: yaml
+   :emphasize-lines: 5-7, 10, 19
+
+      - from: G
+        to: A
+        proba: 1
+        on_cross:
+          - produce_offspring: 'newborn'
+            amount: 1
+          - become: 'next_parity'
+      - from: G
+        to: D
+        escape: yes
+        rate: '1 / avg_adult_death_age'
+   ...
+   prototypes:
+     animals:
+       - next_parity:
+           desc: 'increase the parity of a female at farrowing, based on
+           the order in which parities are defined in the corresponding
+           state machine'
+           parity: next_state
+
+
+.. note::
+
+   - the use of state machines ``sex`` and ``parity`` which have only
+     states (without any transition) to represent discrete and
+     enumerable values
+   - condition ``is_Female`` to allow only females to move to
+     gestating state
+   - built-in action ``produce_offspring`` used when returning from
+     gestating (G) to non-gestating (A) state
+   - keyword ``next_state`` for variable ``parity`` in prototype
+     ``next_parity``, applied when returning from G to A, to make the
+     value change automatically to the "next" one (from P0 to P1, from
+     P1 to P2, etc.)
+   - ``escape`` condition on transition from G to D to allow mortality
+     while being in gestating state (otherwise the ``duration`` would
+     forbid to leave gestating state before the end!)
+   - the grouping involving variables ``age_group`` and ``sex`` to
+     provide variables such as ``total_G_Female`` (number of females
+     in gestating state, which corresponds to ``total_G`` due to the
+     condition on sex).
+
+.. seealso::
+
+   :ref:`Customize transitions`,
+   :ref:`State machines without transitions`,
+   :ref:`Produce new individuals`,
+   :ref:`Design prototypes for typical individuals or populations`
+
+   A very complete example is also provided in the Quickstart model
+   (``quickstart/quickstart.yaml``) used to :ref:`Test your installation`.
+
+   Especially:
+
+   - action ``produce_offspring`` used to model vertical transmission
+   - ``escape`` condition to allow abortions before gestation has ended
+
+
+SIR model with structured population
+************************************
+
+.. admonition:: Files
+
+   - `compart_SIR_struct.yaml <../_static/models/features/compart_SIR_struct.yaml>`_
+   - `hybrid_SIR_struct.yaml <../_static/models/features/hybrid_SIR_struct.yaml>`_
+   - `IBM_SIR_struct.yaml <../_static/models/features/IBM_SIR_struct.yaml>`_
+
+.. graphviz:: ../_images/SIR_struct.dot
+
+.. graphviz:: ../_images/JA_struct.dot
+
+.. code-block:: yaml
+   :emphasize-lines: 3, 8, 11, 14
+
+   grouping:
+     population:
+       details: [health_state, age_group]
+   ...
+   parameters:
+     force_of_infection:
+       desc: 'infection function'
+       value: 'is_J * force_of_infection_juveniles + is_A * force_of_infection_adults'
+     force_of_infection_juveniles:
+       desc: 'infection function experience by juveniles'
+       value: 'DIV(transJJ * total_I_J, total_J) + DIV(transAJ * total_I_A, total_A)'
+     force_of_infection_adults:
+       desc: 'infection function experience by adults'
+       value: 'DIV(transAA * total_I_A, total_A) + DIV(transJA * total_I_J, total_J)'
+
+.. note::
+
+   - The grouping based on health state and age group
+   - The composite definition of the force of infection, based on
+     booleans (``is_J``,  ``is_A``) and on the force of infection
+     experienced by each group
+   - Function ``DIV`` used to compute the ratios: *DIV(a, b)* returns 0
+     if *a=0*, otherwise *a/b*. It is used to avoid divisions by
+     zeros, because when e.g. ``total_J`` is zero, so is ``total_I_J``.
+
+.. seealso::
+
+   :ref:`Complexify grouping`,
+   :ref:`Automatic variables`
+
+SIR model with metapopulation
+*****************************
+
+.. admonition:: Files
+
+   - `compart_SIR_JA_metapop.yaml <../_static/models/features/compart_SIR_JA_metapop.yaml>`_
+   - `hybrid_SIR_JA_metapop.yaml <../_static/models/features/hybrid_SIR_JA_metapop.yaml>`_
+   - `IBM_SIR_JA_metapop.yaml <../_static/models/features/IBM_SIR_JA_metapop.yaml>`_
+
+
+.. image:: ../_images/metapop.png
+   :width: 90%
+
+.. code-block:: yaml
+   :emphasize-lines: 4-12, 18, 21, 24, 27, 38-42
+
+   levels:
+     population:
+     ...
+     metapop:
+       desc: 'level of the metapopulation'
+       contains:
+         - population
+       aggregation_type: metapopulation
+       aggregate_vars:
+         - name: metapop_total_population
+           collect: total_population
+           operator: sum
+   ...
+   parameters:
+     ...
+     force_of_infection_between:
+       desc: 'infection function resulting from possible contacts with other population'
+       value: 'transmission_between_populations * DIV(metapop_total_I - total_I, metapop_total_population - total_population)'
+     force_of_infection_within:
+       desc: 'force of infection within the population'
+       value: 'transmission_I * total_I / total_population'
+     force_of_infection:
+       desc: 'total force of infection'
+       value: 'force_of_infection_within + force_of_infection_between'
+   ...
+   prototypes:
+     population:
+       - healthy_population:
+           desc: 'population initially without infected individuals'
+           initial_prevalence: 0
+       - infected_population:
+           desc: 'population with initially infected individuals'
+           initial_prevalence: 0.1
+   ...
+   initial_conditions:
+     population:
+     ...
+     metapop:
+       - prototype: infected_population
+	 amount: 1
+       - prototype: healthy_population
+	 amount: 'nb_populations - 1'
+
+.. note::
+
+   - The additional level with aggregation type ``metapopulation``
+   - Additional prototypes at population level, used to define initial
+     conditions which now apply not only at population level, but also
+     at metapop level (here, only one population infected initially)
+   - The force of infection, composed of the force of infection within
+     each population, and of the force of infection between
+     populations (based on aggregate variables at the metapopulation
+     level to compute an average external risk), which results in the
+     spread of the pathogen in intially disease-free populations (see figures)
+
+
+.. seealso::
+
+   :ref:`Changing scale: metapopulations`
+
+
+SIR model with metapopulation, data-driven movements and data pre-processing
+****************************************************************************
+
+.. admonition:: Files
+
+   - `compart_SIR_JA_metapop_data.yaml <../_static/models/features/compart_SIR_JA_metapop_data.yaml>`_ +
+     `compart_SIR_JA_metapop_data.py <../_static/models/features/compart_SIR_JA_metapop_data.py>`_
+   - `hybrid_SIR_JA_metapop_data.yaml <../_static/models/features/hybrid_SIR_JA_metapop_data.yaml>`_ +
+     `hybrid_SIR_JA_metapop_data.py <../_static/models/features/hybrid_SIR_JA_metapop_data.py>`_
+   - `IBM_SIR_JA_metapop_data.yaml <../_static/models/features/IBM_SIR_JA_metapop_data.yaml>`_ +
+     `IBM_SIR_JA_metapop_data.py <../_static/models/features/IBM_SIR_JA_metapop_data.py>`_
+   - `data/moves.csv <../_static/models/features/data/moves.csv>`_
+
+.. image:: ../_images/metapop2.png
+   :width: 90%
+
+.. image:: ../_images/trade.png
+   :width: 90%
+
+.. code-block:: yaml
+   :emphasize-lines: 10-11, 19, 21-26
+
+   levels:
+     ...
+     metapop:
+       desc: 'level of the metapopulation'
+       contains:
+         - herd
+       aggregation_type: metapopulation
+       # The metapopulation is explicitly linked to a specific class in a
+       # Python code add-on
+       file: 'hybrid_SIR_metapop_data.py'
+       class_name: Metapopulation
+   ...
+   processes:
+     herd:
+       ...
+       metapop:
+         # here the process is the name of a procedure defined in the
+         # Python code
+         - exchange_animals
+   ...
+   input_data:
+     preprocessing:
+       - file: 'hybrid_SIR_JA_metapop_data.py'
+         class_name: TradeMovementsReader
+         input_files:
+           trade_file: 'moves.csv'
+
+
+
+
+.. note::
+
+   - Reference to Python file and class name in the definition of
+     level ``metapop``
+   - Class name ``Metapopulation`` which links level ``metapop`` from
+     YAML file to actual code in Python file.
+   - New prototype ``imported_movement`` for creating animals coming
+     from outside the metapopulation
+   - Variables ``purchased`` and ``sold`` which are updated in Python
+     code by process ``exchange_animals`` (compare with previous
+     section on metapopulation to see that infections spread is much
+     more deterministic due to data-based trade movements)
+   - New section ``input_data`` with preprocessing operations (loading
+     CSV file describing trade movements and restructuring information
+     as a dictionary which is available in all stochastic repetitions)
+
+.. seealso::
+
+   :ref:`Changing scale: metapopulations`,
+   :ref:`Connecting to Python code add-ons`
+   :ref:`Using pre-processors`

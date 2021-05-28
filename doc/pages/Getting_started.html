@@ -1,0 +1,412 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>3. Getting started with EMULSION &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4. Modelling principles" href="Modelling_principles.html" />
+    <link rel="prev" title="2. Installation" href="Install.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="getting-started-with-emulsion">
+<h1>3. Getting started with EMULSION<a class="headerlink" href="#getting-started-with-emulsion" title="Permalink to this headline">¶</a></h1>
+<p>We assume in what follows that you have downloaded and unzipped the
+<a class="reference external" href="../models.zip">models directory</a> provided
+on <a class="reference external" href="https://sourcesup.renater.fr/www/emulsion-public/">EMULSION website.</a></p>
+<div class="section" id="running-emulsion">
+<h2>3.1. Running EMULSION<a class="headerlink" href="#running-emulsion" title="Permalink to this headline">¶</a></h2>
+<p>To simulate an EMULSION model (named e.g. <code class="docutils literal notranslate"><span class="pre">MODEL</span></code>), open a terminal
+in the directory where your files are located, and type the following
+command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emulsion run --plot MODEL.yaml
+</pre></div>
+</div>
+<p>Option <code class="docutils literal notranslate"><span class="pre">--plot</span></code> automatically opens your web browser to show
+simulation outcomes. To view diagrams representing model structure,
+append option <code class="docutils literal notranslate"><span class="pre">--view-model</span></code> to the previous line.</p>
+<p>As an example, open a terminal in the directory <code class="docutils literal notranslate"><span class="pre">models/features</span></code> and type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emulsion run --plot compart_SIR.yaml --view-model
+</pre></div>
+</div>
+<p>The simulation results will pop up in your web browser:</p>
+<div align="left" class="align-left"><div class="graphviz"><object data="../_images/graphviz-8313e29bb6b6c29f8f35b32c8d648a80e608b683.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;S&quot; [shape=&quot;Mrecord&quot;, label=&quot;S&quot;, tooltip=&quot;S (Susceptible):
+	suceptible of becoming infected&quot;, fillcolor=wheat, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; [shape=&quot;Mrecord&quot;, label=&quot;I&quot;, tooltip=&quot;I (Infectious):
+	infected and able to transmit the disease&quot;, fillcolor=maroon, style=&quot;filled,rounded&quot;] ;
+	&quot;R&quot; [shape=&quot;Mrecord&quot;, label=&quot;R&quot;, tooltip=&quot;R (Resistant):
+	healthy again and resistant to infection&quot;, fillcolor=deepskyblue, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; -&gt; &quot;R&quot; [label=&quot;rate: recovery&quot;, labeltooltip=&quot;recovery [parameter]:
+	recovery rate (/day)                                                    
+	0.1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;I&quot; [label=&quot;rate: force_of_infection&quot;, labeltooltip=&quot;force_of_infection [parameter]:
+	infection function                                                      
+	transmission_I * total_I / total_herd&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+</div>
+<img alt="../_images/SIR1.png" class="align-left" src="../_images/SIR1.png" />
+<img alt="../_images/SIR1b.png" class="align-left" src="../_images/SIR1b.png" />
+<p>You can also check the results of a more complex model, e.g. <code class="docutils literal notranslate"><span class="pre">quickstart</span></code>,
+tested <a class="reference internal" href="Install.html#test-your-installation"><span class="std std-ref">at install</span></a>.</p>
+<p>When running a model, EMULSION:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Reads file <code class="docutils literal notranslate"><span class="pre">MODEL.yaml</span></code> which describes the model</li>
+<li>With options <code class="docutils literal notranslate"><span class="pre">--view-model</span></code>, builds the diagrams representing
+model structure and stores them in the figure directory
+(default: <code class="docutils literal notranslate"><span class="pre">img/</span></code>)</li>
+<li>Runs <em>N</em> (default: 10) stochastic repetitions of model simulation during
+<em>T</em> (default: 100) time steps</li>
+<li>Stores simulation outputs in a CSV file <code class="docutils literal notranslate"><span class="pre">counts.csv</span></code> located
+in the output directory (default: <code class="docutils literal notranslate"><span class="pre">outputs/</span></code>)</li>
+<li>With option <code class="docutils literal notranslate"><span class="pre">--plot</span></code>, produces a web page with a basic
+representation of the outputs (and model structure if
+<code class="docutils literal notranslate"><span class="pre">--view-model</span></code> was also set) which is stored in the figure
+directory, under the name <code class="docutils literal notranslate"><span class="pre">My_model_name.html</span></code>
+(<code class="docutils literal notranslate"><span class="pre">My_model_name</span></code> being the name of the model as defined in
+<code class="docutils literal notranslate"><span class="pre">MODEL.yaml</span></code> by the instruction: <code class="docutils literal notranslate"><span class="pre">model_name:</span>
+<span class="pre">My_model_name</span></code>)</li>
+</ol>
+</div></blockquote>
+<p>Most frequently used options are:</p>
+<dl class="docutils">
+<dt><code class="docutils literal notranslate"><span class="pre">-r</span> <span class="pre">N</span></code></dt>
+<dd>produce <em>N</em> stochastic repetitions</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-t</span> <span class="pre">T</span></code></dt>
+<dd>run the simulation for <em>T</em> time steps</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--silent</span></code></dt>
+<dd>show a progress bar only for the progression of repetitions
+(instead of a progress bar per repetition).</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--output-dir</span> <span class="pre">OUTPUT</span></code></dt>
+<dd>change output directory (the location of <code class="docutils literal notranslate"><span class="pre">counts.csv</span></code> produced
+by the simulation) to <code class="docutils literal notranslate"><span class="pre">OUTPUT</span></code></dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--figure-dir</span> <span class="pre">FIG</span></code></dt>
+<dd>change figure directory (the location of model diagrams and
+outputs web page) to <code class="docutils literal notranslate"><span class="pre">FIG</span></code></dd>
+</dl>
+<p>(Other options are available with <code class="docutils literal notranslate"><span class="pre">emulsion</span> <span class="pre">-h</span></code>.)</p>
+</div>
+<div class="section" id="producing-model-diagrams">
+<h2>3.2. Producing model diagrams<a class="headerlink" href="#producing-model-diagrams" title="Permalink to this headline">¶</a></h2>
+<p>When running a model, you can use options <code class="docutils literal notranslate"><span class="pre">--plot</span></code> and
+<code class="docutils literal notranslate"><span class="pre">--view-model</span></code> to plot simulation outcomes and model diagrams,
+respectively.</p>
+<p>To generate model diagrams without having to run the model, just type
+for instance:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emulsion diagrams compart_SIR.yaml
+</pre></div>
+</div>
+<p>By default, diagrams are generated in SVG format (in the figure
+directory, by default <code class="docutils literal notranslate"><span class="pre">img</span></code>). You can change format to PNG or PDF
+with option <code class="docutils literal notranslate"><span class="pre">--format</span></code>, e.g.:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emulsion diagrams compart_SIR.yaml --format pdf
+</pre></div>
+</div>
+</div>
+<div class="section" id="viewing-parameters">
+<h2>3.3. Viewing parameters<a class="headerlink" href="#viewing-parameters" title="Permalink to this headline">¶</a></h2>
+<p>EMULSION command can also show the actual values of model parameters:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emulsion show compart_SIR.yaml
+</pre></div>
+</div>
+<p>in the following list (“MODEL parameters”):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                      <span class="n">EmulsionModel</span> <span class="s2">&quot;compart_SIR&quot;</span>
+            <span class="n">AVAILABLE</span> <span class="n">PARAMETERS</span> <span class="p">(</span><span class="k">with</span> <span class="n">their</span> <span class="n">current</span> <span class="n">value</span><span class="p">)</span>
+<span class="o">------------------------------------------------------------------------</span>
+<span class="n">MODEL</span> <span class="n">PARAMETERS</span>
+<span class="o">------------------------------------------------------------------------</span>
+  <span class="n">total_duration</span><span class="o">.................................................</span><span class="mf">100.0</span>
+  <span class="n">initial_population_size</span><span class="o">........................................</span><span class="mf">100.0</span>
+  <span class="n">initial_infected</span><span class="o">.................................................</span><span class="mf">1.0</span>
+  <span class="n">transmission_I</span><span class="o">...................................................</span><span class="mf">0.5</span>
+  <span class="n">recovery</span><span class="o">.........................................................</span><span class="mf">0.1</span>
+  <span class="n">delta_t</span><span class="o">..........................................................</span><span class="mf">1.0</span>
+<span class="o">------------------------------------------------------------------------</span>
+</pre></div>
+</div>
+<p>You can also ask for the role of the parameters:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emulsion describe compart_SIR.yaml recovery delta_t transmission_I
+</pre></div>
+</div>
+<p>results in the following list (“MODEL parameters”):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                      <span class="n">EmulsionModel</span> <span class="s2">&quot;compart_SIR&quot;</span>
+              <span class="n">ROLE</span> <span class="n">OF</span> <span class="n">PARAMETERS</span> <span class="p">(</span><span class="n">AND</span> <span class="n">CURRENT</span> <span class="n">DEFINITION</span><span class="p">)</span>
+<span class="o">------------------------------------------------------------------------</span>
+<span class="n">recovery</span> <span class="p">[</span><span class="n">parameter</span><span class="p">]:</span>
+	<span class="n">recovery</span> <span class="n">rate</span> <span class="p">(</span><span class="o">/</span><span class="n">day</span><span class="p">)</span>
+	<span class="mf">0.1</span>
+<span class="n">delta_t</span> <span class="p">[</span><span class="n">parameter</span><span class="p">]:</span>
+	<span class="n">duration</span> <span class="n">of</span> <span class="n">the</span> <span class="n">simulation</span> <span class="n">time</span> <span class="n">step</span>
+	<span class="mf">1.0</span>
+<span class="n">transmission_I</span> <span class="p">[</span><span class="n">parameter</span><span class="p">]:</span>
+	<span class="n">transmission</span> <span class="n">rate</span> <span class="kn">from</span> <span class="nn">infectious</span> <span class="n">animals</span> <span class="p">(</span><span class="o">/</span><span class="n">day</span><span class="p">)</span>
+	<span class="mf">0.5</span>
+<span class="o">------------------------------------------------------------------------</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="changing-parameters">
+<h2>3.4. Changing parameters<a class="headerlink" href="#changing-parameters" title="Permalink to this headline">¶</a></h2>
+<p>Now, to run the model with other parameter values without changing the
+model file, you can specify the new values with option <code class="docutils literal notranslate"><span class="pre">-p</span>
+<span class="pre">PARAM=VALUE</span></code> (one for each parameter to change), for instance:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emulsion run --plot compart_SIR.yaml -p <span class="nv">transmission_I</span><span class="o">=</span><span class="m">0</span>.3 -p <span class="nv">recovery</span><span class="o">=</span><span class="m">0</span>.01
+</pre></div>
+</div>
+<p>which produces:</p>
+<img alt="../_images/SIR2.png" class="align-left" src="../_images/SIR2.png" />
+<img alt="../_images/SIR2b.png" class="align-left" src="../_images/SIR2b.png" />
+</div>
+<div class="section" id="changing-the-model">
+<h2>3.5. Changing the model<a class="headerlink" href="#changing-the-model" title="Permalink to this headline">¶</a></h2>
+<p>To change model structure and assumptions, open the file in a text
+editor. For instance, to change the above SIR model into a SEIRS
+model, open <code class="docutils literal notranslate"><span class="pre">compart_SIR.yaml</span></code> and save it as a new file,
+e.g. <code class="docutils literal notranslate"><span class="pre">compart_SEIRS.yaml</span></code>. You have to add a state (E), modify
+existing transitions and add new ones, and introduce new parameters
+(to represent the incubation and the waning of immunity).</p>
+<ol class="arabic">
+<li><p class="first">Add a latent (or exposed) state: search for the <code class="docutils literal notranslate"><span class="pre">health_state</span></code>
+state machines and change the states and transitions as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span>   <span class="l l-Scalar l-Scalar-Plain">state_machines</span><span class="p p-Indicator">:</span>
+     <span class="l l-Scalar l-Scalar-Plain">health_state</span><span class="p p-Indicator">:</span>
+       <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;The</span><span class="nv"> </span><span class="s">state</span><span class="nv"> </span><span class="s">machine</span><span class="nv"> </span><span class="s">which</span><span class="nv"> </span><span class="s">defines</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">evolution</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">health</span><span class="nv"> </span><span class="s">states&#39;</span>
+       <span class="l l-Scalar l-Scalar-Plain">states</span><span class="p p-Indicator">:</span>
+         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">S</span><span class="p p-Indicator">:</span>
+           <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;Susceptible&#39;</span>
+           <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;suceptible</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">becoming</span><span class="nv"> </span><span class="s">infected&#39;</span>
+           <span class="l l-Scalar l-Scalar-Plain">fillcolor</span><span class="p p-Indicator">:</span> <span class="s">&#39;deepskyblue&#39;</span>
+<span class="hll">         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">E</span><span class="p p-Indicator">:</span>
+</span><span class="hll">           <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;Latent&#39;</span>
+</span><span class="hll">           <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;infected</span><span class="nv"> </span><span class="s">but</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">yet</span><span class="nv"> </span><span class="s">able</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">transmit</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">disease&#39;</span>
+</span><span class="hll">           <span class="l l-Scalar l-Scalar-Plain">fillcolor</span><span class="p p-Indicator">:</span> <span class="s">&#39;orange&#39;</span>
+</span>         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">I</span><span class="p p-Indicator">:</span>
+           <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;Infectious&#39;</span>
+           <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;infected</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">able</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">transmit</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">disease&#39;</span>
+           <span class="l l-Scalar l-Scalar-Plain">fillcolor</span><span class="p p-Indicator">:</span> <span class="s">&#39;red&#39;</span>
+         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">R</span><span class="p p-Indicator">:</span>
+           <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;Resistant&#39;</span>
+           <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;healthy</span><span class="nv"> </span><span class="s">again</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">resistant</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">infection&#39;</span>
+           <span class="l l-Scalar l-Scalar-Plain">fillcolor</span><span class="p p-Indicator">:</span> <span class="s">&#39;limegreen&#39;</span>
+       <span class="l l-Scalar l-Scalar-Plain">transitions</span><span class="p p-Indicator">:</span>
+<span class="hll">         <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">from</span><span class="p p-Indicator">:</span> <span class="nv">S</span><span class="p p-Indicator">,</span> <span class="nv">to</span><span class="p p-Indicator">:</span> <span class="nv">E</span><span class="p p-Indicator">,</span> <span class="nv">rate</span><span class="p p-Indicator">:</span> <span class="s">&#39;force_of_infection&#39;</span><span class="p p-Indicator">}</span>
+</span><span class="hll">         <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">from</span><span class="p p-Indicator">:</span> <span class="nv">E</span><span class="p p-Indicator">,</span> <span class="nv">to</span><span class="p p-Indicator">:</span> <span class="nv">I</span><span class="p p-Indicator">,</span> <span class="nv">rate</span><span class="p p-Indicator">:</span> <span class="s">&#39;1/incubation&#39;</span><span class="p p-Indicator">}</span>
+</span>         <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">from</span><span class="p p-Indicator">:</span> <span class="nv">I</span><span class="p p-Indicator">,</span> <span class="nv">to</span><span class="p p-Indicator">:</span> <span class="nv">R</span><span class="p p-Indicator">,</span> <span class="nv">rate</span><span class="p p-Indicator">:</span> <span class="s">&#39;recovery&#39;</span><span class="p p-Indicator">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Add the waning of immunity simply by adding the following
+transition:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">from</span><span class="p p-Indicator">:</span> <span class="nv">R</span><span class="p p-Indicator">,</span> <span class="nv">to</span><span class="p p-Indicator">:</span> <span class="nv">S</span><span class="p p-Indicator">,</span> <span class="nv">rate</span><span class="p p-Indicator">:</span> <span class="s">&#39;waning&#39;</span><span class="p p-Indicator">}</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Add the new parameters to the <code class="docutils literal notranslate"><span class="pre">parameters</span></code> section:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">parameters</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">...</span>
+  <span class="l l-Scalar l-Scalar-Plain">incubation</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;mean</span><span class="nv"> </span><span class="s">duration</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">latent</span><span class="nv"> </span><span class="s">state</span><span class="nv"> </span><span class="s">(days,</span><span class="nv"> </span><span class="s">assuming</span><span class="nv"> </span><span class="s">exponential</span>
+    <span class="s">distribution</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">durations</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">state)</span>
+    <span class="s">&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+  <span class="l l-Scalar l-Scalar-Plain">waning</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;rate</span><span class="nv"> </span><span class="s">at</span><span class="nv"> </span><span class="s">which</span><span class="nv"> </span><span class="s">individuals</span><span class="nv"> </span><span class="s">lose</span><span class="nv"> </span><span class="s">immunity</span><span class="nv"> </span><span class="s">(/day)&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Do not forget to update the calculation of prevalence, which is an
+expression also defined in the <code class="docutils literal notranslate"><span class="pre">parameters</span></code> section:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">parameters</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">...</span>
+  <span class="l l-Scalar l-Scalar-Plain">&#39;prevalence (%)&#39;</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;proportion</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">infected+infectious</span><span class="nv"> </span><span class="s">individuals&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;100</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">(total_I</span><span class="nv"> </span><span class="s">+</span><span class="nv"> </span><span class="s">total_E)</span><span class="nv"> </span><span class="s">/</span><span class="nv"> </span><span class="s">total_population&#39;</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>You’re done ! Test your model with <code class="docutils literal notranslate"><span class="pre">emulsion</span></code> command as in previous
+examples:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>emulsion run --plot compart_SEIRS.yaml --view-model --silent
+</pre></div>
+</div>
+<p>which produces also a new diagram:</p>
+<div align="left" class="align-left"><div class="graphviz"><object data="../_images/graphviz-ecf80c4c63fd442a022618fa4769d438997e43e4.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;S&quot; [shape=&quot;Mrecord&quot;, label=&quot;S&quot;, tooltip=&quot;S (Susceptible):
+	suceptible of becoming infected&quot;, fillcolor=wheat, style=&quot;filled,rounded&quot;] ;
+	&quot;E&quot; [shape=&quot;Mrecord&quot;, label=&quot;E&quot;, tooltip=&quot;E (Latent):
+	infected but not yet able to transmit the disease&quot;, fillcolor=orange, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; [shape=&quot;Mrecord&quot;, label=&quot;I&quot;, tooltip=&quot;I (Infectious):
+	infected and able to transmit the disease&quot;, fillcolor=maroon, style=&quot;filled,rounded&quot;] ;
+	&quot;R&quot; [shape=&quot;Mrecord&quot;, label=&quot;R&quot;, tooltip=&quot;R (Resistant):
+	healthy again and resistant to infection&quot;, fillcolor=deepskyblue, style=&quot;filled,rounded&quot;] ;
+	&quot;E&quot; -&gt; &quot;I&quot; [label=&quot;rate:     1     
+──────────
+incubation&quot;, labeltooltip=&quot;rate:     1     
+──────────
+incubation&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;I&quot; -&gt; &quot;R&quot; [label=&quot;rate: recovery&quot;, labeltooltip=&quot;recovery [parameter]:
+	recovery rate (/day)                                                    
+	0.1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;R&quot; -&gt; &quot;S&quot; [label=&quot;rate: waning&quot;, labeltooltip=&quot;waning [parameter]:
+	rate at which individuals lose immunity (/day)                          
+	0.05&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;E&quot; [label=&quot;rate: force_of_infection&quot;, labeltooltip=&quot;force_of_infection [parameter]:
+	infection function                                                      
+	transmission_I * total_I / total_herd&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+</div>
+<img alt="../_images/SEIRS.png" class="align-left" src="../_images/SEIRS.png" />
+</div>
+<div class="section" id="going-further">
+<h2>3.6. Going further…<a class="headerlink" href="#going-further" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-check-our-examples admonition">
+<p class="first admonition-title">Check our examples</p>
+<p>EMULSION provides a large number of modelling features. To go
+further on using EMULSION to design models according to your needs
+(even complex), jump to next sections:</p>
+<ul class="last simple">
+<li><a class="reference internal" href="Modelling_principles.html#modelling-principles"><span class="std std-ref">Modelling principles</span></a> to get insights on key EMULSION concepts</li>
+<li><a class="reference internal" href="Modelling_language_basics.html#modelling-language-basics"><span class="std std-ref">Modelling language (basics)</span></a> to have an overview on how
+EMULSION models are structured and to be able to write your first
+models</li>
+<li><a class="reference internal" href="Modelling_language_advanced.html#modelling-language-advanced"><span class="std std-ref">Modelling language (advanced)</span></a> to learn more on EMULSION
+features</li>
+<li><a class="reference internal" href="Feature_examples.html#feature-examples"><span class="std std-ref">Feature examples</span></a> to discover representative
+epidemiological models and how they are handled with EMULSION.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Install.html">2. Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">3. Getting started with EMULSION</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#running-emulsion">3.1. Running EMULSION</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#producing-model-diagrams">3.2. Producing model diagrams</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#viewing-parameters">3.3. Viewing parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#changing-parameters">3.4. Changing parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#changing-the-model">3.5. Changing the model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#going-further">3.6. Going further…</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="Install.html" title="previous chapter">2. Installation</a></li>
+      <li>Next: <a href="Modelling_principles.html" title="next chapter">4. Modelling principles</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/pages/Getting_started.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

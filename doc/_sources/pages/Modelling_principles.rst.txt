@@ -1,0 +1,131 @@
+********************
+Modelling principles
+********************
+
+First, a few words on key concepts used in EMULSION.
+
+Individuals, populations, metapopulations
+*****************************************
+
+EMULSION models can represent the dynamics of several organization
+levels (or scales), through classical paradigms used in epidemiological modelling:
+
+- **Compartment-based models** represent aggregate populations sharing a
+  same state (e.g. same health state, same age group...). Individuals,
+  thus, are not represented explicitly. The population is the mapping
+  between states and the amount of individuals in those states
+  (:numref:`multiscale`, right).
+- **Individual-based models (IBM)**, on the contrary, focus on an
+  explicit depiction of individual specificities (in states, actions,
+  processes...) to account for finer grained assumptions, or represent
+  specific control measures. The population is a collection of
+  individuals (:numref:`multiscale`, left).
+- EMULSION also provides **hybrid models**, which combine the
+  capability of representing detailed information through individuals,
+  with an adaptive grouping of individuals based on their state, to
+  optimize computation (:numref:`multiscale`, center).
+
+
+  In addition, EMULSION can handle **metapopulations**, i.e. a
+  collection of interconnected populations (for instance through
+  movements of individuals, airborne diffusion of pathogens,
+  etc.). Metapopulations can aggregate populations built on
+  compartment-based, individual-based or hybrid modelling paradigms.
+
+
+
+.. _multiscale:
+.. figure:: ../_images/multiscale.jpg
+   :alt: From individuals to aggregate populations in EMULSION
+   :align: center
+
+   From individuals to aggregate populations in EMULSION
+
+
+From flow diagrams to state machines
+************************************
+
+Flow diagrams
+=============
+
+Flow diagrams are a broadly adopted representation in epidemiological
+modelling. Possible states are represented as boxes. Plain arrows
+specify at which rate individuals move from one state to another. For
+instance, a classical flow diagram to represent a SIR model (assuming
+frequency-dependent force of infection) will look as:
+
+.. graphviz:: ../_images/SIR_flow.dot
+   :align: center
+
+
+Under the classical assumption that durations in each state follow an
+exponential distribution, this graphical representation can be easily
+translated into either an ODE system which provides a mathematical
+representation of a deterministic SIR model, or a system of stochastic
+difference equations.
+
+..
+   .. math::
+      \left\lbrace
+	\begin{array}{lcll}
+	  \frac{\mathrm{d}S}{\mathrm{d}t}& = & - \beta \frac{I}{N} S &\\
+	  \frac{\mathrm{d}I}{\mathrm{d}t}& = & - \gamma I & + \beta \frac{I}{N} S\\
+	  \frac{\mathrm{d}R}{\mathrm{d}t}& = & & \gamma I\\
+	\end{array}
+      \right.
+
+However, flow diagrams have two main drawbacks:
+
+1. Dealing with several concerns at the same time (e.g. infectious
+   process and age groups) implies that all states must be subdivided
+   according to each concern (e.g. infected juveniles vs. infected
+   adults), hence a multiplication of boxes and arrows;
+2. With more complex models which do not stand classical assumptions
+   or intend to represent individual-based conditions or actions ,
+   many model features cannot be represented explicitly.
+
+State machines
+==============
+
+State machines (:numref:`state-machine`) is a formalism which
+completely encompasses flow diagrams but can also support more complex
+features while making them appear explicitly. Especially:
+
+- each process involved in the system dynamics (e.g. infection, age
+  groups, demography, treatment protocol, etc.) has to be
+  represented by its own state machine: hence, instead of a large,
+  complicated diagram, EMULSION fosters a separation between concerns
+  through several smaller diagrams
+- state machines represent the dynamics of individual situations
+  instead of the evolution of populations
+- each state can be endowed with additional properties:
+
+  - an explicit duration
+  - actions to perform when entering, staying in, or leaving the state
+
+- each transition is labelled with either a **rate**, or a
+  **probability**, or an absolute **amount** to better control the
+  flow from one state to the other, and can also be associated with:
+
+  - individual conditions to filter which individuals are allowed to
+    cross the transition
+  - temporal conditions to enable/disable transitions at targeted
+    periods of time
+  - escape conditions to allow some individuals to leave their state
+    before the expected duration
+  - actions to perform for individuals crossing the transition
+
+.. _state-machine:
+.. figure:: ../_images/state_machine.jpg
+   :alt: principles of a state machine
+   :align: center
+
+   State machines are similar to flow diagrams but can represent much
+   more explicit details (here all features are represented at the
+   same time)
+
+.. note::
+
+   In a state machine, each possible pathway from one state to another
+   must be represented by one transition, with its own features
+   (rate/proba/amount, conditions, actions).

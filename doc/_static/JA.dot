@@ -1,0 +1,24 @@
+digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style="filled,rounded"];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip="", headtooltip=""];
+
+        	"J" [shape="Mrecord", label="J", tooltip="J (Juvenile):
+	juvenile animals", fillcolor=orange, style="filled,rounded"] ;
+	"A" [shape="Mrecord", label="A", tooltip="A (Adult):
+	adult animals (producing new juveniles)", fillcolor=brown, style="filled,rounded"] ;
+	"D" [shape="Mrecord", label="D", tooltip="D (Dead):
+	compartment to put dead animals", fillcolor=white, style="filled,rounded,dotted"] ;
+	"A" -> "D" [label="rate: death", labeltooltip="death [parameter]:
+	the death rate (/day)                                                   
+	birth", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"A" -> "J" [label="rate: birth", labeltooltip="birth [parameter]:
+	the birth rate (/day)                                                   
+	0.01", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="dashed"];
+	"J" -> "A" [label="rate: maturation", labeltooltip="maturation [parameter]:
+	rate at which juveniles become adults (/day)                            
+	1/20", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+	"J" -> "D" [label="rate: death", labeltooltip="death [parameter]:
+	the death rate (/day)                                                   
+	birth", arrowtail="none", arrowhead="normalnone", dir=both, tooltip="", minlen=3, style="solid"];
+}

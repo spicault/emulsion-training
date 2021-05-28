@@ -1,0 +1,7 @@
+          EmulsionModel "stochastic_compart_SIR_demo_variable"
+              ROLE OF PARAMETERS (AND CURRENT DEFINITION)
+------------------------------------------------------------------------
+beta [parameter]:
+	transmission rate from infectious individuals (/day)
+	beta0 * (1 + sin(time / 20))
+------------------------------------------------------------------------

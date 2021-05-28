@@ -1,0 +1,13 @@
+       EmulsionModel "stochastic_SIR_demo_structured_individuals"
+              ROLE OF PARAMETERS (AND CURRENT DEFINITION)
+------------------------------------------------------------------------
+initial_beta_i [parameter]:
+	initial transmission rate for newly infected individuals
+	0.1 * (0.5 + random_gamma(0.5, 0.5))
+force_infection_juveniles [parameter]:
+	force of infection experienced by juveniles
+	beta_I_J * total_I_J / (total_J + 1e-9) + between_group_factor * beta_I_A * total_I_A / (total_A + 1e-9)
+force_infection_adults [parameter]:
+	force of infection experienced by adults
+	beta_I_A * total_I_A / (total_A + 1e-9) + between_group_factor * beta_I_J * total_I_J / (total_J + 1e-9)
+------------------------------------------------------------------------

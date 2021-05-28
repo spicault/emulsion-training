@@ -1,0 +1,793 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.agent.core package &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="emulsion.agent.managers package" href="emulsion.agent.managers.html" />
+    <link rel="prev" title="emulsion.agent package" href="emulsion.agent.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-emulsion.agent.core">
+<span id="emulsion-agent-core-package"></span><h1>emulsion.agent.core package<a class="headerlink" href="#module-emulsion.agent.core" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-emulsion.agent.core"></span><p><em>Module author: Sébastien Picault &lt;<a class="reference external" href="mailto:sebastien&#46;picault&#37;&#52;&#48;inra&#46;fr">sebastien<span>&#46;</span>picault<span>&#64;</span>inra<span>&#46;</span>fr</a>&gt;</em></p>
+<p>Part of this code was adapted from the PADAWAN framework (S. Picault,
+Univ. Lille).</p>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-emulsion.agent.core.abstract_agent">
+<span id="emulsion-agent-core-abstract-agent-module"></span><h2>emulsion.agent.core.abstract_agent module<a class="headerlink" href="#module-emulsion.agent.core.abstract_agent" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.agent.core.asbtract_agent"></span><p><em>Module author: Sébastien Picault &lt;<a class="reference external" href="mailto:sebastien&#46;picault&#37;&#52;&#48;inra&#46;fr">sebastien<span>&#46;</span>picault<span>&#64;</span>inra<span>&#46;</span>fr</a>&gt;</em></p>
+<p>Part of this code was adapted from the PADAWAN framework (S. Picault,
+Univ. Lille).</p>
+<dl class="class">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent">
+<em class="property">class </em><code class="descclassname">emulsion.agent.core.abstract_agent.</code><code class="descname">AbstractAgent</code><span class="sig-paren">(</span><em>envt=None</em>, <em>content=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The Superclass for any multi-level agent. Due to the MetaAgent
+metaclass, all agents of the same class can be accessed through
+their ID, using the agdict class attribute. Agents are endowed
+with an automatic ID and possibly with a label. Agents also belong
+to families which can be chosen arbitrarily. By default, each
+agent belongs to the family named afer its own class.</p>
+<p>An agent is situated in one or more environments. Besides, agents
+can encapsulate environments where other agents can be
+situated. Agents are also endowed with State Variables, which can
+represent either properties of their own, or properties perceived
+from their inner environment or from the environments where they
+are situated.</p>
+<dl class="method">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>envt=None</em>, <em>content=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate an agent. The instance is automatically added
+to the agentset of its own class. An arbitrary label can be
+specified to give the agent a label (otherwise a label is
+automatically computed using the class name and the agent
+ID).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.apply_initial_prototype">
+<code class="descname">apply_initial_prototype</code><span class="sig-paren">(</span><em>name=None</em>, <em>prototype=None</em>, <em>execute_actions=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent.apply_initial_prototype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.apply_initial_prototype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply prototype to a newly created agent. This function is called
+by <cite>new_atom</cite> in <cite>MultiProcessManager</cite> and redefined to do nothing in
+this class, in order to ensure that the prototype of a level is
+applied before creating entities for the sublevels.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.apply_prototype">
+<code class="descname">apply_prototype</code><span class="sig-paren">(</span><em>name=None</em>, <em>prototype=None</em>, <em>execute_actions=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent.apply_prototype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.apply_prototype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the prototype with the specified name to this agent. A
+prototype is basically a dictionary of statevars associated to
+values. Thus this method changes specific statevars to new
+values as required in the prototype. Other statevars are kept
+unchanged. If a statevar was no amongst those of this agent,
+it is added. When statevars hold the state of a state machine,
+the state is changed with correct initialization of
+corresponding attributes (mainly _time_entered) ; if
+execute_actions is True, on_enter/on_exit actions are
+performed.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.change_state">
+<code class="descname">change_state</code><span class="sig-paren">(</span><em>machine_name</em>, <em>new_state</em>, <em>do_actions=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent.change_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.change_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the state of this agent for the specified state machine to
+<cite>new_state</cite>. The <cite>_time_entered_MACHINE</cite> value for this state machine
+is initialized. If do_actions is True, perform the actions to
+do on_exit from the previous state (if any) and those to do
+on_enter in the new state (if any).</p>
+<p>TAG: USER?</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.delta_t">
+<code class="descname">delta_t</code><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.delta_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>A shortcut to <cite>self.model.delta_t</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.die">
+<code class="descname">die</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent.die"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.die" title="Permalink to this definition">¶</a></dt>
+<dd><p>Operation performed when the agent is removed from the
+simulation. Recursively destroy agents contained in the
+current agent if any, and remove the current agent from the
+agdict attribute of its class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.duration_in_current_state">
+<code class="descname">duration_in_current_state</code><span class="sig-paren">(</span><em>machine_name: str</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent.duration_in_current_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.duration_in_current_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the duration (in time units) this agent has spent in the
+current state of the specified state machine (<em>machine_name</em>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>machine_name</strong> – the name of the state machine for which
+the duration in the current state must be computed</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A duration (expressed in time units) corresponding to the
+duration spent in the current state for this state machine.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['AbstractAgent'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.from_dict">
+<em class="property">classmethod </em><code class="descname">from_dict</code><span class="sig-paren">(</span><em>dct</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent.from_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate an agent using the specified dictionary.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.get_information">
+<code class="descname">get_information</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent.get_information"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.get_information" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value corresponding to the specified name in the
+agent. This value can be stored either as an attribute or a
+property-like descriptor (and thus accessed through an
+attribute-like syntax), or as a State Variable using a
+StateVarDict attribute named <code class="docutils literal notranslate"><span class="pre">statevars</span></code>.</p>
+<p>Example:
+class Cow(AtomAgent):</p>
+<blockquote>
+<div><p>…
+&#64;property
+def age(self):</p>
+<blockquote>
+<div>return self._age</div></blockquote>
+</div></blockquote>
+<p>c = Cow()
+c.get_information(‘age’)
+# -&gt; access through property ‘age’
+c.get_information(‘health_state’)
+# -&gt; access through statevar ‘health_state’ (present in any Unit),
+# unless a ‘health_state’ attribute or property is explicitly
+# redefined to override the state variable</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.get_model_value">
+<code class="descname">get_model_value</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent.get_model_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.get_model_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value corresponding to the specified name in the model
+of the agent. If the name refers to a function, apply this
+function to the agent.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.init_time_entered">
+<code class="descname">init_time_entered</code><span class="sig-paren">(</span><em>machine_name</em>, <em>advance=0</em>, <em>nb_timesteps=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent.init_time_entered"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.init_time_entered" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the time step value when this agent is entering a new
+state of the specified state machine. A (positive) <cite>advance</cite>
+value can be provided to mimick an earlier entering in the
+state. By default, a <cite>_time_to_exit</cite> value is set according to
+the value of <cite>nb_timesteps</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', 'from_dict', '_register_instance', '__init__', '_reset_mbr_cache', '__hash__', '__len__', '__str__', '__repr__', '__eq__', '__lt__', 'get_model_value', 'delta_t', 'time', 'die', 'get_information', 'set_information', 'init_time_entered', 'change_state', 'update_time_to_exit', 'duration_in_current_state', 'reapply_prototype', 'apply_prototype', 'apply_initial_prototype', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.reapply_prototype">
+<code class="descname">reapply_prototype</code><span class="sig-paren">(</span><em>execute_actions=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent.reapply_prototype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.reapply_prototype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reapply to self the last prototype that was used on this agent. The
+whole definition (not the name) of the prototype to apply is
+stored in attribute <code class="docutils literal notranslate"><span class="pre">_last_prototype</span></code>. Use e.g. to apply a
+prototype first without actions, then reapply it with actions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.set_information">
+<code class="descname">set_information</code><span class="sig-paren">(</span><em>name</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent.set_information"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.set_information" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the specified value for the statevar/attribute.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.time">
+<code class="descname">time</code><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.time" title="Permalink to this definition">¶</a></dt>
+<dd><p>The time elapsed since the beginning of simulation (in time
+units).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.abstract_agent.AbstractAgent.update_time_to_exit">
+<code class="descname">update_time_to_exit</code><span class="sig-paren">(</span><em>machine_name</em>, <em>duration</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/abstract_agent.html#AbstractAgent.update_time_to_exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.abstract_agent.AbstractAgent.update_time_to_exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the <em>duration</em> this agent is expected to stay in the current
+state of the specified state machine (<em>machine_name</em>).</p>
+<p>The time step value after which the agent is allowed to leave
+the current state is stored in a statevar called
+<code class="docutils literal notranslate"><span class="pre">_time_to_exit_machine_name</span></code>, is computed from the
+current time (<code class="docutils literal notranslate"><span class="pre">step</span></code>) plus the <em>duration</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>machine_name</strong> (<em>str</em>) – name of the state machine for which
+the duration in the current state must be updated</li>
+<li><strong>duration</strong> (<em>datetime.timedelta</em>) – the new duration for the
+agent to stay in the current state, calculated from the
+current time in the simulation</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.core.emulsion_agent">
+<span id="emulsion-agent-core-emulsion-agent-module"></span><h2>emulsion.agent.core.emulsion_agent module<a class="headerlink" href="#module-emulsion.agent.core.emulsion_agent" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.agent.core.emulsion_agent"></span><p><em>Module author: Sébastien Picault &lt;<a class="reference external" href="mailto:sebastien&#46;picault&#37;&#52;&#48;inra&#46;fr">sebastien<span>&#46;</span>picault<span>&#64;</span>inra<span>&#46;</span>fr</a>&gt;</em></p>
+<p>Part of this code was adapted from the PADAWAN framework (S. Picault,
+Univ. Lille).</p>
+<dl class="class">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent">
+<em class="property">class </em><code class="descclassname">emulsion.agent.core.emulsion_agent.</code><code class="descname">EmulsionAgent</code><span class="sig-paren">(</span><em>model=None</em>, <em>level=None</em>, <em>name=None</em>, <em>host=None</em>, <em>simulation=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="emulsion_for_modellers.html#emulsion.agent.core.abstract_agent.AbstractAgent" title="emulsion.agent.core.abstract_agent.AbstractAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.core.abstract_agent.AbstractAgent</span></code></a></p>
+<p>The EmulsionAgent is the base class for multi-level
+epidemiologic agents. An EmulsionAgent can represent any entity
+involved in the epidemiologic model (individual, compartment,
+herd, [meta]population, etc.).</p>
+<p>Each agent contains an exchange box (in &amp; out) which is composed
+of a list of messages. A message is generally a dictionary of
+Source/Destination (In/Out) and content of exchange with
+Source/Destination agent.</p>
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>model=None</em>, <em>level=None</em>, <em>name=None</em>, <em>host=None</em>, <em>simulation=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the unit with a health state and a name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.activate">
+<code class="descname">activate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.activate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.activate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make this agent active, i.e. able to perform its processes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.add_inbox">
+<code class="descname">add_inbox</code><span class="sig-paren">(</span><em>messages=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.add_inbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.add_inbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified list of messages in the inbox.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.add_outbox">
+<code class="descname">add_outbox</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.add_outbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.add_outbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Appendd a message to the outbox.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.checkout_inbox">
+<code class="descname">checkout_inbox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.checkout_inbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.checkout_inbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pick up agent’s inbox content.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.clean_inbox">
+<code class="descname">clean_inbox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.clean_inbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.clean_inbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove non sticky messages from the inbox.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.deactivate">
+<code class="descname">deactivate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.deactivate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.deactivate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make this agent inactive, i.e. unable to perform its processes</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.detach_model">
+<code class="descname">detach_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.detach_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.detach_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the reference to the model in all agents. Required before
+serialization.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.do_edge_actions">
+<code class="descname">do_edge_actions</code><span class="sig-paren">(</span><em>actions=None</em>, <em>population=None</em>, <em>agents=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.do_edge_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.do_edge_actions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the actions associated to a transition between
+states. If the unit is a ViewCompartment, actions are actually
+performed by each unit of the specified agents list, in
+turn. Otherwise, the actions are performed according to the
+population, which is expected to be a number.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.do_state_actions">
+<code class="descname">do_state_actions</code><span class="sig-paren">(</span><em>event</em>, <em>state_machine</em>, <em>state_name</em>, <em>population=None</em>, <em>agents=None</em>, <em>**_</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.do_state_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.do_state_actions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the actions associated to the current state. If the
+unit is a ViewAgent, actions are actually performed by each
+unit of the specified agents list, in turn. Otherwise, the
+actions are performed according to the population, which is
+expected to be a number.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.evaluate_condition">
+<code class="descname">evaluate_condition</code><span class="sig-paren">(</span><em>condition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.evaluate_condition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.evaluate_condition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the content (tuple either (‘population’, qty) or
+(‘agents’, list)) if the condition is fulfilled, () otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.evaluate_event">
+<code class="descname">evaluate_event</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.evaluate_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.evaluate_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate if the specified event name is fulfilled, using a
+calendar. The calendar is determined dynamically according to
+the name of the event.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>machine=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is aimed at defining what has systematically to
+be done in the unit at each time step (e.g. age change…). It
+has to be overriden if needed in subclasses.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['EmulsionAgent'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.get_content">
+<code class="descname">get_content</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.get_content"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.get_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return either the population (number) of the current unit,
+or the list of agents contained in the current unit. The
+output is a tuple with either (‘population’, qty) or (‘agents’, list).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.get_host">
+<code class="descname">get_host</code><span class="sig-paren">(</span><em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.get_host"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.get_host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the host of the current unit.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.get_outbox">
+<code class="descname">get_outbox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.get_outbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.get_outbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the content of the outbox.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.is_in_state">
+<code class="descname">is_in_state</code><span class="sig-paren">(</span><em>state_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.is_in_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.is_in_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate if the agent is in the specified state. The state name is
+expected to be a valid state of one of the state machines. If
+so, the name of the state machine is expected to be one of the
+statevars of the agent.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.log_path">
+<code class="descname">log_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.log_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.log_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the path to the log file for the current simulation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.matches_prototype">
+<code class="descname">matches_prototype</code><span class="sig-paren">(</span><em>prototype</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.matches_prototype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.matches_prototype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test wether or not this agent corresponds to specified
+prototype. Return True if agent owns all statevars mentioned
+in the prototype, with matching values. Return False
+otherwise.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', 'matches_prototype', 'activate', 'deactivate', 'detach_model', 'upper_level', 'top_level', 'log_path', 'name', '__repr__', 'evolve', 'update_data_based_parameters', 'get_host', 'get_content', 'do_state_actions', 'do_edge_actions', 'next_states_from', 'production_from', '_compute_production', '_compute_values_for_unique_population', '_compute_values_for_multiple_populations', 'shift_times_to_exit', 'evaluate_condition', 'evaluate_event', 'is_in_state', 'get_outbox', 'add_outbox', 'reset_outbox', 'add_inbox', 'clean_inbox', 'checkout_inbox', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.name">
+<code class="descname">name</code><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the name of the unit. If no name was provided during
+instantiation,  the class name is returned.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.next_states_from">
+<code class="descname">next_states_from</code><span class="sig-paren">(</span><em>initial_state</em>, <em>state_machine</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.next_states_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.next_states_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of tuples composed of:</p>
+<ul class="simple">
+<li>each of the possible states reachable from the specified</li>
+</ul>
+<p>initial state (some depending on a condition)</p>
+<ul class="simple">
+<li>the transition rate, probability or amount to each state in</li>
+</ul>
+<p>the specified state_machine (possible clauses: ‘rate’,
+‘proba’, ‘amount’, ‘amount-all-but’ with the actual value)</p>
+<ul class="simple">
+<li>a tuple indicating who can cross the edge, depending on</li>
+</ul>
+<p>conditions, and if related to an escape edge for compartment-based models
+(either (‘population’, qty, esc) or (‘agents’, list, esc) where esc = True
+if CBM and escape edge, False if CBM and regular edge, None otherwise)</p>
+<ul class="simple">
+<li>the list of actions to perform when crossing the edge (if</li>
+</ul>
+<p>any).</p>
+<p>The conditions, rates and probabilities may depend on the state
+variables or properties of the current unit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.production_from">
+<code class="descname">production_from</code><span class="sig-paren">(</span><em>initial_state</em>, <em>state_machine</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.production_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.production_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of tuples composed of:</p>
+<ul class="simple">
+<li>each of the possible states that can be produced from the specified</li>
+</ul>
+<p>initial state (some depending on a condition)</p>
+<ul class="simple">
+<li>the transition rate, probability or amount to each state in</li>
+</ul>
+<p>the specified state_machine (possible clauses: ‘rate’,
+‘proba’, ‘amount’, ‘amount-all-but’ with the actual value)</p>
+<ul class="simple">
+<li>a tuple indicating who can produce cross the edge, depending on</li>
+</ul>
+<p>conditions (either (‘population’, qty) or (‘agents’, list))</p>
+<ul class="simple">
+<li>the prototypes of agents produced through the edge (if</li>
+</ul>
+<p>any).</p>
+<p>The conditions, rates and probabilities may depend on the state
+variables or properties of the current unit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.reset_outbox">
+<code class="descname">reset_outbox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.reset_outbox"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.reset_outbox" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the content of the outbox.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.shift_times_to_exit">
+<code class="descname">shift_times_to_exit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.shift_times_to_exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.shift_times_to_exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update times to exit at the end of the current time step to make populations remaining at current time step available for next time step. USED ONLY IN COMPARTMENTS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.top_level">
+<code class="descname">top_level</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.top_level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.top_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the highest level used in the simulation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.update_data_based_parameters">
+<code class="descname">update_data_based_parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.update_data_based_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.update_data_based_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method is used to update statevars from the current level
+according to data stored in a CSV file. This file is loaded
+once when the simulations begin. The update takes place at
+agent initialization and at each time step.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.emulsion_agent.EmulsionAgent.upper_level">
+<code class="descname">upper_level</code><span class="sig-paren">(</span><em>init=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/emulsion_agent.html#EmulsionAgent.upper_level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent.upper_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the ‘upper level’ for this agent, i.e. the first host with
+a not-None level attribute.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.agent.core.groups">
+<span id="emulsion-agent-core-groups-module"></span><h2>emulsion.agent.core.groups module<a class="headerlink" href="#module-emulsion.agent.core.groups" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.agent.core.groups"></span><p><em>Module author: Sébastien Picault &lt;<a class="reference external" href="mailto:sebastien&#46;picault&#37;&#52;&#48;inra&#46;fr">sebastien<span>&#46;</span>picault<span>&#64;</span>inra<span>&#46;</span>fr</a>&gt;</em></p>
+<p>Part of this code was adapted from the PADAWAN framework (S. Picault,
+Univ. Lille).</p>
+<dl class="class">
+<dt id="emulsion.agent.core.groups.Aggregation">
+<em class="property">class </em><code class="descclassname">emulsion.agent.core.groups.</code><code class="descname">Aggregation</code><span class="sig-paren">(</span><em>recursive=True</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/groups.html#Aggregation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.groups.Aggregation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.core.groups.GroupAgent" title="emulsion.agent.core.groups.GroupAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.core.groups.GroupAgent</span></code></a></p>
+<p>An Aggregation is aimed at grouping agents from the underlying
+level. Thus, aggregate information such as the total number of
+agents in the compartment (population) is calculated from the
+actual content of the compartment. The evolution of a
+ViewCompartment, by default, consists in making the units
+contained in the compartment evolve themselves, unless
+<cite>recursive=False</cite> is specified during instantiation.</p>
+<dl class="method">
+<dt id="emulsion.agent.core.groups.Aggregation.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>recursive=True</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/groups.html#Aggregation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.groups.Aggregation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the unit with a health state and a name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.groups.Aggregation.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/groups.html#Aggregation.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.groups.Aggregation.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified population to the current compartment.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.groups.Aggregation.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.core.groups.Aggregation.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.groups.Aggregation.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.core.groups.Aggregation.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.groups.Aggregation.detach_model">
+<code class="descname">detach_model</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/groups.html#Aggregation.detach_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.groups.Aggregation.detach_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively remove the reference to the model in all
+agents. Required before serialization.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.groups.Aggregation.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>machine=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/groups.html#Aggregation.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.groups.Aggregation.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ask each unit in the current compartment to make its content evolve
+according to its own capabilities. A specific state machine
+can be specified if needed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.groups.Aggregation.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['Aggregation'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.core.groups.Aggregation.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.groups.Aggregation.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', 'population', 'add', 'remove', '_base_move', '__iter__', 'evolve', 'detach_model', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.core.groups.Aggregation.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.groups.Aggregation.population">
+<code class="descname">population</code><a class="headerlink" href="#emulsion.agent.core.groups.Aggregation.population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the total population of the compartment. It is
+calculated either using a true ‘population’ statevar if any,
+or as the sum of the population of each unit contained in the
+compartment.</p>
+<p>TAG: USER</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.groups.Aggregation.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/groups.html#Aggregation.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.groups.Aggregation.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the specified population from the current
+compartment.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.agent.core.groups.GroupAgent">
+<em class="property">class </em><code class="descclassname">emulsion.agent.core.groups.</code><code class="descname">GroupAgent</code><span class="sig-paren">(</span><em>keys=()</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/groups.html#GroupAgent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.groups.GroupAgent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.agent.core.emulsion_agent.EmulsionAgent" title="emulsion.agent.core.emulsion_agent.EmulsionAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.agent.core.emulsion_agent.EmulsionAgent</span></code></a></p>
+<p>A GroupAgent is aimed at representing a group of agents. The
+underlying level may be either explicitly represented (using a
+ViewCompartment) or aggregated (using an Compartment). Each
+compartment is associated with keys, i.e. a tuple of state
+variables (possibly empty) which play a crucial role in this
+compartment.</p>
+<dl class="method">
+<dt id="emulsion.agent.core.groups.GroupAgent.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>keys=()</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/groups.html#GroupAgent.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.groups.GroupAgent.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the unit with a health state and a name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.groups.GroupAgent.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/groups.html#GroupAgent.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.groups.GroupAgent.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified population to the current compartment.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.groups.GroupAgent.agcount">
+<code class="descname">agcount</code><em class="property"> = 0</em><a class="headerlink" href="#emulsion.agent.core.groups.GroupAgent.agcount" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.groups.GroupAgent.agdict">
+<code class="descname">agdict</code><em class="property"> = {}</em><a class="headerlink" href="#emulsion.agent.core.groups.GroupAgent.agdict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.groups.GroupAgent.families">
+<code class="descname">families</code><em class="property"> = SortedSet(['GroupAgent'], key=None, load=1000)</em><a class="headerlink" href="#emulsion.agent.core.groups.GroupAgent.families" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.agent.core.groups.GroupAgent.members">
+<code class="descname">members</code><em class="property"> = ('agcount', 'agdict', 'families', '__module__', '__qualname__', '__doc__', '__init__', 'add', 'remove', '_base_move', '_before_move', '_after_move', 'move_to', '__classcell__')</em><a class="headerlink" href="#emulsion.agent.core.groups.GroupAgent.members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.groups.GroupAgent.move_to">
+<code class="descname">move_to</code><span class="sig-paren">(</span><em>target_group</em>, <em>state_machine=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/groups.html#GroupAgent.move_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.groups.GroupAgent.move_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the specified population from the current group to the target group.
+If a state machine is provided, executes the corresponding actions when
+entering/exiting nodes and crossing edges if needed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.agent.core.groups.GroupAgent.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/agent/core/groups.html#GroupAgent.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.agent.core.groups.GroupAgent.remove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the specified population from the current
+compartment.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="emulsion.html">11. emulsion package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="emulsion.html#subpackages">11.1. Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="emulsion.agent.html">emulsion.agent package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emulsion.model.html">emulsion.model package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emulsion.tools.html">emulsion.tools package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.html#submodules">11.2. Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.html#module-emulsion.init_emulsion">11.3. emulsion.init_emulsion module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="emulsion.html">11. emulsion package</a><ul>
+  <li><a href="emulsion.agent.html">emulsion.agent package</a><ul>
+      <li>Previous: <a href="emulsion.agent.html" title="previous chapter">emulsion.agent package</a></li>
+      <li>Next: <a href="emulsion.agent.managers.html" title="next chapter">emulsion.agent.managers package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/emulsion.agent.core.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,1244 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>7. Feature examples &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="../_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="8. Release notes" href="Release_notes.html" />
+    <link rel="prev" title="6. Modelling language (advanced)" href="Modelling_language_advanced.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="feature-examples">
+<h1>7. Feature examples<a class="headerlink" href="#feature-examples" title="Permalink to this headline">¶</a></h1>
+<p>Directory <code class="docutils literal notranslate"><span class="pre">models/features</span></code> provides a collection of EMULSION models
+which demonstrate EMULSION features in their simplest usage.</p>
+<div class="section" id="sir-model">
+<h2>7.1. SIR model<a class="headerlink" href="#sir-model" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li>compartment-based: <a class="reference external" href="../_static/models/features/compart_SIR.yaml">compart_SIR.yaml</a></li>
+<li>individual-based: <a class="reference external" href="../_static/models/features/IBM_SIR.yaml">IBM_SIR.yaml</a></li>
+<li>hybrid model: <a class="reference external" href="../_static/models/features/hybrid_SIR.yaml">hybrid_SIR.yaml</a></li>
+</ul>
+</div>
+<p><strong>Move cursor over diagram states and transitions to see the tooltip</strong></p>
+<div class="graphviz"><object data="../_images/graphviz-54bc3f5df3f3f6a9791971df764f869f516cfd65.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;S&quot; [shape=&quot;Mrecord&quot;, label=&quot;S&quot;, tooltip=&quot;S (Susceptible):
+	suceptible of becoming infected&quot;, fillcolor=wheat, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; [shape=&quot;Mrecord&quot;, label=&quot;I&quot;, tooltip=&quot;I (Infectious):
+	infected and able to transmit the disease&quot;, fillcolor=maroon, style=&quot;filled,rounded&quot;] ;
+	&quot;R&quot; [shape=&quot;Mrecord&quot;, label=&quot;R&quot;, tooltip=&quot;R (Resistant):
+	healthy again and resistant to infection&quot;, fillcolor=deepskyblue, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; -&gt; &quot;R&quot; [label=&quot;rate: recovery&quot;, labeltooltip=&quot;recovery [parameter]:
+	recovery rate (/day)                                                    
+	0.1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;I&quot; [label=&quot;rate: force_of_infection&quot;, labeltooltip=&quot;force_of_infection [parameter]:
+	infection function                                                      
+	transmission_I * total_I / total_herd&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Variables <code class="docutils literal notranslate"><span class="pre">total_I</span></code> and <code class="docutils literal notranslate"><span class="pre">total_population</span></code> used in force of infection
+(see tooltip when moving your mouse above <code class="docutils literal notranslate"><span class="pre">force_of_infection</span></code> in
+the diagram above) are computed automatically because of the
+existence of a level <code class="docutils literal notranslate"><span class="pre">population</span></code> and a state <code class="docutils literal notranslate"><span class="pre">I</span></code>.</p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_basics.html#model-structure"><span class="std std-ref">Model structure</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#compartments-ibm-or-hybrid-models"><span class="std std-ref">Compartments, IBM or hybrid models?</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#automatic-variables"><span class="std std-ref">Automatic variables</span></a></p>
+</div>
+</div>
+<div class="section" id="seirs-model">
+<h2>7.2. SEIRS model<a class="headerlink" href="#seirs-model" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/compart_SEIRS.yaml">compart_SEIRS.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/IBM_SEIRS.yaml">IBM_SEIRS.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/hybrid_SEIRS.yaml">hybrid_SEIRS.yaml</a></li>
+</ul>
+</div>
+<div class="graphviz"><object data="../_images/graphviz-26904ca62a026e3af5ee369eec9587226844472d.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+          charset=&quot;utf-8&quot;
+        	rankdir=LR;
+        
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;S&quot; [shape=&quot;Mrecord&quot;, label=&quot;S&quot;, tooltip=&quot;S (Susceptible):
+	suceptible of becoming infected&quot;, fillcolor=&quot;wheat&quot;, style=&quot;filled,rounded&quot;] ;
+	&quot;E&quot; [shape=&quot;Mrecord&quot;, label=&quot;E&quot;, tooltip=&quot;E (Latent):
+	infected but not yet able to transmit the disease&quot;, fillcolor=&quot;orange&quot;, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; [shape=&quot;Mrecord&quot;, label=&quot;I&quot;, tooltip=&quot;I (Infectious):
+	infected and able to transmit the disease&quot;, fillcolor=&quot;maroon&quot;, style=&quot;filled,rounded&quot;] ;
+	&quot;R&quot; [shape=&quot;Mrecord&quot;, label=&quot;R&quot;, tooltip=&quot;R (Resistant):
+	healthy again and resistant to infection&quot;, fillcolor=&quot;deepskyblue&quot;, style=&quot;filled,rounded&quot;] ;
+	&quot;E&quot; -&gt; &quot;I&quot; [label=&quot;rate: 1/incubation&quot;, labeltooltip=&quot;rate: 1/incubation&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;I&quot; -&gt; &quot;R&quot; [label=&quot;rate: recovery&quot;, labeltooltip=&quot;recovery [parameter]:
+	recovery rate (/day)                                                    
+	0.1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;R&quot; -&gt; &quot;S&quot; [label=&quot;rate: waning&quot;, labeltooltip=&quot;waning [parameter]:
+	rate at which individuals lose immunity (/day)                          
+	0.05&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;E&quot; [label=&quot;rate: force_of_infection&quot;, labeltooltip=&quot;force_of_infection [parameter]:
+	infection function                                                      
+	transmission_I * total_I / total_population&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+<p>Differences with previous model (SIR):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">state_machines</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">health_state</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">states</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="hll">      <span class="l l-Scalar l-Scalar-Plain">- E</span><span class="p p-Indicator">:</span>
+</span>          <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;Latent&#39;</span>
+          <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;infected</span><span class="nv"> </span><span class="s">but</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">yet</span><span class="nv"> </span><span class="s">able</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">transmit</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">disease&#39;</span>
+          <span class="l l-Scalar l-Scalar-Plain">fillcolor</span><span class="p p-Indicator">:</span> <span class="s">&#39;orange&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">transitions</span><span class="p p-Indicator">:</span>
+<span class="hll">      <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">from</span><span class="p p-Indicator">:</span> <span class="nv">S</span><span class="p p-Indicator">,</span> <span class="nv">to</span><span class="p p-Indicator">:</span> <span class="nv">E</span><span class="p p-Indicator">,</span> <span class="nv">rate</span><span class="p p-Indicator">:</span> <span class="s">&#39;force_of_infection&#39;</span><span class="p p-Indicator">}</span>
+</span><span class="hll">      <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">from</span><span class="p p-Indicator">:</span> <span class="nv">E</span><span class="p p-Indicator">,</span> <span class="nv">to</span><span class="p p-Indicator">:</span> <span class="nv">I</span><span class="p p-Indicator">,</span> <span class="nv">rate</span><span class="p p-Indicator">:</span> <span class="s">&#39;1/incubation&#39;</span><span class="p p-Indicator">}</span>
+</span>      <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">from</span><span class="p p-Indicator">:</span> <span class="nv">I</span><span class="p p-Indicator">,</span> <span class="nv">to</span><span class="p p-Indicator">:</span> <span class="nv">R</span><span class="p p-Indicator">,</span> <span class="nv">rate</span><span class="p p-Indicator">:</span> <span class="s">&#39;recovery&#39;</span><span class="p p-Indicator">}</span>
+<span class="hll">      <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">from</span><span class="p p-Indicator">:</span> <span class="nv">R</span><span class="p p-Indicator">,</span> <span class="nv">to</span><span class="p p-Indicator">:</span> <span class="nv">S</span><span class="p p-Indicator">,</span> <span class="nv">rate</span><span class="p p-Indicator">:</span> <span class="s">&#39;waning&#39;</span><span class="p p-Indicator">}</span>
+</span><span class="nn">...</span>
+<span class="l l-Scalar l-Scalar-Plain">parameters</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">...</span>
+    <span class="l l-Scalar l-Scalar-Plain">incubation</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;mean</span><span class="nv"> </span><span class="s">duration</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">latent</span><span class="nv"> </span><span class="s">state</span><span class="nv"> </span><span class="s">(days,</span><span class="nv"> </span><span class="s">assuming</span><span class="nv"> </span><span class="s">exponential</span>
+      <span class="s">distribution</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">durations</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">state)&#39;</span>
+      <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+    <span class="l l-Scalar l-Scalar-Plain">waning</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;rate</span><span class="nv"> </span><span class="s">at</span><span class="nv"> </span><span class="s">which</span><span class="nv"> </span><span class="s">individuals</span><span class="nv"> </span><span class="s">lose</span><span class="nv"> </span><span class="s">immunity</span><span class="nv"> </span><span class="s">(/day)&#39;</span>
+      <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
+    <span class="s">&#39;prevalence</span><span class="nv"> </span><span class="s">(%)&#39;</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;proportion</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">infected+infectious</span><span class="nv"> </span><span class="s">individuals&#39;</span>
+      <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;100</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">(total_I</span><span class="nv"> </span><span class="s">+</span><span class="nv"> </span><span class="s">total_E)</span><span class="nv"> </span><span class="s">/</span><span class="nv"> </span><span class="s">total_population&#39;</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_basics.html#model-structure"><span class="std std-ref">Model structure</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#compartments-ibm-or-hybrid-models"><span class="std std-ref">Compartments, IBM or hybrid models?</span></a></p>
+</div>
+</div>
+<div class="section" id="sirs-model-with-periodic-external-risk">
+<h2>7.3. SIRS model with periodic external risk<a class="headerlink" href="#sirs-model-with-periodic-external-risk" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/compart_SIRS_periodic_risk.yaml">compart_SIRS_periodic_risk.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/hybrid_SIRS_periodic_risk.yaml">hybrid_SIRS_periodic_risk.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/IBM_SIRS_periodic_risk.yaml">IBM_SIRS_periodic_risk.yaml</a></li>
+</ul>
+</div>
+<a class="reference internal image-reference" href="../_images/SIRS1.png"><img alt="../_images/SIRS1.png" src="../_images/SIRS1.png" style="width: 90%;" /></a>
+<a class="reference internal image-reference" href="../_images/SIRS2.png"><img alt="../_images/SIRS2.png" src="../_images/SIRS2.png" style="width: 90%;" /></a>
+<div class="graphviz"><object data="../_images/graphviz-d3a6fd6c0e7cbef6e491020f6580a2a9a13dea34.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;S&quot; [shape=&quot;Mrecord&quot;, label=&quot;S&quot;, tooltip=&quot;S (Susceptible):
+	suceptible of becoming infected&quot;, fillcolor=wheat, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; [shape=&quot;Mrecord&quot;, label=&quot;I&quot;, tooltip=&quot;I (Infectious):
+	infected and able to transmit the disease&quot;, fillcolor=maroon, style=&quot;filled,rounded&quot;] ;
+	&quot;R&quot; [shape=&quot;Mrecord&quot;, label=&quot;R&quot;, tooltip=&quot;R (Resistant):
+	healthy again and resistant to infection&quot;, fillcolor=deepskyblue, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; -&gt; &quot;R&quot; [label=&quot;rate: recovery&quot;, labeltooltip=&quot;recovery [parameter]:
+	recovery rate (/day)                                                    
+	0.1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;R&quot; -&gt; &quot;S&quot; [label=&quot;rate: waning&quot;, labeltooltip=&quot;waning [parameter]:
+	rate at which individuals lose immunity (/day)                          
+	0.01&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;I&quot; [label=&quot;rate: force_of_infection&quot;, labeltooltip=&quot;force_of_infection [parameter]:
+	infection function                                                      
+	 (external_risk + transmission_I * total_I) / total_herd&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last">
+<li><p class="first">this model is initialized with a healthy population only</p>
+</li>
+<li><p class="first">external risk is modelled through a periodic forcing variable:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transmission_I</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">sin</span><span class="p">(</span><span class="n">time</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">/</span> <span class="n">external_risk_period</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">time</span></code> represents the time elapsed since the beginning of
+simulation (in time units - here days)</p>
+</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_advanced.html#automatic-variables"><span class="std std-ref">Automatic variables</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#built-in-functions"><span class="std std-ref">Built-in functions</span></a></p>
+</div>
+</div>
+<div class="section" id="custom-state-durations">
+<h2>7.4. Custom state durations<a class="headerlink" href="#custom-state-durations" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/compart_duration.yaml">compart_duration.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/hybrid_duration.yaml">hybrid_duration.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/IBM_duration.yaml">IBM_duration.yaml</a></li>
+</ul>
+</div>
+<a class="reference internal image-reference" href="../_images/duration.png"><img alt="../_images/duration.png" src="../_images/duration.png" style="width: 90%;" /></a>
+<div class="graphviz"><object data="../_images/graphviz-d6f99e3132e443b3fcf2f3d1b25f24290ce84095.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;N&quot; [shape=&quot;Mrecord&quot;, label=&quot;N&amp;nbsp;&amp;#9719;&quot;, tooltip=&quot;N (Newborn):
+	very young animals&quot;, fillcolor=deepskyblue, style=&quot;filled,rounded,bold&quot;] ;
+	&quot;J&quot; [shape=&quot;Mrecord&quot;, label=&quot;J&amp;nbsp;&amp;#9719;&quot;, tooltip=&quot;J (Juvenile):
+	juvenile animals&quot;, fillcolor=orange, style=&quot;filled,rounded&quot;] ;
+	&quot;A&quot; [shape=&quot;Mrecord&quot;, label=&quot;A&quot;, tooltip=&quot;A (Adult):
+	adult animals (producing new juveniles)&quot;, fillcolor=brown, style=&quot;filled,rounded&quot;] ;
+	&quot;J&quot; -&gt; &quot;A&quot; [label=&quot;proba: 1&quot;, labeltooltip=&quot;proba: 1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;N&quot; -&gt; &quot;J&quot; [label=&quot;proba: 1&quot;, labeltooltip=&quot;proba: 1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">state_machines</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">health_state</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">states</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">N</span><span class="p p-Indicator">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;Newborn&#39;</span>
+<span class="hll">          <span class="l l-Scalar l-Scalar-Plain">duration</span><span class="p p-Indicator">:</span> <span class="s">&#39;juvenile_age&#39;</span>
+</span>      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">J</span><span class="p p-Indicator">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;Juvenile&#39;</span>
+<span class="hll">          <span class="l l-Scalar l-Scalar-Plain">duration</span><span class="p p-Indicator">:</span> <span class="s">&#39;adult_age</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">juvenile_age&#39;</span>
+</span>      <span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="l l-Scalar l-Scalar-Plain">parameters</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">juvenile_age</span><span class="p p-Indicator">:</span>
+<span class="hll">    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">20</span>
+</span>  <span class="l l-Scalar l-Scalar-Plain">adult_age</span><span class="p p-Indicator">:</span>
+<span class="hll">    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;random_uniform(50,</span><span class="nv"> </span><span class="s">70)&#39;</span>
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>Duration in <code class="docutils literal notranslate"><span class="pre">N</span></code> is constant (20 days)</li>
+<li>Duration in <code class="docutils literal notranslate"><span class="pre">J</span></code> depends on a distribution (parameter
+<code class="docutils literal notranslate"><span class="pre">adult_age</span></code>), hence each individual gets a duration based on a
+random sample</li>
+<li>Transitions use <code class="docutils literal notranslate"><span class="pre">proba:</span> <span class="pre">1</span></code> to ensure that all individuals that
+have spent the required duration in their state move to the next
+one.</li>
+<li>On state machine diagrams, a clock appears next to the state name
+when a duration is explicitly specified.</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_advanced.html#set-states-attributes"><span class="std std-ref">Set states attributes</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#built-in-functions"><span class="std std-ref">Built-in functions</span></a></p>
+</div>
+</div>
+<div class="section" id="sir-model-with-basic-demography-births-deaths">
+<h2>7.5. SIR model with basic demography (births/deaths)<a class="headerlink" href="#sir-model-with-basic-demography-births-deaths" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/compart_SIR_demo.yaml">compart_SIR_demo.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/hybrid_SIR_demo.yaml">hybrid_SIR_demo.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/IBM_SIR_demo.yaml">IBM_SIR_demo.yaml</a></li>
+</ul>
+</div>
+<div class="graphviz"><object data="../_images/graphviz-94cbfc21fc02703ac1f627a073ce22c4622d8034.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;S&quot; [shape=&quot;Mrecord&quot;, label=&quot;S&quot;, tooltip=&quot;S (Susceptible):
+	suceptible of becoming infected&quot;, fillcolor=wheat, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; [shape=&quot;Mrecord&quot;, label=&quot;I&quot;, tooltip=&quot;I (Infectious):
+	infected and able to transmit the disease&quot;, fillcolor=maroon, style=&quot;filled,rounded&quot;] ;
+	&quot;R&quot; [shape=&quot;Mrecord&quot;, label=&quot;R&quot;, tooltip=&quot;R (Resistant):
+	healthy again and resistant to infection&quot;, fillcolor=deepskyblue, style=&quot;filled,rounded&quot;] ;
+	&quot;D&quot; [shape=&quot;Mrecord&quot;, label=&quot;D&quot;, tooltip=&quot;D (Dead):
+	compartment to put dead animals&quot;, fillcolor=white, style=&quot;filled,rounded,dotted&quot;] ;
+	&quot;I&quot; -&gt; &quot;D&quot; [label=&quot;rate: death&quot;, labeltooltip=&quot;death [parameter]:
+	the death rate (/day)                                                   
+	birth&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;I&quot; -&gt; &quot;R&quot; [label=&quot;rate: recovery&quot;, labeltooltip=&quot;recovery [parameter]:
+	recovery rate (/day)                                                    
+	0.1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;I&quot; -&gt; &quot;S&quot; [label=&quot;rate: birth&quot;, labeltooltip=&quot;birth [parameter]:
+	the birth rate (/day)                                                   
+	0.01&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;dashed&quot;];
+	&quot;R&quot; -&gt; &quot;D&quot; [label=&quot;rate: death&quot;, labeltooltip=&quot;death [parameter]:
+	the death rate (/day)                                                   
+	birth&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;R&quot; -&gt; &quot;S&quot; [label=&quot;rate: birth&quot;, labeltooltip=&quot;birth [parameter]:
+	the birth rate (/day)                                                   
+	0.01&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;dashed&quot;];
+	&quot;S&quot; -&gt; &quot;D&quot; [label=&quot;rate: death&quot;, labeltooltip=&quot;death [parameter]:
+	the death rate (/day)                                                   
+	birth&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;I&quot; [label=&quot;rate: force_of_infection&quot;, labeltooltip=&quot;force_of_infection [parameter]:
+	infection function                                                      
+	transmission_I * total_I / total_herd&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;S&quot; [label=&quot;rate: birth&quot;, labeltooltip=&quot;birth [parameter]:
+	the birth rate (/day)                                                   
+	0.01&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;dashed&quot;];
+}</p></object></div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">state_machines</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">health_state</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">states</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">...</span>
+      <span class="l l-Scalar l-Scalar-Plain">- D</span><span class="p p-Indicator">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;Dead&#39;</span>
+          <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;compartment</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">put</span><span class="nv"> </span><span class="s">dead</span><span class="nv"> </span><span class="s">individuals&#39;</span>
+          <span class="l l-Scalar l-Scalar-Plain">fillcolor</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">white</span>
+<span class="hll">          <span class="l l-Scalar l-Scalar-Plain">autoremove</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+</span>  <span class="l l-Scalar l-Scalar-Plain">transitions</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">...</span>
+    <span class="l l-Scalar l-Scalar-Plain">- {from</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">S, to</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">D, rate</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">death}</span>
+    <span class="l l-Scalar l-Scalar-Plain">- {from</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">I, to</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">D, rate</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">death}</span>
+    <span class="l l-Scalar l-Scalar-Plain">- {from</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">R, to</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">D, rate</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">death}</span>
+<span class="hll">  <span class="l l-Scalar l-Scalar-Plain">productions</span><span class="p p-Indicator">:</span>
+</span>    <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">from</span><span class="p p-Indicator">:</span> <span class="nv">S</span><span class="p p-Indicator">,</span> <span class="nv">to</span><span class="p p-Indicator">:</span> <span class="nv">S</span><span class="p p-Indicator">,</span> <span class="nv">rate</span><span class="p p-Indicator">:</span> <span class="nv">birth</span><span class="p p-Indicator">,</span> <span class="nv">prototype</span><span class="p p-Indicator">:</span> <span class="nv">newborn</span><span class="p p-Indicator">}</span>
+    <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">from</span><span class="p p-Indicator">:</span> <span class="nv">I</span><span class="p p-Indicator">,</span> <span class="nv">to</span><span class="p p-Indicator">:</span> <span class="nv">S</span><span class="p p-Indicator">,</span> <span class="nv">rate</span><span class="p p-Indicator">:</span> <span class="nv">birth</span><span class="p p-Indicator">,</span> <span class="nv">prototype</span><span class="p p-Indicator">:</span> <span class="nv">newborn</span><span class="p p-Indicator">}</span>
+    <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">from</span><span class="p p-Indicator">:</span> <span class="nv">R</span><span class="p p-Indicator">,</span> <span class="nv">to</span><span class="p p-Indicator">:</span> <span class="nv">S</span><span class="p p-Indicator">,</span> <span class="nv">rate</span><span class="p p-Indicator">:</span> <span class="nv">birth</span><span class="p p-Indicator">,</span> <span class="nv">prototype</span><span class="p p-Indicator">:</span> <span class="nv">newborn</span><span class="p p-Indicator">}</span>
+
+<span class="nn">...</span>
+<span class="l l-Scalar l-Scalar-Plain">parameters</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">juvenile_age</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">20</span>
+  <span class="l l-Scalar l-Scalar-Plain">adult_age</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;random_uniform(50,</span><span class="nv"> </span><span class="s">70)&#39;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>State <code class="docutils literal notranslate"><span class="pre">D</span></code> with <code class="docutils literal notranslate"><span class="pre">autoremove:</span> <span class="pre">yes</span></code> represents the state of
+deceased individuals: all individuals sent to <code class="docutils literal notranslate"><span class="pre">D</span></code> are
+automatically removed from simulation. On the state machine
+diagram, this state appears as a dotted box.</li>
+<li>Section <code class="docutils literal notranslate"><span class="pre">productions</span></code> in <code class="docutils literal notranslate"><span class="pre">state_machines</span></code>: production links
+specify from which state groups new individuals are
+produced and which prototype describes the new individuals.
+Here for instance all health states are able to produce
+<code class="docutils literal notranslate"><span class="pre">newborn</span></code> individuals.
+On the diagram, productions links appear as dashed arrows.</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_advanced.html#set-states-attributes"><span class="std std-ref">Set states attributes</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#produce-new-individuals"><span class="std std-ref">Produce new individuals</span></a></p>
+</div>
+</div>
+<div class="section" id="sir-model-with-age-groups">
+<h2>7.6. SIR model with age groups<a class="headerlink" href="#sir-model-with-age-groups" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/compart_SIR_JA_demo.yaml">compart_SIR_JA_demo.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/hybrid_SIR_JA_demo.yaml">hybrid_SIR_JA_demo.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/IBM_SIR_JA_demo.yaml">IBM_SIR_JA_demo.yaml</a></li>
+</ul>
+</div>
+<div class="graphviz"><object data="../_images/graphviz-aba2a0b4a54311ba2ed1d43bd3b1d8c99af73de1.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;S&quot; [shape=&quot;Mrecord&quot;, label=&quot;S&quot;, tooltip=&quot;S (Susceptible):
+	suceptible of becoming infected&quot;, fillcolor=wheat, style=&quot;filled,rounded,bold&quot;] ;
+	&quot;I&quot; [shape=&quot;Mrecord&quot;, label=&quot;I&quot;, tooltip=&quot;I (Infectious):
+	infected and able to transmit the disease&quot;, fillcolor=maroon, style=&quot;filled,rounded&quot;] ;
+	&quot;R&quot; [shape=&quot;Mrecord&quot;, label=&quot;R&quot;, tooltip=&quot;R (Resistant):
+	healthy again and resistant to infection&quot;, fillcolor=deepskyblue, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; -&gt; &quot;R&quot; [label=&quot;rate: recovery&quot;, labeltooltip=&quot;recovery [parameter]:
+	recovery rate (/day)                                                    
+	0.1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;I&quot; [label=&quot;rate: force_of_infection&quot;, labeltooltip=&quot;force_of_infection [parameter]:
+	infection function                                                      
+	transmission_I * total_I / total_herd&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+<div class="graphviz"><object data="../_images/graphviz-dd6a57ebf82f0b50f4dca4db5068fc667926b24e.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;J&quot; [shape=&quot;Mrecord&quot;, label=&quot;J&quot;, tooltip=&quot;J (Juvenile):
+	juvenile animals&quot;, fillcolor=orange, style=&quot;filled,rounded&quot;] ;
+	&quot;A&quot; [shape=&quot;Mrecord&quot;, label=&quot;A&quot;, tooltip=&quot;A (Adult):
+	adult animals (producing new juveniles)&quot;, fillcolor=brown, style=&quot;filled,rounded&quot;] ;
+	&quot;D&quot; [shape=&quot;Mrecord&quot;, label=&quot;D&quot;, tooltip=&quot;D (Dead):
+	compartment to put dead animals&quot;, fillcolor=white, style=&quot;filled,rounded,dotted&quot;] ;
+	&quot;A&quot; -&gt; &quot;D&quot; [label=&quot;rate: death&quot;, labeltooltip=&quot;death [parameter]:
+	the death rate (/day)                                                   
+	birth&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;A&quot; -&gt; &quot;J&quot; [label=&quot;rate: birth&quot;, labeltooltip=&quot;birth [parameter]:
+	the birth rate (/day)                                                   
+	0.01&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;dashed&quot;];
+	&quot;J&quot; -&gt; &quot;A&quot; [label=&quot;rate: maturation&quot;, labeltooltip=&quot;maturation [parameter]:
+	rate at which juveniles become adults (/day)                            
+	1/20&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;J&quot; -&gt; &quot;D&quot; [label=&quot;rate: death&quot;, labeltooltip=&quot;death [parameter]:
+	the death rate (/day)                                                   
+	birth&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+<a class="reference internal image-reference" href="../_images/JA.png"><img alt="../_images/JA.png" src="../_images/JA.png" style="width: 90%;" /></a>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li><strong>Two state machines</strong> and corresponding groupings/processes are
+defined: one for the progression of infection (<code class="docutils literal notranslate"><span class="pre">health_state</span></code>),
+the other for the maturation of individuals and demography
+(<code class="docutils literal notranslate"><span class="pre">age_group</span></code>).</li>
+<li>State <code class="docutils literal notranslate"><span class="pre">S</span></code> with property <code class="docutils literal notranslate"><span class="pre">default:</span> <span class="pre">yes</span></code> (hence, in bold on the diagram)
+allows to use keyword <code class="docutils literal notranslate"><span class="pre">default</span></code> as value for <code class="docutils literal notranslate"><span class="pre">health_state</span></code>
+in the prototype for <code class="docutils literal notranslate"><span class="pre">newborn</span></code> individuals. If the health state
+of new individuals has to be revised in further evolutions of the
+model, the corresponding state has to be labelled as <code class="docutils literal notranslate"><span class="pre">default</span></code>
+to replace <code class="docutils literal notranslate"><span class="pre">S</span></code>.</li>
+<li>The prototypes now initialize the values for both state
+machines. Especially, for prototypes used in initial conditions,
+age groups are set to <code class="docutils literal notranslate"><span class="pre">random</span></code>, which means an equiprobable
+choice between states of state machine <code class="docutils literal notranslate"><span class="pre">age_group</span></code> (except
+autoremove states).</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_advanced.html#set-states-attributes"><span class="std std-ref">Set states attributes</span></a></p>
+</div>
+</div>
+<div class="section" id="sir-model-with-age-groups-and-random-initialization">
+<h2>7.7. SIR model with age groups and random initialization<a class="headerlink" href="#sir-model-with-age-groups-and-random-initialization" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/compart_SIR_JA_demo_random.yaml">compart_SIR_JA_demo_random.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/hybrid_SIR_JA_demo_random.yaml">hybrid_SIR_JA_demo_random.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/IBM_SIR_JA_demo_random.yaml">IBM_SIR_JA_demo_random.yaml</a></li>
+</ul>
+</div>
+<a class="reference internal image-reference" href="../_images/JA2.png"><img alt="../_images/JA2.png" src="../_images/JA2.png" style="width: 90%;" /></a>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last">
+<li><p class="first">Prototypes <code class="docutils literal notranslate"><span class="pre">healthy</span></code> and <code class="docutils literal notranslate"><span class="pre">infected</span></code> define the <code class="docutils literal notranslate"><span class="pre">age_group</span></code>
+using a multinomial sampling between possible states (<code class="docutils literal notranslate"><span class="pre">J</span></code> and
+<code class="docutils literal notranslate"><span class="pre">A</span></code>), to ensure a given proportion of juveniles among healthy
+individuals in average:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">prototypes</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">individuals</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">healthy</span><span class="p p-Indicator">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;healthy</span><span class="nv"> </span><span class="s">individuals&#39;</span>
+          <span class="l l-Scalar l-Scalar-Plain">health_state</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">S</span>
+<span class="hll">          <span class="l l-Scalar l-Scalar-Plain">age_group</span><span class="p p-Indicator">:</span> <span class="s">&#39;random(init_prop_juveniles,</span><span class="nv"> </span><span class="s">1-init_prop_juveniles)&#39;</span>
+</span></pre></div>
+</div>
+</li>
+<li><p class="first">Similarly, initial conditions use a multinomial sampling between
+two prototypes (<code class="docutils literal notranslate"><span class="pre">healthy</span></code> and <code class="docutils literal notranslate"><span class="pre">infected</span></code>) to make the
+initial prevalence vary stochastically according to the initial
+probability of being infected (<code class="docutils literal notranslate"><span class="pre">initial_proba_infection</span></code>):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">initial_conditions</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+<span class="hll">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">prototype</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">infected</span><span class="p p-Indicator">,</span> <span class="nv">healthy</span><span class="p p-Indicator">]</span>
+</span>      <span class="c1"># two possible prototypes for individual initially in the population</span>
+<span class="hll">      <span class="l l-Scalar l-Scalar-Plain">amount</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">initial_population_size</span>
+</span>      <span class="c1"># drawn among a population of size initial_population_size</span>
+<span class="hll">      <span class="l l-Scalar l-Scalar-Plain">proba</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">initial_proba_infection</span><span class="p p-Indicator">,</span> <span class="nv">1-initial_proba_infection</span><span class="p p-Indicator">]</span>
+</span>      <span class="c1"># with respective probabilities initial_proba_infection and</span>
+      <span class="c1"># 1-initial_proba_infection</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_advanced.html#design-prototypes-for-typical-individuals-or-populations"><span class="std std-ref">Design prototypes for typical individuals or populations</span></a></p>
+</div>
+</div>
+<div class="section" id="sir-model-with-age-groups-and-data-based-prototypes">
+<h2>7.8. SIR model with age groups and data-based prototypes<a class="headerlink" href="#sir-model-with-age-groups-and-data-based-prototypes" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This feature is still experimental and likely to evolve in further versions.</p>
+</div>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/hybrid_SIR_JA_demo_prototypes.yaml">hybrid_SIR_JA_demo_prototypes.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/IBMx&#64;_SIR_JA_demo_prototypes.yaml">IBM_SIR_JA_demo_prototypes.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/data/initial_individuals.csv">data/initial_individuals.csv</a></li>
+<li><a class="reference external" href="../_static/models/features/data/population_size.csv">data/population_size.csv</a></li>
+</ul>
+</div>
+<a class="reference internal image-reference" href="../_images/pop_struct1.png"><img alt="../_images/pop_struct1.png" src="../_images/pop_struct1.png" style="width: 49%;" /></a>
+<a class="reference internal image-reference" href="../_images/pop_struct2.png"><img alt="../_images/pop_struct2.png" src="../_images/pop_struct2.png" style="width: 49%;" /></a>
+<a class="reference internal image-reference" href="../_images/pop_struct3.png"><img alt="../_images/pop_struct3.png" src="../_images/pop_struct3.png" style="width: 49%;" /></a>
+<a class="reference internal image-reference" href="../_images/pop_struct4.png"><img alt="../_images/pop_struct4.png" src="../_images/pop_struct4.png" style="width: 49%;" /></a>
+<p>In above figures, 50 stochastic repetitions with data-based population
+sizes are run. The metapopulation contains 4 populations, which size
+is defined in <code class="docutils literal notranslate"><span class="pre">data/population_size.csv</span></code>. Each population is
+composed of individuals defined in <code class="docutils literal notranslate"><span class="pre">data/initial_individuals.csv</span></code>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last">
+<li><p class="first">Prototype <code class="docutils literal notranslate"><span class="pre">initial_individuals</span></code> is actually a collection defined in
+CSV file <code class="docutils literal notranslate"><span class="pre">data/initial_individuals.csv</span></code>: each time this prototype
+is used (here, in initial conditions), a concrete prototype is
+sampled randomly among those defined in the CSV file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">health_state</span><span class="p">,</span><span class="n">age_group</span><span class="p">,</span><span class="n">weight</span><span class="p">,</span><span class="n">desc</span>
+<span class="n">S</span><span class="p">,</span><span class="n">J</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="s2">&quot;healthy juvenile individuals&quot;</span>
+<span class="n">I</span><span class="p">,</span><span class="n">J</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="s2">&quot;infected juvenile individuals&quot;</span>
+<span class="n">S</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="mi">90</span><span class="p">,</span><span class="s2">&quot;healthy adult individuals&quot;</span>
+<span class="n">I</span><span class="p">,</span><span class="n">A</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="s2">&quot;infected adult individuals&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Similarly, prototype <code class="docutils literal notranslate"><span class="pre">data_based_population</span></code> is a collection defined
+in a CSV file <code class="docutils literal notranslate"><span class="pre">data/population_size.csv</span></code> as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">prototype_name</span><span class="p">,</span><span class="n">initial_population_size</span><span class="p">,</span><span class="n">proportion</span><span class="p">,</span><span class="n">desc</span>
+<span class="n">huge_pop</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="o">.</span><span class="mi">05</span><span class="p">,</span><span class="s2">&quot;a huge population&quot;</span>
+<span class="n">large_pop</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="o">.</span><span class="mi">35</span><span class="p">,</span><span class="s2">&quot;a large population&quot;</span>
+<span class="n">medium_pop</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span><span class="s2">&quot;a medium population&quot;</span>
+<span class="n">small_pop</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;a small population&quot;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_advanced.html#design-prototypes-for-typical-individuals-or-populations"><span class="std std-ref">Design prototypes for typical individuals or populations</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#data-based-prototype-collections"><span class="std std-ref">Data-based prototype collections</span></a></p>
+</div>
+</div>
+<div class="section" id="sir-model-with-cumulative-incidence">
+<h2>7.9. SIR model with cumulative incidence<a class="headerlink" href="#sir-model-with-cumulative-incidence" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/compart_SIR_cumul_inc.yaml">compart_SIR_cumul_inc.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/hybrid_SIR_cumul_inc.yaml">hybrid_SIR_cumul_inc.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/IBM_SIR_cumul_inc.yaml">IBM_SIR_cumul_inc.yaml</a></li>
+</ul>
+</div>
+<a class="reference internal image-reference" href="../_images/cum_inc.png"><img alt="../_images/cum_inc.png" src="../_images/cum_inc.png" style="width: 90%;" /></a>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">I</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;Infectious&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;infected</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">able</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">transmit</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">disease&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">fillcolor</span><span class="p p-Indicator">:</span> <span class="s">&#39;maroon&#39;</span>
+<span class="hll">    <span class="l l-Scalar l-Scalar-Plain">on_enter</span><span class="p p-Indicator">:</span>
+</span><span class="hll">      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">record_change</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">cumulative_incidence</span>
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Cumulative incidence is obtained through the built-in action
+<code class="docutils literal notranslate"><span class="pre">record_change</span></code> executed when entering infecious state. This
+action adds the number of individuals currently executing the action
+to a variable, here <code class="docutils literal notranslate"><span class="pre">cumulative_incidence</span></code>.</p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_advanced.html#built-in-actions"><span class="std std-ref">Built-in actions</span></a></p>
+</div>
+</div>
+<div class="section" id="sir-model-with-individual-actions-and-variable-aggregation">
+<h2>7.10. SIR model with individual actions and variable aggregation<a class="headerlink" href="#sir-model-with-individual-actions-and-variable-aggregation" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/hybrid_SIR_aggreg.yaml">hybrid_SIR_aggreg.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/IBM_SIR_aggreg.yaml">IBM_SIR_aggreg.yaml</a></li>
+</ul>
+</div>
+<div class="graphviz"><object data="../_images/graphviz-0a94a9af4de873ad3f6224339b6b6406f811dce0.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;S&quot; [shape=&quot;Mrecord&quot;, label=&quot;{&amp;#9670;|{\ S\ }}&quot;, tooltip=&quot;S (Susceptible):
+	suceptible of becoming infected&quot;, fillcolor=wheat, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; [shape=&quot;Mrecord&quot;, label=&quot;{&amp;#9670;|{\ I\ |&amp;#9670;}}&quot;, tooltip=&quot;I (Infectious):
+	infected and able to transmit the disease&quot;, fillcolor=maroon, style=&quot;filled,rounded&quot;] ;
+	&quot;R&quot; [shape=&quot;Mrecord&quot;, label=&quot;R&quot;, tooltip=&quot;R (Resistant):
+	healthy again and resistant to infection&quot;, fillcolor=deepskyblue, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; -&gt; &quot;R&quot; [label=&quot;rate: recovery&quot;, labeltooltip=&quot;recovery [parameter]:
+	recovery rate (/day)                                                    
+	0.1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;I&quot; [label=&quot;rate: force_of_infection&quot;, labeltooltip=&quot;force_of_infection [parameter]:
+	infection function                                                      
+	transmission_I * total_I / total_herd&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+<a class="reference internal image-reference" href="../_images/aggreg.png"><img alt="../_images/aggreg.png" src="../_images/aggreg.png" style="width: 90%;" /></a>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">levels</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;level</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">population&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">aggregation_type</span><span class="p p-Indicator">:</span> <span class="s">&#39;hybrid&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">contains</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">individuals</span>
+<span class="hll">    <span class="l l-Scalar l-Scalar-Plain">aggregate_vars</span><span class="p p-Indicator">:</span>
+</span><span class="hll">      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">population_affected_over_time</span>
+</span><span class="hll">        <span class="l l-Scalar l-Scalar-Plain">collect</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">nb_episodes</span>
+</span><span class="hll">        <span class="l l-Scalar l-Scalar-Plain">operator</span><span class="p p-Indicator">:</span> <span class="s">&#39;sum&#39;</span>
+</span><span class="hll">      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">average_infection_duration</span>
+</span><span class="hll">        <span class="l l-Scalar l-Scalar-Plain">collect</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">duration_infected</span>
+</span><span class="hll">        <span class="l l-Scalar l-Scalar-Plain">operator</span><span class="p p-Indicator">:</span> <span class="s">&#39;mean&#39;</span>
+</span><span class=" -Error"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+   <span class="l l-Scalar l-Scalar-Plain">- I</span><span class="p p-Indicator">:</span>
+       <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="s">&#39;Infectious&#39;</span>
+ <span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="hll">       <span class="l l-Scalar l-Scalar-Plain">on_enter</span><span class="p p-Indicator">:</span>
+</span><span class="hll">         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">set_var</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">nb_episodes</span>
+</span><span class="hll">           <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span class="hll">         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">message</span><span class="p p-Indicator">:</span> <span class="s">&#39;I</span><span class="nv"> </span><span class="s">have</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">bad</span><span class="nv"> </span><span class="s">feeling</span><span class="nv"> </span><span class="s">about</span><span class="nv"> </span><span class="s">this...&#39;</span>
+</span><span class="hll"> <span class=" -Error">      </span><span class="l l-Scalar l-Scalar-Plain">on_stay</span><span class="p p-Indicator">:</span>
+</span><span class="hll">         <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">set_var</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">duration_infected</span>
+</span><span class="hll">           <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;duration_infected</span><span class="nv"> </span><span class="s">+</span><span class="nv"> </span><span class="s">1&#39;</span>
+</span> <span class=" -Error"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
+  <span class="l l-Scalar l-Scalar-Plain">prototypes</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">individuals</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">healthy</span><span class="p p-Indicator">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;healthy</span><span class="nv"> </span><span class="s">individuals&#39;</span>
+          <span class="l l-Scalar l-Scalar-Plain">health_state</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">S</span>
+<span class="hll">          <span class="l l-Scalar l-Scalar-Plain">nb_episodes</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+</span><span class="hll">          <span class="l l-Scalar l-Scalar-Plain">duration_infected</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>On state machine diagrams, black lozenges (left to, below or
+right to the state name) mark the specification of actions
+(respectively on enter, on stay and on exit).</li>
+<li>Look at messages in the terminal (beware, printing messages
+increases computation time!)</li>
+<li>Variables at population scale are created by aggregating
+variables at individual scale, which are updated in the
+convenient states.</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_advanced.html#built-in-actions"><span class="std std-ref">Built-in actions</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#aggregate-variables"><span class="std std-ref">Aggregate variables</span></a></p>
+</div>
+</div>
+<div class="section" id="sir-model-with-age-groups-and-explicit-age">
+<h2>7.11. SIR model with age groups and explicit age<a class="headerlink" href="#sir-model-with-age-groups-and-explicit-age" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/hybrid_SIR_age_demo.yaml">hybrid_SIR_age_demo.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/IBM_SIR_age_demo.yaml">IBM_SIR_age_demo.yaml</a></li>
+</ul>
+</div>
+<div class="graphviz"><object data="../_images/graphviz-aba2a0b4a54311ba2ed1d43bd3b1d8c99af73de1.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;S&quot; [shape=&quot;Mrecord&quot;, label=&quot;S&quot;, tooltip=&quot;S (Susceptible):
+	suceptible of becoming infected&quot;, fillcolor=wheat, style=&quot;filled,rounded,bold&quot;] ;
+	&quot;I&quot; [shape=&quot;Mrecord&quot;, label=&quot;I&quot;, tooltip=&quot;I (Infectious):
+	infected and able to transmit the disease&quot;, fillcolor=maroon, style=&quot;filled,rounded&quot;] ;
+	&quot;R&quot; [shape=&quot;Mrecord&quot;, label=&quot;R&quot;, tooltip=&quot;R (Resistant):
+	healthy again and resistant to infection&quot;, fillcolor=deepskyblue, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; -&gt; &quot;R&quot; [label=&quot;rate: recovery&quot;, labeltooltip=&quot;recovery [parameter]:
+	recovery rate (/day)                                                    
+	0.1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;I&quot; [label=&quot;rate: force_of_infection&quot;, labeltooltip=&quot;force_of_infection [parameter]:
+	infection function                                                      
+	transmission_I * total_I / total_herd&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+<div class="graphviz"><object data="../_images/graphviz-b47c56657f51b077fb3f6d2bc36e6f36f70170a8.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+          charset=&quot;utf-8&quot;
+        	rankdir=LR;
+        
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;J&quot; [shape=&quot;Mrecord&quot;, label=&quot;{{\ J\ |&amp;#9670;}}&quot;, tooltip=&quot;J (Juvenile):
+	juvenile individuals&quot;, fillcolor=&quot;orange&quot;, style=&quot;filled,rounded&quot;] ;
+	&quot;A&quot; [shape=&quot;Mrecord&quot;, label=&quot;{{\ A\ |&amp;#9670;}}&quot;, tooltip=&quot;A (Adult):
+	adult individuals (producing new juveniles)&quot;, fillcolor=&quot;brown&quot;, style=&quot;filled,rounded&quot;] ;
+	&quot;D&quot; [shape=&quot;Mrecord&quot;, label=&quot;D&quot;, tooltip=&quot;D (Dead):
+	compartment to put dead individuals&quot;, fillcolor=&quot;white&quot;, style=&quot;filled,rounded,dotted&quot;] ;
+	&quot;A&quot; -&gt; &quot;D&quot; [label=&quot;rate: 1 / avg_adult_death_age&quot;, labeltooltip=&quot;rate: 1 / avg_adult_death_age&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;A&quot; -&gt; &quot;J&quot; [label=&quot;rate: birth&quot;, labeltooltip=&quot;birth [parameter]:
+	the birth rate (/day)                                                   
+	0.01&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;dashed&quot;];
+	&quot;J&quot; -&gt; &quot;A&quot; [label=&quot;proba: 1&quot;, labeltooltip=&quot;proba: 1&quot;, arrowtail=&quot;nonetee&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;COND: age &gt;= adult_age&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+<a class="reference internal image-reference" href="../_images/explicit_age.png"><img alt="../_images/explicit_age.png" src="../_images/explicit_age.png" style="width: 90%;" /></a>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">state_machines</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">age_group</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">J</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="hll">        <span class="l l-Scalar l-Scalar-Plain">on_stay</span><span class="p p-Indicator">:</span>
+</span><span class="hll">          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">set_var</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">age</span>
+</span><span class="hll">            <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;age</span><span class="nv"> </span><span class="s">+</span><span class="nv"> </span><span class="s">delta_t&#39;</span>
+</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">A</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="hll">        <span class="l l-Scalar l-Scalar-Plain">on_stay</span><span class="p p-Indicator">:</span>
+</span><span class="hll">          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">set_var</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">age</span>
+</span><span class="hll">            <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;age</span><span class="nv"> </span><span class="s">+</span><span class="nv"> </span><span class="s">delta_t&#39;</span>
+</span>    <span class="l l-Scalar l-Scalar-Plain">...</span>
+  <span class="l l-Scalar l-Scalar-Plain">transitions</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">from</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">J</span>
+      <span class="l l-Scalar l-Scalar-Plain">to</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">A</span>
+<span class="hll">      <span class="l l-Scalar l-Scalar-Plain">cond</span><span class="p p-Indicator">:</span> <span class="s">&#39;age</span><span class="nv"> </span><span class="s">&gt;=</span><span class="nv"> </span><span class="s">adult_age&#39;</span>
+</span>      <span class="l l-Scalar l-Scalar-Plain">proba</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="nn">...</span>
+<span class="l l-Scalar l-Scalar-Plain">grouping</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+<span class="hll">    <span class="l l-Scalar l-Scalar-Plain">details</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">age_group</span><span class="p p-Indicator">,</span> <span class="nv">health_state</span><span class="p p-Indicator">]</span>
+</span><span class="nn">...</span>
+<span class="l l-Scalar l-Scalar-Plain">parameters</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="hll">  <span class="l l-Scalar l-Scalar-Plain">init_age_distrib</span><span class="p p-Indicator">:</span>
+</span><span class="hll">    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;distribution</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">initial</span><span class="nv"> </span><span class="s">ages&#39;</span>
+</span><span class="hll">    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;random_integers(0,</span><span class="nv"> </span><span class="s">adult_age-1)&#39;</span>
+</span><span class="nn">...</span>
+<span class="l l-Scalar l-Scalar-Plain">prototypes</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">individuals</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">healthy</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;healthy</span><span class="nv"> </span><span class="s">individuals&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">health_state</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">S</span>
+        <span class="l l-Scalar l-Scalar-Plain">age_group</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">J</span>
+<span class="hll">        <span class="l l-Scalar l-Scalar-Plain">age</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">init_age_distrib</span>
+</span>    <span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="l l-Scalar l-Scalar-Plain">statevars</span><span class="p p-Indicator">:</span>
+<span class="hll">  <span class="l l-Scalar l-Scalar-Plain">age</span><span class="p p-Indicator">:</span>
+</span><span class="hll">    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;age</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">individual&#39;</span>
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>the individual variable <code class="docutils literal notranslate"><span class="pre">age</span></code> is sampled in a distribution, and
+incremented while individuals are in states <code class="docutils literal notranslate"><span class="pre">J</span></code> and
+<code class="docutils literal notranslate"><span class="pre">A</span></code>. Incrementation of age is based on built-in value
+<code class="docutils literal notranslate"><span class="pre">delta_t</span></code> to ensure consistency whatever the simulation time step</li>
+<li><code class="docutils literal notranslate"><span class="pre">cond</span></code> in transition from J to A: since ages are initially distributed
+randomly within the limits of J group, becoming adult does not
+rely on a duration but on an explicit verification of age. (An
+alternative would be to define a duration in J as the difference
+between adult age and individual age.)</li>
+<li><code class="docutils literal notranslate"><span class="pre">statevars</span></code> section to declare variable <code class="docutils literal notranslate"><span class="pre">age</span></code>, which is
+initialized in prototypes, modified by actions in J and A states,
+and used to define the condition in transition from J to A.</li>
+<li>the grouping <code class="docutils literal notranslate"><span class="pre">details</span></code> based on both variables <code class="docutils literal notranslate"><span class="pre">age_group</span></code>
+and <code class="docutils literal notranslate"><span class="pre">health_state</span></code>: it automatically provides variables siche
+as <code class="docutils literal notranslate"><span class="pre">total_A_I</span></code> (number of infectious adults) and, in hybrid
+model, a variable <code class="docutils literal notranslate"><span class="pre">max_age_A_I</span></code> (the highest age in
+infected adults) based on the aggregate variable defined in <code class="docutils literal notranslate"><span class="pre">levels</span></code>.</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_advanced.html#customize-transitions"><span class="std std-ref">Customize transitions</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#built-in-actions"><span class="std std-ref">Built-in actions</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#aggregate-variables"><span class="std std-ref">Aggregate variables</span></a></p>
+</div>
+</div>
+<div class="section" id="sir-model-with-explicit-gestation">
+<h2>7.12. SIR model with explicit gestation<a class="headerlink" href="#sir-model-with-explicit-gestation" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/hybrid_gest.yaml">hybrid_gest.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/IBM_gest.yaml">IBM_gest.yaml</a></li>
+</ul>
+</div>
+<div class="graphviz"><object data="../_images/graphviz-f75a7ff9adc19f337a15a56132a6f87d86ab2205.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;Female&quot; [shape=&quot;Mrecord&quot;, label=&quot;Female&quot;, tooltip=&quot;Female (Female animals):
+	&quot;, fillcolor=orange, style=&quot;filled,rounded,bold&quot;] ;
+	&quot;Male&quot; [shape=&quot;Mrecord&quot;, label=&quot;Male&quot;, tooltip=&quot;Male (Male animals):
+	&quot;, fillcolor=deepskyblue, style=&quot;filled,rounded&quot;] ;
+}</p></object></div>
+<div class="graphviz"><object data="../_images/graphviz-8189d16f7e1977516a29b03262f7f5fd70885908.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+          charset=&quot;utf-8&quot;
+        	rankdir=TB;
+        
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;P0&quot; [shape=&quot;Mrecord&quot;, label=&quot;P0&quot;, tooltip=&quot;P0 (Nulliparous):
+	Nulliparous animal (no previous farrowing)&quot;, fillcolor=orange, style=&quot;filled,rounded&quot;] ;
+	&quot;P1&quot; [shape=&quot;Mrecord&quot;, label=&quot;P1&quot;, tooltip=&quot;P1 (Parity 1):
+	Animal with parity 1 (first farrowing)&quot;, fillcolor=pink, style=&quot;filled,rounded&quot;] ;
+	&quot;P2&quot; [shape=&quot;Mrecord&quot;, label=&quot;P2&quot;, tooltip=&quot;P2 (Parity 2):
+	Animal with parity 2&quot;, fillcolor=red, style=&quot;filled,rounded&quot;] ;
+	&quot;P3&quot; [shape=&quot;Mrecord&quot;, label=&quot;P3&quot;, tooltip=&quot;P3 (Parity 3+):
+	Animal with parity 3 and more&quot;, fillcolor=purple, style=&quot;filled,rounded&quot;] ;
+}</p></object></div>
+<div class="graphviz"><object data="../_images/graphviz-f825ff05cc301bbe4e2a824f207d4b65f3e8f618.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+          charset=&quot;utf-8&quot;
+        	rankdir=LR;
+        
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, fontname=Times, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;J&quot; [shape=&quot;Mrecord&quot;, label=&quot;{{\ J\ |&amp;#9670;}}&quot;, tooltip=&quot;J (Juvenile):
+	juvenile animals&quot;, fillcolor=orange, style=&quot;filled,rounded&quot;] ;
+	&quot;A&quot; [shape=&quot;Mrecord&quot;, label=&quot;{{\ A\ |&amp;#9670;}}&quot;, tooltip=&quot;A (Non-gestating Adult):
+	adult animals&quot;, fillcolor=brown, style=&quot;filled,rounded&quot;] ;
+	&quot;G&quot; [shape=&quot;Mrecord&quot;, label=&quot;{{\ G&amp;nbsp;&amp;#9719;\ |&amp;#9670;}}&quot;, tooltip=&quot;G (Gestating Adult):
+	adult animals (producing new juveniles)&quot;, fillcolor=deepskyblue, style=&quot;filled,rounded&quot;] ;
+	&quot;D&quot; [shape=&quot;Mrecord&quot;, label=&quot;D&quot;, tooltip=&quot;D (Dead):
+	compartment to put dead animals&quot;, fillcolor=white, style=&quot;filled,rounded,dotted&quot;] ;
+	&quot;A&quot; -&gt; &quot;D&quot; [label=&quot;rate: 1 / avg_adult_death_age&quot;, labeltooltip=&quot;rate: 1 / avg_adult_death_age&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;A&quot; -&gt; &quot;G&quot; [label=&quot;rate: reproduction&quot;, labeltooltip=&quot;reproduction [parameter]:
+	reproduction rate (/days)                                               
+	1/20&quot;, arrowtail=&quot;nonetee&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;COND: is_Female&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;G&quot; -&gt; &quot;A&quot; [label=&quot;proba: 1&quot;, labeltooltip=&quot;proba: 1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnonediamond&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;G&quot; -&gt; &quot;D&quot; [label=&quot;rate: 1 / avg_adult_death_age&quot;, labeltooltip=&quot;rate: 1 / avg_adult_death_age&quot;, arrowtail=&quot;noneoinv&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;ESCAPE: True&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;J&quot; -&gt; &quot;A&quot; [label=&quot;proba: 1&quot;, labeltooltip=&quot;proba: 1&quot;, arrowtail=&quot;nonetee&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;COND: GreaterThan(age, adult_age)&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+<a class="reference internal image-reference" href="../_images/gest.png"><img alt="../_images/gest.png" src="../_images/gest.png" style="width: 90%;" /></a>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span>   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">from</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">G</span>
+     <span class="l l-Scalar l-Scalar-Plain">to</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">A</span>
+     <span class="l l-Scalar l-Scalar-Plain">proba</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+     <span class="l l-Scalar l-Scalar-Plain">on_cross</span><span class="p p-Indicator">:</span>
+<span class="hll">       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">produce_offspring</span><span class="p p-Indicator">:</span> <span class="s">&#39;newborn&#39;</span>
+</span><span class="hll">         <span class="l l-Scalar l-Scalar-Plain">amount</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span class="hll">       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">become</span><span class="p p-Indicator">:</span> <span class="s">&#39;next_parity&#39;</span>
+</span>   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">from</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">G</span>
+     <span class="l l-Scalar l-Scalar-Plain">to</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">D</span>
+<span class="hll">     <span class="l l-Scalar l-Scalar-Plain">escape</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">yes</span>
+</span>     <span class="l l-Scalar l-Scalar-Plain">rate</span><span class="p p-Indicator">:</span> <span class="s">&#39;1</span><span class="nv"> </span><span class="s">/</span><span class="nv"> </span><span class="s">avg_adult_death_age&#39;</span>
+<span class="nn">...</span>
+<span class="l l-Scalar l-Scalar-Plain">prototypes</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">animals</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">next_parity</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;increase</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">parity</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">female</span><span class="nv"> </span><span class="s">at</span><span class="nv"> </span><span class="s">farrowing,</span><span class="nv"> </span><span class="s">based</span><span class="nv"> </span><span class="s">on</span>
+        <span class="s">the</span><span class="nv"> </span><span class="s">order</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">which</span><span class="nv"> </span><span class="s">parities</span><span class="nv"> </span><span class="s">are</span><span class="nv"> </span><span class="s">defined</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">corresponding</span>
+        <span class="s">state</span><span class="nv"> </span><span class="s">machine&#39;</span>
+<span class="hll">        <span class="l l-Scalar l-Scalar-Plain">parity</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">next_state</span>
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>the use of state machines <code class="docutils literal notranslate"><span class="pre">sex</span></code> and <code class="docutils literal notranslate"><span class="pre">parity</span></code> which have only
+states (without any transition) to represent discrete and
+enumerable values</li>
+<li>condition <code class="docutils literal notranslate"><span class="pre">is_Female</span></code> to allow only females to move to
+gestating state</li>
+<li>built-in action <code class="docutils literal notranslate"><span class="pre">produce_offspring</span></code> used when returning from
+gestating (G) to non-gestating (A) state</li>
+<li>keyword <code class="docutils literal notranslate"><span class="pre">next_state</span></code> for variable <code class="docutils literal notranslate"><span class="pre">parity</span></code> in prototype
+<code class="docutils literal notranslate"><span class="pre">next_parity</span></code>, applied when returning from G to A, to make the
+value change automatically to the “next” one (from P0 to P1, from
+P1 to P2, etc.)</li>
+<li><code class="docutils literal notranslate"><span class="pre">escape</span></code> condition on transition from G to D to allow mortality
+while being in gestating state (otherwise the <code class="docutils literal notranslate"><span class="pre">duration</span></code> would
+forbid to leave gestating state before the end!)</li>
+<li>the grouping involving variables <code class="docutils literal notranslate"><span class="pre">age_group</span></code> and <code class="docutils literal notranslate"><span class="pre">sex</span></code> to
+provide variables such as <code class="docutils literal notranslate"><span class="pre">total_G_Female</span></code> (number of females
+in gestating state, which corresponds to <code class="docutils literal notranslate"><span class="pre">total_G</span></code> due to the
+condition on sex).</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p><a class="reference internal" href="Modelling_language_advanced.html#customize-transitions"><span class="std std-ref">Customize transitions</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#state-machines-without-transitions"><span class="std std-ref">State machines without transitions</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#produce-new-individuals"><span class="std std-ref">Produce new individuals</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#design-prototypes-for-typical-individuals-or-populations"><span class="std std-ref">Design prototypes for typical individuals or populations</span></a></p>
+<p>A very complete example is also provided in the Quickstart model
+(<code class="docutils literal notranslate"><span class="pre">quickstart/quickstart.yaml</span></code>) used to <a class="reference internal" href="Install.html#test-your-installation"><span class="std std-ref">Test your installation</span></a>.</p>
+<p>Especially:</p>
+<ul class="last simple">
+<li>action <code class="docutils literal notranslate"><span class="pre">produce_offspring</span></code> used to model vertical transmission</li>
+<li><code class="docutils literal notranslate"><span class="pre">escape</span></code> condition to allow abortions before gestation has ended</li>
+</ul>
+</div>
+</div>
+<div class="section" id="sir-model-with-structured-population">
+<h2>7.13. SIR model with structured population<a class="headerlink" href="#sir-model-with-structured-population" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/compart_SIR_struct.yaml">compart_SIR_struct.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/hybrid_SIR_struct.yaml">hybrid_SIR_struct.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/IBM_SIR_struct.yaml">IBM_SIR_struct.yaml</a></li>
+</ul>
+</div>
+<div class="graphviz"><object data="../_images/graphviz-2672332cb20b1abe39934877ae5cdebc54e1d1b7.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;S&quot; [shape=&quot;Mrecord&quot;, label=&quot;S&quot;, tooltip=&quot;S (Susceptible):
+	suceptible of becoming infected&quot;, fillcolor=wheat, style=&quot;filled,rounded,bold&quot;] ;
+	&quot;I&quot; [shape=&quot;Mrecord&quot;, label=&quot;I&quot;, tooltip=&quot;I (Infectious):
+	infected and able to transmit the disease&quot;, fillcolor=maroon, style=&quot;filled,rounded&quot;] ;
+	&quot;R&quot; [shape=&quot;Mrecord&quot;, label=&quot;R&quot;, tooltip=&quot;R (Resistant):
+	healthy again and resistant to infection&quot;, fillcolor=deepskyblue, style=&quot;filled,rounded&quot;] ;
+	&quot;I&quot; -&gt; &quot;R&quot; [label=&quot;rate: recovery&quot;, labeltooltip=&quot;recovery [parameter]:
+	recovery rate (/day)                                                    
+	0.1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;S&quot; -&gt; &quot;I&quot; [label=&quot;rate: force_of_infection&quot;, labeltooltip=&quot;force_of_infection [parameter]:
+	infection function                                                      
+	is_J * force_of_infection_juveniles + is_A * force_of_infection_adults &quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+<div class="graphviz"><object data="../_images/graphviz-3b14f077f0bf7e3aa04716c7dcbb6bb90358d4d8.svg" type="image/svg+xml" class="graphviz">
+<p class="warning">digraph {
+        	rankdir=LR;
+        	node[fontsize=16, fontname=Arial, shape=box, style=&quot;filled,rounded&quot;];
+        	edge[minlen=1.5, penwidth=1.5, tailtooltip=&quot;&quot;, headtooltip=&quot;&quot;];
+
+        	&quot;J&quot; [shape=&quot;Mrecord&quot;, label=&quot;J&amp;nbsp;&amp;#9719;&quot;, tooltip=&quot;J (Juvenile):
+	Young animals&quot;, fillcolor=orange, style=&quot;filled,rounded,bold&quot;] ;
+	&quot;A&quot; [shape=&quot;Mrecord&quot;, label=&quot;A&quot;, tooltip=&quot;A (Adult):
+	Adult animals&quot;, fillcolor=brown, style=&quot;filled,rounded&quot;] ;
+	&quot;D&quot; [shape=&quot;Mrecord&quot;, label=&quot;D&quot;, tooltip=&quot;D (Dead):
+	compartment to represent deceased animals&quot;, fillcolor=white, style=&quot;filled,rounded,dotted&quot;] ;
+	&quot;A&quot; -&gt; &quot;D&quot; [label=&quot;rate: mortality&quot;, labeltooltip=&quot;mortality [parameter]:
+	density-dependent mortality rate                                        
+	b * total_herd / carrying_capacity&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;A&quot; -&gt; &quot;J&quot; [label=&quot;rate: birth&quot;, labeltooltip=&quot;birth [parameter]:
+	birth rate (/day)                                                       
+	b * 2&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;dashed&quot;];
+	&quot;J&quot; -&gt; &quot;A&quot; [label=&quot;proba: 1&quot;, labeltooltip=&quot;proba: 1&quot;, arrowtail=&quot;none&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;&quot;, minlen=3, style=&quot;solid&quot;];
+	&quot;J&quot; -&gt; &quot;D&quot; [label=&quot;rate: mortality&quot;, labeltooltip=&quot;mortality [parameter]:
+	density-dependent mortality rate                                        
+	b * total_herd / carrying_capacity&quot;, arrowtail=&quot;noneoinv&quot;, arrowhead=&quot;normalnone&quot;, dir=both, tooltip=&quot;ESCAPE: True&quot;, minlen=3, style=&quot;solid&quot;];
+}</p></object></div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">grouping</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+<span class="hll">    <span class="l l-Scalar l-Scalar-Plain">details</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">health_state</span><span class="p p-Indicator">,</span> <span class="nv">age_group</span><span class="p p-Indicator">]</span>
+</span><span class="nn">...</span>
+<span class="l l-Scalar l-Scalar-Plain">parameters</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">force_of_infection</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;infection</span><span class="nv"> </span><span class="s">function&#39;</span>
+<span class="hll">    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;is_J</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">force_of_infection_juveniles</span><span class="nv"> </span><span class="s">+</span><span class="nv"> </span><span class="s">is_A</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">force_of_infection_adults&#39;</span>
+</span>  <span class="l l-Scalar l-Scalar-Plain">force_of_infection_juveniles</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;infection</span><span class="nv"> </span><span class="s">function</span><span class="nv"> </span><span class="s">experience</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">juveniles&#39;</span>
+<span class="hll">    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;DIV(transJJ</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">total_I_J,</span><span class="nv"> </span><span class="s">total_J)</span><span class="nv"> </span><span class="s">+</span><span class="nv"> </span><span class="s">DIV(transAJ</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">total_I_A,</span><span class="nv"> </span><span class="s">total_A)&#39;</span>
+</span>  <span class="l l-Scalar l-Scalar-Plain">force_of_infection_adults</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;infection</span><span class="nv"> </span><span class="s">function</span><span class="nv"> </span><span class="s">experience</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">adults&#39;</span>
+<span class="hll">    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;DIV(transAA</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">total_I_A,</span><span class="nv"> </span><span class="s">total_A)</span><span class="nv"> </span><span class="s">+</span><span class="nv"> </span><span class="s">DIV(transJA</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">total_I_J,</span><span class="nv"> </span><span class="s">total_J)&#39;</span>
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>The grouping based on health state and age group</li>
+<li>The composite definition of the force of infection, based on
+booleans (<code class="docutils literal notranslate"><span class="pre">is_J</span></code>,  <code class="docutils literal notranslate"><span class="pre">is_A</span></code>) and on the force of infection
+experienced by each group</li>
+<li>Function <code class="docutils literal notranslate"><span class="pre">DIV</span></code> used to compute the ratios: <em>DIV(a, b)</em> returns 0
+if <em>a=0</em>, otherwise <em>a/b</em>. It is used to avoid divisions by
+zeros, because when e.g. <code class="docutils literal notranslate"><span class="pre">total_J</span></code> is zero, so is <code class="docutils literal notranslate"><span class="pre">total_I_J</span></code>.</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_advanced.html#complexify-grouping"><span class="std std-ref">Complexify grouping</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#automatic-variables"><span class="std std-ref">Automatic variables</span></a></p>
+</div>
+</div>
+<div class="section" id="sir-model-with-metapopulation">
+<h2>7.14. SIR model with metapopulation<a class="headerlink" href="#sir-model-with-metapopulation" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/compart_SIR_JA_metapop.yaml">compart_SIR_JA_metapop.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/hybrid_SIR_JA_metapop.yaml">hybrid_SIR_JA_metapop.yaml</a></li>
+<li><a class="reference external" href="../_static/models/features/IBM_SIR_JA_metapop.yaml">IBM_SIR_JA_metapop.yaml</a></li>
+</ul>
+</div>
+<a class="reference internal image-reference" href="../_images/metapop.png"><img alt="../_images/metapop.png" src="../_images/metapop.png" style="width: 90%;" /></a>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">levels</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="hll">  <span class="l l-Scalar l-Scalar-Plain">metapop</span><span class="p p-Indicator">:</span>
+</span><span class="hll">    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;level</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">metapopulation&#39;</span>
+</span><span class="hll">    <span class="l l-Scalar l-Scalar-Plain">contains</span><span class="p p-Indicator">:</span>
+</span><span class="hll">      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">population</span>
+</span><span class="hll">    <span class="l l-Scalar l-Scalar-Plain">aggregation_type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">metapopulation</span>
+</span><span class="hll">    <span class="l l-Scalar l-Scalar-Plain">aggregate_vars</span><span class="p p-Indicator">:</span>
+</span><span class="hll">      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">metapop_total_population</span>
+</span><span class="hll">        <span class="l l-Scalar l-Scalar-Plain">collect</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">total_population</span>
+</span><span class="hll">        <span class="l l-Scalar l-Scalar-Plain">operator</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">sum</span>
+</span><span class="nn">...</span>
+<span class="l l-Scalar l-Scalar-Plain">parameters</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">...</span>
+  <span class="l l-Scalar l-Scalar-Plain">force_of_infection_between</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;infection</span><span class="nv"> </span><span class="s">function</span><span class="nv"> </span><span class="s">resulting</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">possible</span><span class="nv"> </span><span class="s">contacts</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">other</span><span class="nv"> </span><span class="s">population&#39;</span>
+<span class="hll">    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;transmission_between_populations</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">DIV(metapop_total_I</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">total_I,</span><span class="nv"> </span><span class="s">metapop_total_population</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">total_population)&#39;</span>
+</span>  <span class="l l-Scalar l-Scalar-Plain">force_of_infection_within</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;force</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">infection</span><span class="nv"> </span><span class="s">within</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">population&#39;</span>
+<span class="hll">    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;transmission_I</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">total_I</span><span class="nv"> </span><span class="s">/</span><span class="nv"> </span><span class="s">total_population&#39;</span>
+</span>  <span class="l l-Scalar l-Scalar-Plain">force_of_infection</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;total</span><span class="nv"> </span><span class="s">force</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">infection&#39;</span>
+<span class="hll">    <span class="l l-Scalar l-Scalar-Plain">value</span><span class="p p-Indicator">:</span> <span class="s">&#39;force_of_infection_within</span><span class="nv"> </span><span class="s">+</span><span class="nv"> </span><span class="s">force_of_infection_between&#39;</span>
+</span><span class="nn">...</span>
+<span class="l l-Scalar l-Scalar-Plain">prototypes</span><span class="p p-Indicator">:</span>
+<span class="hll">  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+</span>    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">healthy_population</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;population</span><span class="nv"> </span><span class="s">initially</span><span class="nv"> </span><span class="s">without</span><span class="nv"> </span><span class="s">infected</span><span class="nv"> </span><span class="s">individuals&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">initial_prevalence</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">infected_population</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;population</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">initially</span><span class="nv"> </span><span class="s">infected</span><span class="nv"> </span><span class="s">individuals&#39;</span>
+        <span class="l l-Scalar l-Scalar-Plain">initial_prevalence</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="nn">...</span>
+<span class="l l-Scalar l-Scalar-Plain">initial_conditions</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">population</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">...</span>
+<span class="hll">  <span class="l l-Scalar l-Scalar-Plain">metapop</span><span class="p p-Indicator">:</span>
+</span><span class="hll">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">prototype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">infected_population</span>
+</span><span class="hll">      <span class="l l-Scalar l-Scalar-Plain">amount</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span class="hll">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">prototype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">healthy_population</span>
+</span><span class="hll">      <span class="l l-Scalar l-Scalar-Plain">amount</span><span class="p p-Indicator">:</span> <span class="s">&#39;nb_populations</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">1&#39;</span>
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>The additional level with aggregation type <code class="docutils literal notranslate"><span class="pre">metapopulation</span></code></li>
+<li>Additional prototypes at population level, used to define initial
+conditions which now apply not only at population level, but also
+at metapop level (here, only one population infected initially)</li>
+<li>The force of infection, composed of the force of infection within
+each population, and of the force of infection between
+populations (based on aggregate variables at the metapopulation
+level to compute an average external risk), which results in the
+spread of the pathogen in intially disease-free populations (see figures)</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_advanced.html#changing-scale-metapopulations"><span class="std std-ref">Changing scale: metapopulations</span></a></p>
+</div>
+</div>
+<div class="section" id="sir-model-with-metapopulation-data-driven-movements-and-data-pre-processing">
+<h2>7.15. SIR model with metapopulation, data-driven movements and data pre-processing<a class="headerlink" href="#sir-model-with-metapopulation-data-driven-movements-and-data-pre-processing" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-files admonition">
+<p class="first admonition-title">Files</p>
+<ul class="last simple">
+<li><a class="reference external" href="../_static/models/features/compart_SIR_JA_metapop_data.yaml">compart_SIR_JA_metapop_data.yaml</a> +
+<a class="reference external" href="../_static/models/features/compart_SIR_JA_metapop_data.py">compart_SIR_JA_metapop_data.py</a></li>
+<li><a class="reference external" href="../_static/models/features/hybrid_SIR_JA_metapop_data.yaml">hybrid_SIR_JA_metapop_data.yaml</a> +
+<a class="reference external" href="../_static/models/features/hybrid_SIR_JA_metapop_data.py">hybrid_SIR_JA_metapop_data.py</a></li>
+<li><a class="reference external" href="../_static/models/features/IBM_SIR_JA_metapop_data.yaml">IBM_SIR_JA_metapop_data.yaml</a> +
+<a class="reference external" href="../_static/models/features/IBM_SIR_JA_metapop_data.py">IBM_SIR_JA_metapop_data.py</a></li>
+<li><a class="reference external" href="../_static/models/features/data/moves.csv">data/moves.csv</a></li>
+</ul>
+</div>
+<a class="reference internal image-reference" href="../_images/metapop2.png"><img alt="../_images/metapop2.png" src="../_images/metapop2.png" style="width: 90%;" /></a>
+<a class="reference internal image-reference" href="../_images/trade.png"><img alt="../_images/trade.png" src="../_images/trade.png" style="width: 90%;" /></a>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">levels</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">...</span>
+  <span class="l l-Scalar l-Scalar-Plain">metapop</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">desc</span><span class="p p-Indicator">:</span> <span class="s">&#39;level</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">metapopulation&#39;</span>
+    <span class="l l-Scalar l-Scalar-Plain">contains</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">herd</span>
+    <span class="l l-Scalar l-Scalar-Plain">aggregation_type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">metapopulation</span>
+    <span class="c1"># The metapopulation is explicitly linked to a specific class in a</span>
+    <span class="c1"># Python code add-on</span>
+<span class="hll">    <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="s">&#39;hybrid_SIR_metapop_data.py&#39;</span>
+</span><span class="hll">    <span class="l l-Scalar l-Scalar-Plain">class_name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Metapopulation</span>
+</span><span class="nn">...</span>
+<span class="l l-Scalar l-Scalar-Plain">processes</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">herd</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">...</span>
+    <span class="l l-Scalar l-Scalar-Plain">metapop</span><span class="p p-Indicator">:</span>
+      <span class="c1"># here the process is the name of a procedure defined in the</span>
+      <span class="c1"># Python code</span>
+<span class="hll">      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">exchange_animals</span>
+</span><span class="nn">...</span>
+<span class="hll"><span class="l l-Scalar l-Scalar-Plain">input_data</span><span class="p p-Indicator">:</span>
+</span><span class="hll">  <span class="l l-Scalar l-Scalar-Plain">preprocessing</span><span class="p p-Indicator">:</span>
+</span><span class="hll">    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span> <span class="s">&#39;hybrid_SIR_JA_metapop_data.py&#39;</span>
+</span><span class="hll">      <span class="l l-Scalar l-Scalar-Plain">class_name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">TradeMovementsReader</span>
+</span><span class="hll">      <span class="l l-Scalar l-Scalar-Plain">input_files</span><span class="p p-Indicator">:</span>
+</span><span class="hll">        <span class="l l-Scalar l-Scalar-Plain">trade_file</span><span class="p p-Indicator">:</span> <span class="s">&#39;moves.csv&#39;</span>
+</span></pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>Reference to Python file and class name in the definition of
+level <code class="docutils literal notranslate"><span class="pre">metapop</span></code></li>
+<li>Class name <code class="docutils literal notranslate"><span class="pre">Metapopulation</span></code> which links level <code class="docutils literal notranslate"><span class="pre">metapop</span></code> from
+YAML file to actual code in Python file.</li>
+<li>New prototype <code class="docutils literal notranslate"><span class="pre">imported_movement</span></code> for creating animals coming
+from outside the metapopulation</li>
+<li>Variables <code class="docutils literal notranslate"><span class="pre">purchased</span></code> and <code class="docutils literal notranslate"><span class="pre">sold</span></code> which are updated in Python
+code by process <code class="docutils literal notranslate"><span class="pre">exchange_animals</span></code> (compare with previous
+section on metapopulation to see that infections spread is much
+more deterministic due to data-based trade movements)</li>
+<li>New section <code class="docutils literal notranslate"><span class="pre">input_data</span></code> with preprocessing operations (loading
+CSV file describing trade movements and restructuring information
+as a dictionary which is available in all stochastic repetitions)</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="Modelling_language_advanced.html#changing-scale-metapopulations"><span class="std std-ref">Changing scale: metapopulations</span></a>,
+<a class="reference internal" href="Modelling_language_advanced.html#connecting-to-python-code-add-ons"><span class="std std-ref">Connecting to Python code add-ons</span></a>
+<a class="reference internal" href="Modelling_language_advanced.html#using-pre-processors"><span class="std std-ref">Using pre-processors</span></a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">7. Feature examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sir-model">7.1. SIR model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#seirs-model">7.2. SEIRS model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sirs-model-with-periodic-external-risk">7.3. SIRS model with periodic external risk</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#custom-state-durations">7.4. Custom state durations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sir-model-with-basic-demography-births-deaths">7.5. SIR model with basic demography (births/deaths)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sir-model-with-age-groups">7.6. SIR model with age groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sir-model-with-age-groups-and-random-initialization">7.7. SIR model with age groups and random initialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sir-model-with-age-groups-and-data-based-prototypes">7.8. SIR model with age groups and data-based prototypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sir-model-with-cumulative-incidence">7.9. SIR model with cumulative incidence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sir-model-with-individual-actions-and-variable-aggregation">7.10. SIR model with individual actions and variable aggregation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sir-model-with-age-groups-and-explicit-age">7.11. SIR model with age groups and explicit age</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sir-model-with-explicit-gestation">7.12. SIR model with explicit gestation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sir-model-with-structured-population">7.13. SIR model with structured population</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sir-model-with-metapopulation">7.14. SIR model with metapopulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sir-model-with-metapopulation-data-driven-movements-and-data-pre-processing">7.15. SIR model with metapopulation, data-driven movements and data pre-processing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulsion.html">11. emulsion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="Modelling_language_advanced.html" title="previous chapter">6. Modelling language (advanced)</a></li>
+      <li>Next: <a href="Release_notes.html" title="next chapter">8. Release notes</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/pages/Feature_examples.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

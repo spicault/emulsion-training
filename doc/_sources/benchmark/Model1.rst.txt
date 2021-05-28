@@ -1,0 +1,40 @@
+Model 1 (classical SIR)
+***********************
+
+File with full comments: `model1.yaml <../_static/benchmark/model1.yaml>`_
+
+.. literalinclude:: ../_static/benchmark/model1-short.yaml
+
+
+To run the model for 100 stochastic repetitions:
+
+.. code-block:: bash
+
+  emulsion run --plot model1.yaml -r 100 --silent
+
+Which produces the following output:
+
+.. image:: ../_images/benchmark/model1-output.png
+   :width: 75%
+
+To produce the diagrams of the state machine which controls health
+states:
+
+.. code-block:: bash
+
+   emulsion diagrams model1.yaml
+
+Which gives:
+
+.. graphviz:: ../_images/benchmark/model1.dot
+
+
+To view model parameters:
+
+.. code-block:: bash
+
+   emulsion show model1.yaml
+
+which produces:
+
+.. literalinclude:: ../_images/benchmark/model1.txt

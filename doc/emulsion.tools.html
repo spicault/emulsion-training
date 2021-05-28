@@ -1,0 +1,2414 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>emulsion.tools package &#8212; EMULSION (Epidemiological Multi-Level Simulation framework)</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="shortcut icon" href="_static/STEMAH-favicon.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="emulsion.model package" href="emulsion.model.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-emulsion.tools">
+<span id="emulsion-tools-package"></span><h1>emulsion.tools package<a class="headerlink" href="#module-emulsion.tools" title="Permalink to this headline">¶</a></h1>
+<p>A Python implementation of the EMuLSion framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>Misc. tools</p>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-emulsion.tools.calendar">
+<span id="emulsion-tools-calendar-module"></span><h2>emulsion.tools.calendar module<a class="headerlink" href="#module-emulsion.tools.calendar" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.tools.calendar"></span><p>Classes and functions for the definition of Emulsion calendars.</p>
+<dl class="class">
+<dt id="emulsion.tools.calendar.EventCalendar">
+<em class="property">class </em><code class="descclassname">emulsion.tools.calendar.</code><code class="descname">EventCalendar</code><span class="sig-paren">(</span><em>calendar_name</em>, <em>step_duration</em>, <em>origin</em>, <em>period=None</em>, <em>**initial_dates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#EventCalendar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.EventCalendar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The EventCalendar class is intended to handle events and
+periods of time. Dates/times are given to the calendar in a
+human-readable format, and converted to integers (simulation
+steps).</p>
+<dl class="method">
+<dt id="emulsion.tools.calendar.EventCalendar.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>calendar_name</em>, <em>step_duration</em>, <em>origin</em>, <em>period=None</em>, <em>**initial_dates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#EventCalendar.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.EventCalendar.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the calendar using the specified information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>calendar_name</strong> (<em>string</em>) – the name of the calendar</li>
+<li><strong>step_duration</strong> (<code class="docutils literal notranslate"><span class="pre">datetime.timedelta</span></code>) – actual duration of one simulation step</li>
+<li><strong>origin</strong> (<code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code>) – date/time value of the beginning of the calendar</li>
+<li><strong>period</strong> (<code class="docutils literal notranslate"><span class="pre">datetime.timedelta</span></code>) – if the calendar is periodic, actual duration of the
+period, None otherwise</li>
+<li><strong>initial_dates</strong> (<em>dict</em>) – initial dictionary of events (event name as key, dict as
+value with either begin/end dates or one single date if
+punctual event)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.calendar.EventCalendar.add_event">
+<code class="descname">add_event</code><span class="sig-paren">(</span><em>name</em>, <em>begin_end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#EventCalendar.add_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.EventCalendar.add_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified event to the calendar. An event is characterized
+by its <em>name</em> and a <em>begin_end</em> tuple indicating the begin and
+end dates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>str</em>) – the name of the event</li>
+<li><strong>begin_end</strong> (<em>tuple</em>) – a tuple composed of the begin date and the end date
+(possibly identical for handling punctual events)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.calendar.EventCalendar.date_to_step">
+<code class="descname">date_to_step</code><span class="sig-paren">(</span><em>date</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#EventCalendar.date_to_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.EventCalendar.date_to_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the step corresponding the specified date.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>date</strong> (<code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code>) – the date to convert into time steps</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>t</strong> (<em>int</em>) – the time step during which the specified date occurs (the
+date occurs between the returned time step <em>t</em> and time
+step <em>t+1</em>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.calendar.EventCalendar.get_events">
+<code class="descname">get_events</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#EventCalendar.get_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.EventCalendar.get_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of events contained in the current calendar.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>l</strong> (<em>list</em>) – the list of all event names</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.calendar.EventCalendar.increment">
+<code class="descname">increment</code><span class="sig-paren">(</span><em>steps=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#EventCalendar.increment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.EventCalendar.increment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Advance the current date by the specified number of
+simulation steps.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>steps</strong> (<em>int</em>) – number of steps to ‘add’ to the current date</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.calendar.EventCalendar.step_to_date">
+<code class="descname">step_to_date</code><span class="sig-paren">(</span><em>step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#EventCalendar.step_to_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.EventCalendar.step_to_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the date when the specified step begins.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>step</strong> (<em>int</em>) – the time step to convert to a date</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>d</strong> (<code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code>) – the corresponding date</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="emulsion.tools.calendar.InvalidIntervalException">
+<em class="property">exception </em><code class="descclassname">emulsion.tools.calendar.</code><code class="descname">InvalidIntervalException</code><span class="sig-paren">(</span><em>begin</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#InvalidIntervalException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.InvalidIntervalException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Exception raised when trying to insert an inconsistent event in the
+calendar. An event is considered inconsistent if the begin date is
+posterior to the send date in a non-periodic calendar.</p>
+<dl class="method">
+<dt id="emulsion.tools.calendar.InvalidIntervalException.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>begin</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#InvalidIntervalException.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.InvalidIntervalException.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the exception with the incorrect <em>begin</em> and <em>end</em> dates.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.calendar.date_in">
+<code class="descclassname">emulsion.tools.calendar.</code><code class="descname">date_in</code><span class="sig-paren">(</span><em>begin</em>, <em>end</em>, <em>period=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#date_in"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.date_in" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a callable class which tests if a date belongs to the
+specified interval (from <em>begin</em> to <em>end</em>). If a <em>period</em> is
+specified, the test relies upon the periodicity, otherwise dates
+are considered absolute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>begin</strong> (<code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code>) – the date when the interval begins</li>
+<li><strong>end</strong> (<code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code>) – the date when the interval ends</li>
+<li><strong>period</strong> (<code class="docutils literal notranslate"><span class="pre">datetime.timedelta</span></code>) – the duration of the period after which the calendar cycles</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><em>class</em> – a callable class which depends on relations between parameter
+values and can be called on a date (<code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code>) to
+return a <code class="docutils literal notranslate"><span class="pre">bool</span></code> which indicates whether or not the date
+belongs to the <em>begin</em>-<em>end</em> interval.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidIntervalexception</span></code> – if <em>begin</em> is posterior to <em>end</em> in a non-periodic calendar</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.calendar.date_tester">
+<em class="property">class </em><code class="descclassname">emulsion.tools.calendar.</code><code class="descname">date_tester</code><span class="sig-paren">(</span><em>begin</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#date_tester"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.date_tester" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.calendar.date_tester.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>begin</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#date_tester.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.date_tester.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.calendar.periodic_date_tester">
+<em class="property">class </em><code class="descclassname">emulsion.tools.calendar.</code><code class="descname">periodic_date_tester</code><span class="sig-paren">(</span><em>begin</em>, <em>end</em>, <em>period</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#periodic_date_tester"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.periodic_date_tester" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.calendar.periodic_date_tester.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>begin</em>, <em>end</em>, <em>period</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#periodic_date_tester.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.periodic_date_tester.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.calendar.periodic_date_tester_inverted">
+<em class="property">class </em><code class="descclassname">emulsion.tools.calendar.</code><code class="descname">periodic_date_tester_inverted</code><span class="sig-paren">(</span><em>begin</em>, <em>end</em>, <em>period</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#periodic_date_tester_inverted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.periodic_date_tester_inverted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.calendar.periodic_date_tester_inverted.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>begin</em>, <em>end</em>, <em>period</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/calendar.html#periodic_date_tester_inverted.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.calendar.periodic_date_tester_inverted.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.tools.debug">
+<span id="emulsion-tools-debug-module"></span><h2>emulsion.tools.debug module<a class="headerlink" href="#module-emulsion.tools.debug" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.tools.debug"></span><p>Tools for debugging.</p>
+<dl class="function">
+<dt id="emulsion.tools.debug.debuginfo">
+<code class="descclassname">emulsion.tools.debug.</code><code class="descname">debuginfo</code><span class="sig-paren">(</span><em>*message</em>, <em>**options</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/debug.html#debuginfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.debug.debuginfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print debug information.</p>
+<p>Can be used in the code as a classical <cite>print</cite>
+function. Information are printed in bright yellow colour, with
+the name of the python file and line number where it was used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>*message</strong> (<em>list</em>) – the items to print</li>
+<li><strong>**options</strong> (<em>dict</em>) – options passed to the classical <cite>print</cite> function</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-examples admonition">
+<p class="first admonition-title">Examples</p>
+<p>Here is a small example of how to use this function in a python script:</p>
+<blockquote class="last">
+<div><blockquote>
+<div><p>from emulsion.tools.debug import debuginfo</p>
+<p>debuginfo(‘Starting test’)</p>
+<dl class="docutils">
+<dt>for i in range(10):</dt>
+<dd>print(i)</dd>
+</dl>
+</div></blockquote>
+<p>debuginfo(‘Test finished, logging in file test.log’)</p>
+<dl class="docutils">
+<dt>with open(‘test.log’, ‘a’) as out:</dt>
+<dd>debuginfo(‘values:’, <a href="#id1"><span class="problematic" id="id2">*</span></a>[i for i in range(10)], sep=”-“, file=out)</dd>
+</dl>
+</div></blockquote>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.tools.functions">
+<span id="emulsion-tools-functions-module"></span><h2>emulsion.tools.functions module<a class="headerlink" href="#module-emulsion.tools.functions" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.tools.functions"></span><p>Additional functions for symbolic computing in YAML model definition files.</p>
+<p>All functions in this module can be used in EMULSION models.</p>
+<dl class="function">
+<dt id="emulsion.tools.functions.AND">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">AND</code><span class="sig-paren">(</span><em>*values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/functions.html#AND"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.AND" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a logical AND (conjunction) between all the values.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>To define symptomatic individuals as infected for at least 5 days:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">is_symptomatic</span><span class="p">:</span>
+  <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;test if individuals has symptoms&#39;</span>
+  <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;AND(is_I, duration_in_health_state &gt;= 5)&#39;</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*values</strong> (<em>list</em>) – boolean values separated by commas</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>bool</em> – True if <strong>all</strong> values are True, False otherwise.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.DIV">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">DIV</code><span class="sig-paren">(</span><em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/functions.html#DIV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.DIV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return 0 if a=0 without considering b, otherwise a/b.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>b</strong> (<em>a</em><em>,</em>) – the values to divide</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>float</em> – 0 if a is 0, otherwise a/b</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.IfThenElse">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">IfThenElse</code><span class="sig-paren">(</span><em>condition</em>, <em>val_if_true</em>, <em>val_if_false</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/functions.html#IfThenElse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.IfThenElse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ternary conditional function: return either <em>val_if_true</em> or
+<em>val_if_false</em> depending on <em>condition</em>.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>Here in a parameter definition (assuming that <code class="docutils literal notranslate"><span class="pre">summer_period</span></code> is
+defined e.g. in the <em>calendars</em> section of the model):</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">average_temperature</span><span class="p">:</span>
+  <span class="n">desc</span><span class="p">:</span> <span class="s1">&#39;average temperature for the season&#39;</span>
+  <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;IfThenElse(summer_period, 25, 8)&#39;</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>condition</strong> (<em>bool</em>) – a boolean expression</li>
+<li><strong>val_if_true</strong> (<em>number</em>) – value to return if the expression is True</li>
+<li><strong>val_if_false</strong> (<em>number</em>) – value to return if the expression is False</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>number</em> – One of the two values, depending on <em>condition</em>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.MAX">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">MAX</code><span class="sig-paren">(</span><em>*values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/functions.html#MAX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.MAX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the maximum of all values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*values</strong> (<em>list</em>) – boolean values separated by commas</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>float</em> – the highest value</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.MIN">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">MIN</code><span class="sig-paren">(</span><em>*values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/functions.html#MIN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.MIN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the minimum of all values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*values</strong> (<em>list</em>) – boolean values separated by commas</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>float</em> – the lowest value</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.NOT">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">NOT</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/functions.html#NOT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.NOT" title="Permalink to this definition">¶</a></dt>
+<dd><p>An alias for Not</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.OR">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">OR</code><span class="sig-paren">(</span><em>*values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/functions.html#OR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.OR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a logical OR (disjunction) between all the values.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>To sell animals depending on either their weight or their age:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transitions</span><span class="p">:</span>
+  <span class="o">...</span>
+  <span class="o">-</span> <span class="n">from</span><span class="p">:</span> <span class="n">Fattening</span>
+    <span class="n">to</span><span class="p">:</span> <span class="n">Sold</span>
+    <span class="n">proba</span><span class="p">:</span> <span class="mi">1</span>
+    <span class="n">cond</span><span class="p">:</span> <span class="s1">&#39;OR(weight &gt;= weight_thr, age &gt;= age_thr)&#39;</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*values</strong> (<em>list</em>) – boolean values separated by commas</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>bool</em> – True if <strong>at least one</strong> of the values is True, False otherwise.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.random_beta">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">random_beta</code><span class="sig-paren">(</span><em>a: float</em>, <em>b: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/emulsion/tools/functions.html#random_beta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.random_beta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a random value drawn from a beta distribution of parameters
+<em>a</em> and <em>b</em>.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>In a prototype definition:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">age</span><span class="p">:</span> <span class="s1">&#39;random_beta(2, 5) * age_max&#39;</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>a</strong> (<em>float</em><em>, </em><em>positive</em><em> (</em><em>&gt;0</em><em>)</em>) – first shape parameter of the beta distribution</li>
+<li><strong>b</strong> (<em>float</em><em>, </em><em>positive</em><em> (</em><em>&gt;0</em><em>)</em>) – second shape parameter of the beta distribution</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>float</em> – a random value sampled according to a beta distribution of
+parameters <em>a</em> and <em>b</em></p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.beta()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.random_bool">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">random_bool</code><span class="sig-paren">(</span><em>proba_success: float</em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/emulsion/tools/functions.html#random_bool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.random_bool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a random boolean value (actually, 0 or 1) depending on
+<em>proba_success</em>.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>Set the value of a state variable <code class="docutils literal notranslate"><span class="pre">has_symptoms</span></code> when entering
+in the infectious state:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">states</span><span class="p">:</span>
+  <span class="o">...</span>
+  <span class="o">-</span> <span class="n">I</span><span class="p">:</span>
+    <span class="o">...</span>
+    <span class="n">on_enter</span><span class="p">:</span>
+      <span class="o">-</span> <span class="n">set_var</span><span class="p">:</span> <span class="n">has_symptoms</span>
+        <span class="n">value</span><span class="p">:</span> <span class="s1">&#39;random_bool(proba_symptomatic)&#39;</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>proba_success</strong> (<em>float in</em><em> [</em><em>0</em><em>,</em><em>1</em><em>]</em>) – probability of returning 1 (True)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>int</em> – either 1 with probability <em>proba_success</em>, or 0 with
+probability 1-<em>proba_success</em></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.random_choice">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">random_choice</code><span class="sig-paren">(</span><em>*values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/functions.html#random_choice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.random_choice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a value chosen randomly among those provided (equiprobable
+sampling).</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>To init <code class="docutils literal notranslate"><span class="pre">age</span></code> among three typical values:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">prototypes</span><span class="p">:</span>
+  <span class="n">individuals</span><span class="p">:</span>
+    <span class="n">init_individual</span><span class="p">:</span>
+      <span class="n">age</span><span class="p">:</span> <span class="s1">&#39;random_choice(10, 50, 200)&#39;</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*values</strong> (<em>list</em>) – the possible values, separated by commas</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>val</em> – one of the values (equiprobable choice)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.random_choice_weighted">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">random_choice_weighted</code><span class="sig-paren">(</span><em>*values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/functions.html#random_choice_weighted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.random_choice_weighted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a value chosen randomly among those provided (but not
+equiprobably).</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>To init <code class="docutils literal notranslate"><span class="pre">age</span></code> among three typical values which respectively
+represent 10%, 20% and 70% of the population:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">prototypes</span><span class="p">:</span>
+  <span class="n">individuals</span><span class="p">:</span>
+    <span class="n">init_individual</span><span class="p">:</span>
+      <span class="n">age</span><span class="p">:</span> <span class="s1">&#39;random_choice_weighted(10, 0.1, 50, 0.2, 200, 0.7)&#39;</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>values</strong> (<em>list</em>) – possibles choices and their weight, alternatively, separated
+by commas. Weights are normalized to be used as probabilities.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>One of the choices</em></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.random_exponential">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">random_exponential</code><span class="sig-paren">(</span><em>scale: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/emulsion/tools/functions.html#random_exponential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.random_exponential" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a random value drawn from an exponential distribution of
+rate 1/<em>scale</em> (thus of mean <em>scale</em>).</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>In a prototype definition:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">time_to_live</span><span class="p">:</span> <span class="n">random_exponential</span><span class="p">(</span><span class="n">mean_duration</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scale</strong> (<em>float</em>) – the scale parameter of the distribution, i.e. the inverse of the rate</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>float</em> – a random value sampled according to an exponential
+distribution of rate 1/<em>scale</em></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.exponential()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.random_gamma">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">random_gamma</code><span class="sig-paren">(</span><em>shape: float</em>, <em>scale: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/emulsion/tools/functions.html#random_gamma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.random_gamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a random value drawn from a gamma distribution of parameters
+<em>shape</em> and <em>scale</em>.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>In a prototype definition:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">age</span><span class="p">:</span> <span class="s1">&#39;random_gamma(3, 2)&#39;</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>shape</strong> (<em>float</em><em>, </em><em>positive</em><em> (</em><em>&gt;0</em><em>)</em>) – the shape of the gamma distribution</li>
+<li><strong>scale</strong> (<em>float</em><em>, </em><em>positive</em><em> (</em><em>&gt;0</em><em>)</em>) – the scale of the gamma distribution</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>float</em> – a random value sampled according to a gamma distribution of
+parameters <em>shape</em> and <em>scale</em></p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.gamma()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.random_integers">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">random_integers</code><span class="sig-paren">(</span><em>low: int</em>, <em>high: int</em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/emulsion/tools/functions.html#random_integers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.random_integers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a random integer value drawn from a discrete uniform
+distribution between <em>low</em> and <em>high</em> (both inclusive).</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>In a prototype definition:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">age</span><span class="p">:</span> <span class="n">random_integers</span><span class="p">(</span><span class="n">min_age</span><span class="p">,</span> <span class="n">max_age</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>low</strong> (<em>int</em>) – lower boundary of the sample interval (inclusive)</li>
+<li><strong>high</strong> (<em>int</em>) – upper boundary of the sample interval (inclusive)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>int</em> – a random integer value sampled according to a discrete uniform
+distribution between <em>low</em> and <em>high</em></p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.random_integers()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.random_multinomial">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">random_multinomial</code><span class="sig-paren">(</span><em>number_of_samples</em>, <em>*probas</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/functions.html#random_multinomial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.random_multinomial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a multinomial sample based on the specified probabilities.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>number_of_samples</strong> (<em>int</em>) – number of experiments</li>
+<li><strong>probas</strong> (<em>list</em>) – list of probabilities</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> – the drawn samples</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.random_normal">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">random_normal</code><span class="sig-paren">(</span><em>mn: float</em>, <em>sd: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/emulsion/tools/functions.html#random_normal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.random_normal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a random value drawn from a normal distribution of mean <em>mn</em>
+and standard deviation <em>sd</em>.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>In a prototype definition:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">age</span><span class="p">:</span> <span class="s1">&#39;random_normal(100, 5)&#39;</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mn</strong> (<em>float</em>) – the mean of the normal distribution</li>
+<li><strong>sd</strong> (<em>float</em><em>, </em><em>positive</em><em> (</em><em>&gt;=0</em><em>)</em>) – the standard deviation of the normal distribution</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>float</em> – a random value sampled according to a normal distribution of
+mean <em>mn</em> and standard deviation <em>sd</em></p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.normal()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.random_poisson">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">random_poisson</code><span class="sig-paren">(</span><em>lam: float</em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/emulsion/tools/functions.html#random_poisson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.random_poisson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an integer random value drawn from a Poisson distribution of
+mean <em>lam</em>.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>In an action, e.g. here when computing how many newborn
+individuals will be produced:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">from</span><span class="p">:</span> <span class="n">Gestating</span>
+  <span class="n">to</span><span class="p">:</span> <span class="n">NonGestating</span>
+  <span class="n">on_cross</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">produce_offspring</span><span class="p">:</span> <span class="n">newborn</span>
+      <span class="n">amount</span><span class="p">:</span> <span class="s1">&#39;random_poisson(1.05)&#39;</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>lam</strong> (<em>float</em>) – the mean of the Poisson distribution</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>int</em> – a random integer value sampled according to a Poisson distribution of
+mean <em>lam</em></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.poisson()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.functions.random_uniform">
+<code class="descclassname">emulsion.tools.functions.</code><code class="descname">random_uniform</code><span class="sig-paren">(</span><em>low: float</em>, <em>high: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/emulsion/tools/functions.html#random_uniform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.functions.random_uniform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a random value drawn from a uniform distribution between
+<em>low</em> (inclusive) and <em>high</em> (exclusive).</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>In a prototype definition:</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">age</span><span class="p">:</span> <span class="n">random_uniform</span><span class="p">(</span><span class="n">min_age</span><span class="p">,</span> <span class="n">max_age</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>low</strong> (<em>float</em>) – lower boundary of the sample interval (inclusive)</li>
+<li><strong>high</strong> (<em>float</em>) – upper boundary of the sample interval (exclusive)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>float</em> – a random value sampled according to a uniform distribution
+between <em>low</em> and <em>high</em></p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.random.uniform()</span></code></p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.tools.getters">
+<span id="emulsion-tools-getters-module"></span><h2>emulsion.tools.getters module<a class="headerlink" href="#module-emulsion.tools.getters" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.tools.getters"></span><p>Collection of callable classes used in EMULSION framework to replace
+closures and lambda functions.</p>
+<dl class="class">
+<dt id="emulsion.tools.getters.PrototypeGenerator">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">PrototypeGenerator</code><span class="sig-paren">(</span><em>names</em>, <em>freqs</em>, <em>collection_name</em>, <em>method</em>, <em>cycle=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#PrototypeGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.PrototypeGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class designed to give prototypes on demand in a collection.</p>
+<dl class="method">
+<dt id="emulsion.tools.getters.PrototypeGenerator.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>names</em>, <em>freqs</em>, <em>collection_name</em>, <em>method</em>, <em>cycle=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#PrototypeGenerator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.PrototypeGenerator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.getters.PrototypeGenerator.set_simu_id">
+<code class="descname">set_simu_id</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#PrototypeGenerator.set_simu_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.PrototypeGenerator.set_simu_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.create_aggregator">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">create_aggregator</code><span class="sig-paren">(</span><em>sourcevar: str</em>, <em>operator: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_aggregator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_aggregator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.create_aggregator.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>sourcevar: str</em>, <em>operator: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_aggregator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_aggregator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an aggregator function to be used as property getter. This
+aggregator function has to collect all values of <em>sourcevar</em>
+for agents contained in a given host, and reduce them to one
+avalue using the specified <em>operator</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sourcevar</strong> (<em>str</em>) – the name of the variable to collect in the sublevel</li>
+<li><strong>operator</strong> (<em>str</em>) – the name of the operator to apply to the collected values</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>callable</em> – A callable class which can be applied to a
+<cite>MultiProcessManager</cite> agent (i.e. with explicit sublevel
+agents) which returns the aggregated values for the whole
+population.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.create_atoms_aggregator">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">create_atoms_aggregator</code><span class="sig-paren">(</span><em>sourcevar: str</em>, <em>operator: str</em>, <em>machine_name: str</em>, <em>state_name: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_atoms_aggregator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_atoms_aggregator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.create_atoms_aggregator.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>sourcevar: str</em>, <em>operator: str</em>, <em>machine_name: str</em>, <em>state_name: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_atoms_aggregator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_atoms_aggregator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a getter for property of the form <code class="docutils literal notranslate"><span class="pre">newvar_X</span></code> where <code class="docutils literal notranslate"><span class="pre">X</span></code> if
+the value of <em>state_name</em> (a state of <em>state_machine</em>),
+<code class="docutils literal notranslate"><span class="pre">newvar</span></code> is an aggregate variable based on collecting all
+values of <em>sourcevar</em> for the specific <em>group_name</em> and
+aggregating the values using <em>operator</em>. This function is
+intended to work on <cite>IBMProcessManager</cite> agents, which do not
+benefit from groupings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sourcevar</strong> (<em>str</em>) – the name of the variable to collect in the sublevel</li>
+<li><strong>operator</strong> (<em>str</em>) – the name of the operator to apply to the collected values</li>
+<li><strong>machine_name</strong> (<em>str</em>) – the name of the state machine for which the getter is created</li>
+<li><strong>state_name</strong> (<em>str</em>) – the state name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>callable</em> – A callable class on which can be applied to an
+<cite>IBMProcessManager</cite> agent (i.e. with explicit but
+ungrouped sublevel agents) which returns the aggregated
+value for the specified group.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.create_counter_getter">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">create_counter_getter</code><span class="sig-paren">(</span><em>grouping_name</em>, <em>t_states</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_counter_getter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_counter_getter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.create_counter_getter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>grouping_name</em>, <em>t_states</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_counter_getter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_counter_getter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a callable class used as a getter for property of the form
+<code class="docutils literal notranslate"><span class="pre">total_X_Y</span></code> where <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code> are state names in the
+tuple <em>t_states</em> and where the total number of individuals in
+those states can be calculated from the specified
+<em>grouping_name</em>.</p>
+<p>If a single state is passed to <em>t_states</em>, a tuple is created.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>grouping_name</strong> (<em>str</em>) – the name of the grouping (or single state machine) to use for calculation</li>
+<li><strong>t_states</strong> (<em>tuple</em>) – tuple of states to count (possibly single value)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>callable</em> – A callable class which can be applied to an
+<code class="docutils literal notranslate"><span class="pre">IBMProcessManager</span></code> agent which returns the
+population size for the specified group.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.create_duration_getter">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">create_duration_getter</code><span class="sig-paren">(</span><em>machine_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_duration_getter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_duration_getter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.create_duration_getter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>machine_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_duration_getter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_duration_getter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a callable class used as a getter for property of the form
+<code class="docutils literal notranslate"><span class="pre">duration_in_M</span></code> where <code class="docutils literal notranslate"><span class="pre">M</span></code> is a <em>machine_name</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>machine_name</strong> (<em>str</em>) – the name of the state machine</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>callable</em> – A callable class which can be applied to an <code class="docutils literal notranslate"><span class="pre">AtomAgent</span></code>
+agent which returns the duration elapsed since the agent
+entered the current state of <em>machine_name</em></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.create_group_aggregator">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">create_group_aggregator</code><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_group_aggregator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_group_aggregator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.create_group_aggregator.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_group_aggregator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_group_aggregator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a getter for property of the form <code class="docutils literal notranslate"><span class="pre">newvar_X_Y</span></code> where <code class="docutils literal notranslate"><span class="pre">X</span></code>
+and <code class="docutils literal notranslate"><span class="pre">Y</span></code> are states of two different states machines used in
+a grouping, <code class="docutils literal notranslate"><span class="pre">newvar</span></code> is an aggregate variable based on
+collecting all values of <em>sourcevar</em> for the specific
+<em>group_name</em> and aggregating the values using <em>operator</em>. The
+functions can handle groupings with an arbitrary number of
+states.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sourcevar</strong> (<em>str</em>) – the name of the variable to collect in the sublevel</li>
+<li><strong>operator</strong> (<em>str</em>) – the name of the operator to apply to the collected values</li>
+<li><strong>process_name</strong> (<em>str</em>) – the name of the process associated with the grouping for which
+the population getter is created</li>
+<li><strong>group_name</strong> (<em>str</em><em> or </em><em>tuple</em>) – either a string representing the state name (if only one), or
+a tuple of several state names</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>callable</em> – A callable class which can be applied to an
+<cite>MultiProcessManager</cite> agent (i.e. with explicit sublevel
+agents) which returns the aggregated value for the
+specified group.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.create_new_serial">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">create_new_serial</code><span class="sig-paren">(</span><em>end=None</em>, <em>model=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_new_serial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_new_serial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.create_new_serial.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>end=None</em>, <em>model=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_new_serial.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_new_serial.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the serial number generator associated to the specified
+variable.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.create_population_getter">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">create_population_getter</code><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_population_getter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_population_getter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.create_population_getter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_population_getter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_population_getter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a callable class used as a getter for property of the form
+<code class="docutils literal notranslate"><span class="pre">total_X_Y</span></code> where <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code> are states of two
+different states machines used in the grouping <em>grouping_name</em>.</p>
+<p>The functions can handle groupings with an arbitrary number of
+states.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>grouping_name</strong> (<em>str</em>) – the name of the grouping for which the population getter is created</li>
+<li><strong>t_states</strong> (<em>str</em><em> or </em><em>tuple</em>) – either a string representing the state name (if only one), or
+a tuple of several state names</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>callable</em> – A callable class which can be applied to an
+<code class="docutils literal notranslate"><span class="pre">AbstractProcessManager</span></code> agent which returns the
+population size for the specified group.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.create_predecessor_getter">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">create_predecessor_getter</code><span class="sig-paren">(</span><em>machine_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_predecessor_getter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_predecessor_getter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.create_predecessor_getter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>machine_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_predecessor_getter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_predecessor_getter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a function to access the predecessor state for the specified
+<em>machine_name</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>machine_name</strong> (<em>str</em>) – the name of a state machine for which the function will be built</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>callable</em> – a callable class that returns the predecessor state for
+the current state of the statevar specified by
+<em>state_machine</em>. If no value is set, returns a random
+state of this state machine.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.create_relative_population_getter">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">create_relative_population_getter</code><span class="sig-paren">(</span><em>model</em>, <em>t_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_relative_population_getter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_relative_population_getter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.create_relative_population_getter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>model</em>, <em>t_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_relative_population_getter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_relative_population_getter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a callable class used as a getter for property of the form
+<code class="docutils literal notranslate"><span class="pre">total_X_Y</span></code> where <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code> are either states of two
+different states machines used in the grouping described by <em>t_variables</em>,
+or keywords built upon a state machine name <code class="docutils literal notranslate"><span class="pre">M</span></code> of the form <code class="docutils literal notranslate"><span class="pre">my_M</span></code> or
+<code class="docutils literal notranslate"><span class="pre">other_M</span></code>.</p>
+<p>The functions can handle groupings with an arbitrary number of
+states.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>model</strong> (<a class="reference internal" href="emulsion_for_modellers.html#emulsion.model.emulsion_model.EmulsionModel" title="emulsion.model.emulsion_model.EmulsionModel"><em>EmulsionModel</em></a>) – the model in which population counts apply</li>
+<li><strong>t_variables</strong> (<em>str</em><em> or </em><em>tuple</em>) – tuple of strings (possibly one string), each one
+representing either an explicit state (e.g. ‘S’), or the current
+state of the agent for a specific state machine (e.g.
+‘my_health_state’), or all states other than the current state of
+the agent for a specific state machine (e.g. ‘other_health_state’)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>callable</em> – A callable class which can be applied to an
+<code class="docutils literal notranslate"><span class="pre">AtomAgent</span></code> agent which returns the
+population size for the specified group.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.create_state_tester">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">create_state_tester</code><span class="sig-paren">(</span><em>state_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_state_tester"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_state_tester" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.create_state_tester.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>state_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_state_tester.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_state_tester.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a callable class used as a getter for property of the form
+<code class="docutils literal notranslate"><span class="pre">is_X</span></code> where <code class="docutils literal notranslate"><span class="pre">X</span></code> is a state of a state machine.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_name</strong> (<em>str</em>) – the name of state</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>callable</em> – A callable class which can be applied to an <code class="docutils literal notranslate"><span class="pre">AtomAgent</span></code>
+agent which returns True if the agent is in state
+<em>state_name</em>, False otherwise.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.create_successor_getter">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">create_successor_getter</code><span class="sig-paren">(</span><em>machine_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_successor_getter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_successor_getter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.create_successor_getter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>machine_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_successor_getter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_successor_getter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a callable class to access the successor state for the
+specified <em>machine_name</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>machine_name</strong> (<em>str</em>) – the name of a state machine for which the function will be built</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>callable</em> – a function that returns the successor state for the
+current state of the statevar specified by
+<em>state_machine</em>. If no value is set, returns a random
+state of this state machine.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.create_weighted_random">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">create_weighted_random</code><span class="sig-paren">(</span><em>machine_name</em>, <em>weights</em>, <em>model=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_weighted_random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_weighted_random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.create_weighted_random.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>machine_name</em>, <em>weights</em>, <em>model=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#create_weighted_random.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.create_weighted_random.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a random choice function which returns a random state from
+the given state machine (among non-autoremove states), according
+to the weights. Weights are interpreted either directly as
+probabilities (if the number of weights is stricly one below the
+number of available states, the last state getting the complement
+to 1), or as true weights which are then normalized to be used as
+probabilities.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>machine_name</strong> (<em>str</em>) – the name of the state machine where the states must be chosen
+among the <em>N</em> non-autoremove states.</li>
+<li><strong>weights</strong> (<em>list</em>) – a list of <em>N</em> or <em>N-1</em> model expressions assumed to produce positive numbers</li>
+<li><strong>model</strong> (<a class="reference internal" href="emulsion_for_modellers.html#emulsion.model.emulsion_model.EmulsionModel" title="emulsion.model.emulsion_model.EmulsionModel"><em>EmulsionModel</em></a>) – the model where this function is defined</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>callable</em> – a callable class that returns a random state according to the
+values of the weights list, interpreted either as
+probabilities (if size <em>N-1</em>) or as weights (if size <em>N</em>)
+which are then normalized to provide probabilities</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.find_operator">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">find_operator</code><span class="sig-paren">(</span><em>operator: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#find_operator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.find_operator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.find_operator.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>operator: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#find_operator.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.find_operator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an aggregation function named <em>operator</em>.</p>
+<p>Search starts with emulsion functions (module
+<cite>emulsion.tools.functions</cite>), which includes Python built-ins, then
+in <cite>numpy</cite>.</p>
+<p>A special shortcut is provided for percentiles: <code class="docutils literal notranslate"><span class="pre">percentileXX</span></code>
+is interpreted as the partial function
+<code class="docutils literal notranslate"><span class="pre">numpy.percentile(q=int(XX))</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>operator</strong> (<em>str</em>) – the name of the aggregation operator</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>callable</em> – a callable class which can be called on a list (or
+array-like) as input and returns the application of the
+<em>operator</em> to the values.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.make_generator_prototype_getter">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">make_generator_prototype_getter</code><span class="sig-paren">(</span><em>names</em>, <em>freqs</em>, <em>collection_name</em>, <em>method</em>, <em>cycle=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#make_generator_prototype_getter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.make_generator_prototype_getter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.make_generator_prototype_getter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>names</em>, <em>freqs</em>, <em>collection_name</em>, <em>method</em>, <em>cycle=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#make_generator_prototype_getter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.make_generator_prototype_getter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a function to access to prototypes in order, based on given
+<em>names</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>names</strong> (<em>list</em>) – the list of prototypes to sample</li>
+<li><strong>freqs</strong> (<em>list</em>) – the list of probabilities associated with each name</li>
+<li><strong>collection_name</strong> (<em>str</em>) – the name of the prototype collection</li>
+<li><strong>method</strong> (<em>str</em>) – the method used to pick concrete prototypes in the collection</li>
+<li><strong>cycle</strong> (<em>bool</em>) – True if the values must cycle when end of list is reached,
+False otherwise</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>callable</em> – a callable class that returns a prototype name when called</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.make_information_getter">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">make_information_getter</code><span class="sig-paren">(</span><em>value_vame</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#make_information_getter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.make_information_getter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Build and return a callable class, which can be called on an agent
+to return the value of the specified parameter (or expression) in
+the the agent.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value_name</strong> (<code class="docutils literal notranslate"><span class="pre">str</span></code>) – the name of the statevar to get</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>class</em> – a callable which can be called on an agent</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="emulsion.tools.getters.make_information_getter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>value_vame</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#make_information_getter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.make_information_getter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.getters.make_random_prototype_getter">
+<em class="property">class </em><code class="descclassname">emulsion.tools.getters.</code><code class="descname">make_random_prototype_getter</code><span class="sig-paren">(</span><em>names</em>, <em>freqs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#make_random_prototype_getter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.make_random_prototype_getter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="emulsion.tools.getters.make_random_prototype_getter.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>names</em>, <em>freqs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/getters.html#make_random_prototype_getter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.getters.make_random_prototype_getter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a function to access to random prototypes based on given
+frequencies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>names</strong> (<em>list</em>) – the list of prototypes to sample</li>
+<li><strong>freqs</strong> (<em>list</em>) – list of probabilities for random sampling</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>callable</em> – a callable class that returns a random prototype name sampled
+randomly in <em>names</em> based on <em>freqs</em></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.tools.graph">
+<span id="emulsion-tools-graph-module"></span><h2>emulsion.tools.graph module<a class="headerlink" href="#module-emulsion.tools.graph" title="Permalink to this headline">¶</a></h2>
+<p>A Python implementation of the EMuLSion framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>Tools aimed at handling graphs for the state machines</p>
+<dl class="class">
+<dt id="emulsion.tools.graph.EdgeTypes">
+<em class="property">class </em><code class="descclassname">emulsion.tools.graph.</code><code class="descname">EdgeTypes</code><a class="headerlink" href="#emulsion.tools.graph.EdgeTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.tools.state.EmulsionEnum" title="emulsion.tools.state.EmulsionEnum"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.tools.state.EmulsionEnum</span></code></a></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="emulsion.tools.graph.EdgeTypes.PRODUCTION">
+<code class="descname">PRODUCTION</code><em class="property"> = 2</em><a class="headerlink" href="#emulsion.tools.graph.EdgeTypes.PRODUCTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.tools.graph.EdgeTypes.TRANSITION">
+<code class="descname">TRANSITION</code><em class="property"> = 1</em><a class="headerlink" href="#emulsion.tools.graph.EdgeTypes.TRANSITION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.tools.graph.EdgeTypes.linestyle">
+<code class="descname">linestyle</code><em class="property"> = 'solid'</em><a class="headerlink" href="#emulsion.tools.graph.EdgeTypes.linestyle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.graph.MultiDiGraph">
+<em class="property">class </em><code class="descclassname">emulsion.tools.graph.</code><code class="descname">MultiDiGraph</code><span class="sig-paren">(</span><em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/graph.html#MultiDiGraph"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.graph.MultiDiGraph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An oriented multigraph (two nodes can be linked by several
+edges). Replacement for MultiDiGraph in networkx with a
+reproducible order in accessing edges and nodes.</p>
+<dl class="method">
+<dt id="emulsion.tools.graph.MultiDiGraph.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/graph.html#MultiDiGraph.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.graph.MultiDiGraph.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an instance of MultiDiGraph. If keywords arguments
+are specified, they are considered attributes of the whole
+graph.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.graph.MultiDiGraph.add_edge">
+<code class="descname">add_edge</code><span class="sig-paren">(</span><em>from_id</em>, <em>to_id</em>, <em>type_id=&lt;EdgeTypes.TRANSITION&gt;</em>, <em>key=None</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/graph.html#MultiDiGraph.add_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.graph.MultiDiGraph.add_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified edge to the graph. If nodes are not
+already created, they are automatically added. Edge attributes
+can be specified. Since this graph allows multiple edges
+between pairs of nodes, two calls to this method lead to two
+distinct edges (even if the attributes are the same), unless a
+key is specified. The key is used to identify edges between a
+given pair of nodes. By default, keys are consecutive
+integers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.graph.MultiDiGraph.add_node">
+<code class="descname">add_node</code><span class="sig-paren">(</span><em>node_id</em>, <em>**attributes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/graph.html#MultiDiGraph.add_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.graph.MultiDiGraph.add_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified node to the graph. Node attributes can be
+specified. If the node is already present, updated the
+attributes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.graph.MultiDiGraph.edges">
+<code class="descname">edges</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/graph.html#MultiDiGraph.edges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.graph.MultiDiGraph.edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of edge tuples.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.graph.MultiDiGraph.edges_from">
+<code class="descname">edges_from</code><span class="sig-paren">(</span><em>from_id</em>, <em>type_id=&lt;EdgeTypes.TRANSITION&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/graph.html#MultiDiGraph.edges_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.graph.MultiDiGraph.edges_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of tuples (to_id, attributes) corresponding
+to all edges going out of the <cite>from_id</cite> node.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.tools.misc">
+<span id="emulsion-tools-misc-module"></span><h2>emulsion.tools.misc module<a class="headerlink" href="#module-emulsion.tools.misc" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.tools.misc"></span><p>Collection of various useful functions used in EMULSION framework,
+especially regarding introspection.</p>
+<dl class="data">
+<dt id="emulsion.tools.misc.AGENTS">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">AGENTS</code><em class="property"> = 1</em><a class="headerlink" href="#emulsion.tools.misc.AGENTS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant value for the index where list of agents are stored in
+‘populations’ tuples.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="emulsion.tools.misc.POPULATION">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">POPULATION</code><em class="property"> = 1</em><a class="headerlink" href="#emulsion.tools.misc.POPULATION" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constant value for the index where population amounts are stored in
+‘populations’ tuples.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.add_all_relative_population_getters">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">add_all_relative_population_getters</code><span class="sig-paren">(</span><em>agent</em>, <em>t_key_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/misc.html#add_all_relative_population_getters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.add_all_relative_population_getters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Endow the agent with individual properties of the form <code class="docutils literal notranslate"><span class="pre">total_X_Y</span></code>
+where <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">Y</span></code> are either states of two different states
+machines used in a grouping, or keywords built upon a state
+machine name <code class="docutils literal notranslate"><span class="pre">M</span></code> of the form <code class="docutils literal notranslate"><span class="pre">my_M</span></code> or <code class="docutils literal notranslate"><span class="pre">other_M</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>agent</strong> (<a class="reference internal" href="emulsion.agent.core.html#emulsion.agent.core.emulsion_agent.EmulsionAgent" title="emulsion.agent.core.emulsion_agent.EmulsionAgent"><em>EmulsionAgent</em></a><em> (</em><a class="reference internal" href="emulsion.agent.html#emulsion.agent.views.AdaptiveView" title="emulsion.agent.views.AdaptiveView"><em>AdaptiveView</em></a><em> or </em><a class="reference internal" href="emulsion.agent.html#emulsion.agent.atoms.AtomAgent" title="emulsion.agent.atoms.AtomAgent"><em>AtomAgent</em></a><em>)</em>) – the agent which will be endowed with the new properties</li>
+<li><strong>key_variables</strong> (<em>tuple</em>) – string of tuple containing the names of the state machines</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.add_all_test_properties">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">add_all_test_properties</code><span class="sig-paren">(</span><em>agent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/misc.html#add_all_test_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.add_all_test_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Endow the agent with individuals properties: <code class="docutils literal notranslate"><span class="pre">duration_in_&lt;a</span> <span class="pre">state</span>
+<span class="pre">machine&gt;</span></code> for all state machines, and <code class="docutils literal notranslate"><span class="pre">is_X</span></code> for all states.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.add_new_property">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">add_new_property</code><span class="sig-paren">(</span><em>agent</em>, <em>property_name</em>, <em>getter_function</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/misc.html#add_new_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.add_new_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new property to an agent.</p>
+<p>Actually, the property is added to the class of the agent, as
+Python properties are descriptors. Yet, the dynamic attribution of
+properties must me done through instances rather than classes,
+since agents must add the name of the property to their
+<code class="docutils literal notranslate"><span class="pre">_mbr_cache</span></code> attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>agent</strong> (<a class="reference internal" href="emulsion_for_modellers.html#emulsion.agent.core.abstract_agent.AbstractAgent" title="emulsion.agent.core.abstract_agent.AbstractAgent"><em>AbstractAgent</em></a>) – the agent to which the property must be added</li>
+<li><strong>property_name</strong> (<em>str</em>) – the name of the property</li>
+<li><strong>getter_function</strong> (<em>callable</em>) – the callable class upon which the property is built</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.aggregate_probabilities">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">aggregate_probabilities</code><span class="sig-paren">(</span><em>probability_values: Iterable[float], delta_t: float</em><span class="sig-paren">)</span> &#x2192; Iterable[float]<a class="reference internal" href="_modules/emulsion/tools/misc.html#aggregate_probabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.aggregate_probabilities" title="Permalink to this definition">¶</a></dt>
+<dd><p>From the specified <em>probability_values</em>, intended to represent
+probabilities of events duting one time unit, compute the
+probabilities for the specified time step (<em>delta_t</em>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>probability_values</strong> (<em>list</em>) – a list of probability values for several events (during 1 time unit)</li>
+<li><strong>delta_t</strong> (<em>float</em>) – the value of the time step (expressed in time units)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> – the probabilities of the same events during <em>delta_t</em> time units.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.aggregate_probability">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">aggregate_probability</code><span class="sig-paren">(</span><em>probability: float</em>, <em>delta_t: float</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/emulsion/tools/misc.html#aggregate_probability"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.aggregate_probability" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the specified <em>probability</em> value, intended to represent
+a probability for events tested each time unit, into the
+probability for the specified time step (<em>delta_t</em>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>probability</strong> (<em>float</em>) – the probability value of an event (during 1 time unit)</li>
+<li><strong>delta_t</strong> (<em>float</em>) – the value of the time step (expressed in time units)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>float</em> – the probability of the event during <em>delta_t</em> time units.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.complement_key">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">complement_key</code><span class="sig-paren">(</span><em>d_initial_key</em>, <em>l_state_machines</em>, <em>prototype=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/misc.html#complement_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.complement_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure that all values are assigned to build a consistent key based on <em>d_initial_key</em> to identify a compartment (values for the variables corresponding to the expected state machines which operate on the compartment) according to the following rules:</p>
+<ol class="arabic simple">
+<li>if a <em>prototype</em> is given, the state machine values specified in the prototype are applied</li>
+<li>missing value for each state machine in <em>l_state_machines</em> are replaced with the default state if any</li>
+<li>remaining missing values are all non-autoremove states, which leads to building all possible consistent combinations</li>
+</ol>
+<dl class="docutils">
+<dt>list:</dt>
+<dd>list of tuples which correspond to valid keys for this specification</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.count_population">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">count_population</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/misc.html#count_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.count_population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the amount of atoms represented in <em>agents_or_pop</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>agents_or_pop</strong> (<em>tuple</em>) – either (‘population’, qty, esc) or (‘agents’, list of agents, None)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>int or float</em> – the amount corresponding to the population: generally, an int
+value, but deterministic models produce float values.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.load_class">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">load_class</code><span class="sig-paren">(</span><em>module=None</em>, <em>class_name: str = None</em>, <em>options: dict = {}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/misc.html#load_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.load_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamically load the class with the specified <em>class_name</em> from the
+given <em>module</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>module</strong> – a Python module, where the class is expected to be located.</li>
+<li><strong>class_name</strong> (<em>str</em>) – the name of the class to load</li>
+<li><strong>options</strong> – some options</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>tuple</em> – a tuple composed of the class (type) and the options.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<ul class="last simple">
+<li>clarify the role of <em>options</em></li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.load_module">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">load_module</code><span class="sig-paren">(</span><em>module_name: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/misc.html#load_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.load_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamically load the module with the specified <em>module_name</em> and
+return it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>module_name</strong> (<em>str</em>) – the name of a valid Python module (accessible in the
+<code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code> environment variable).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>ref</em> – A reference to the Python module.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.moving_average">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">moving_average</code><span class="sig-paren">(</span><em>values</em>, <em>window_size</em>, <em>mode='same'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/misc.html#moving_average"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.moving_average" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a moving average of the specified <em>values</em> with respect to
+the <em>window_size</em> on which the average is calculated. The return
+moving average has the same size as the original values. To avoid
+boundary effects, use <code class="docutils literal notranslate"><span class="pre">mode='valid'</span></code>, which produce a result of
+size <code class="docutils literal notranslate"><span class="pre">len(values)</span> <span class="pre">-</span> <span class="pre">window_size</span> <span class="pre">+</span> <span class="pre">1</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>values</strong> (<em>array-like</em>) – contains the values for moving average computation</li>
+<li><strong>window_size</strong> (<em>int</em>) – width of the moving average window</li>
+<li><strong>mode</strong> (<em>str</em>) – a parameter for <cite>numpy.convolve</cite></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>nd_array</em> – a numpy <code class="docutils literal notranslate"><span class="pre">nd_array</span></code> containing the values of the moving average.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.probabilities_to_rates">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">probabilities_to_rates</code><span class="sig-paren">(</span><em>probability_values: Iterable[float]</em><span class="sig-paren">)</span> &#x2192; List[float]<a class="reference internal" href="_modules/emulsion/tools/misc.html#probabilities_to_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.probabilities_to_rates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform a list of probabilities into a list of rates. The
+last value is expected to represent the probability of staying in
+the current state.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>probability_values</strong> (<em>list</em>) – a list of probabilities, the last one representing the
+probability to stay in the current state</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>list</em> – a list of rates corresponding to those probabilities.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.rates_to_probabilities">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">rates_to_probabilities</code><span class="sig-paren">(</span><em>total_rate: float, rate_values: List[float], delta_t: float = 1</em><span class="sig-paren">)</span> &#x2192; List[float]<a class="reference internal" href="_modules/emulsion/tools/misc.html#rates_to_probabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.rates_to_probabilities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the specified list of <em>rate_values</em>, interpreted as
+outgoing rates, into probabilities, according to the specified
+time step (<em>delta_t</em>) and normalized by <em>total_rate</em>.</p>
+<p>For exit rates <span class="math notranslate nohighlight">\(\rho_i\)</span> (one of the <em>rate_values</em>), the
+probability to stay in current state is given by:</p>
+<div class="math notranslate nohighlight">
+\[p_0 = e^{-\delta t.\sum_i \rho_i}\]</div>
+<p>Thus, each rate <span class="math notranslate nohighlight">\(\rho_i\)</span> corresponds to a probability</p>
+<div class="math notranslate nohighlight">
+\[p_i = \frac{\rho_i}{\sum_i \rho_i} (1 - p_0)\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>total_rate</strong> (<em>float</em>) – the total exit rate, used for normalization purposes. If
+<em>rate_values</em> represent all possible exit rates, <em>total_rate</em>
+is their sum.</li>
+<li><strong>rate_values</strong> (<em>list</em>) – the list of rates to transform</li>
+<li><strong>delta_t</strong> (<em>float</em>) – the value of the time step (expressed in time units)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> – the list of probabilities corresponding to the <em>rate_values</em>.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.read_csv_prototypes">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">read_csv_prototypes</code><span class="sig-paren">(</span><em>collection_name</em>, <em>filename</em>, <em>method=None</em>, <em>condition=None</em>, <em>weight_column=None</em>, <em>include=[]</em>, <em>exclude=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/misc.html#read_csv_prototypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.read_csv_prototypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the definitions of prototypes contained in file <em>filename</em> and
+return a dictionary representing the collection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>collection_name</strong> (<em>str</em>) – the name of the prototypes collection</li>
+<li><strong>filename</strong> (<em>Path</em>) – the path to the CSV file to read</li>
+<li><strong>method</strong> (<em>str</em>) – method used to select prototypes in the collection</li>
+<li><strong>condition</strong> (<em>callable</em>) – a callable class which can be called on a CSV line, returning
+1 if the line fulfils the condition, 0 otherwise</li>
+<li><strong>weight_column</strong> (<em>str</em>) – the name of the column to use to weight prototypes in random
+sampling. If None, all prototypes are given the same weight</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> – A prototype collection, as a list of tuples composed of the
+prototype frequency, the prototype name, and the dictionary
+describing the prototype itself</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>The CSV file is expected to contain a description of the
+prototypes. Prototypes define how to set variables in agents that
+belong to the same organization level. The CSV header is expected
+to contain the names of the variables. A column named
+<em>prototype_name</em> can be used to associate each combination of
+variable values to a specific identifier (built from the
+collection name followed by the prototype name, e.g. collection
+<cite>default_herd</cite> and <em>prototype_name</em> <cite>small</cite> gives
+<cite>default_herd-small</cite>). If not specified, the prototype names will
+be generated automatically based on the filename and line
+numbers. The resulting prototypes are named after this initial
+prototype name (automatically generated or specified) and the
+collection name (<cite>collection_name-prototype_name</cite>).  A <em>filter</em>
+can be used in the prototype section to select only lines that
+fulfil a given condition (provided as a function here).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.read_from_file">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">read_from_file</code><span class="sig-paren">(</span><em>filename: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/misc.html#read_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.read_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the specified YAML <em>filename</em> and return the corresponding
+Python document.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) – the name of the YAML file to load</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><em>object</em> – a Python object built by parsing of the YAML file, i.e. either
+a dict, list, or even str/int/etc… (Most YAML document will
+produce dictionaries.)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.retrieve_value">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">retrieve_value</code><span class="sig-paren">(</span><em>value_or_function</em>, <em>agent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/misc.html#retrieve_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.retrieve_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a value either directly given by parameter
+<em>value_or_function</em> if it is a true value, or computed from this
+parameter seen as a function, with the specified <em>agent</em> as argument.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value_or_function</strong> – either a callable (function that applies to an agent to
+retrieve an individual value), or the value itself</li>
+<li><strong>agent</strong> – the agent to use as parameter of the callable if necessary</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>value</em> – the expected value (agent-based or not).</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.rewrite_keys">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">rewrite_keys</code><span class="sig-paren">(</span><em>name</em>, <em>position</em>, <em>change_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/misc.html#rewrite_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.rewrite_keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.select_random">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">select_random</code><span class="sig-paren">(</span><em>origin: Iterable</em>, <em>quantity: int</em>, <em>exclude: sortedcontainers.sortedset.SortedSet = SortedSet([]</em>, <em>key=None</em>, <em>load=1000)</em><span class="sig-paren">)</span> &#x2192; List<a class="reference internal" href="_modules/emulsion/tools/misc.html#select_random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.select_random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a random selection of <em>quantity</em> agents from the <em>origin</em>
+group, avoiding those explicitly in the <em>exclude</em> set. If the
+<em>origin</em> population proves too small, all available agents are
+taken, irrespective to the <em>quantity</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>origin</strong> (<em>iterable</em>) – the population where agents must be selected</li>
+<li><strong>quantity</strong> (<em>int</em>) – the number of agents to select in the population</li>
+<li><strong>exclude</strong> (<em>set</em>) – agents which are not available for the selection</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><em>list</em> – a list of randomly selected agents according to the above constraints.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.misc.serial">
+<code class="descclassname">emulsion.tools.misc.</code><code class="descname">serial</code><span class="sig-paren">(</span><em>start=0</em>, <em>end=None</em>, <em>model=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/misc.html#serial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.misc.serial" title="Permalink to this definition">¶</a></dt>
+<dd><p>A very simple serial number generator.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.tools.parallel">
+<span id="emulsion-tools-parallel-module"></span><h2>emulsion.tools.parallel module<a class="headerlink" href="#module-emulsion.tools.parallel" title="Permalink to this headline">¶</a></h2>
+<p>A Python implementation of the EMuLSion framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>Tools for parallel computing.</p>
+<dl class="function">
+<dt id="emulsion.tools.parallel.job">
+<code class="descclassname">emulsion.tools.parallel.</code><code class="descname">job</code><span class="sig-paren">(</span><em>target_simulation_class</em>, <em>proc</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/parallel.html#job"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.parallel.job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple job for a simple processes</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.parallel.job_dist">
+<code class="descclassname">emulsion.tools.parallel.</code><code class="descname">job_dist</code><span class="sig-paren">(</span><em>total_task</em>, <em>workers</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/parallel.html#job_dist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.parallel.job_dist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a distribution of each worker need to do.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.parallel.parallel_multi">
+<code class="descclassname">emulsion.tools.parallel.</code><code class="descname">parallel_multi</code><span class="sig-paren">(</span><em>target_simulation_class=&lt;class 'emulsion.tools.simulation.MultiSimulation'&gt;</em>, <em>nb_simu=None</em>, <em>nb_proc=1</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/parallel.html#parallel_multi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.parallel.parallel_multi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parallel loop for distributing tasks in different processes</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.parallel.parallel_sensi">
+<code class="descclassname">emulsion.tools.parallel.</code><code class="descname">parallel_sensi</code><span class="sig-paren">(</span><em>target_simulation_class=&lt;class 'emulsion.tools.simulation.SensitivitySimulation'&gt;</em>, <em>nb_proc=1</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/parallel.html#parallel_sensi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.parallel.parallel_sensi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parallel loop for distributing sensitivity tasks in different processes</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.tools.plot">
+<span id="emulsion-tools-plot-module"></span><h2>emulsion.tools.plot module<a class="headerlink" href="#module-emulsion.tools.plot" title="Permalink to this headline">¶</a></h2>
+<p>A Python implementation of the EMuLSion framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>Plotting tools… to be improved!</p>
+<dl class="function">
+<dt id="emulsion.tools.plot.build_machine_plot">
+<code class="descclassname">emulsion.tools.plot.</code><code class="descname">build_machine_plot</code><span class="sig-paren">(</span><em>machine_name</em>, <em>model</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/plot.html#build_machine_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.plot.build_machine_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a bokeh figure based on the representation of the state
+machine, with the associated colors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>machine</strong> – the state machine to which the states are related</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A bokeh gridplot.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.plot.build_state_plot">
+<code class="descclassname">emulsion.tools.plot.</code><code class="descname">build_state_plot</code><span class="sig-paren">(</span><em>counts</em>, <em>cols</em>, <em>machine</em>, <em>model</em>, <em>y='quantity'</em>, <em>group='state'</em>, <em>ylab='Number of individuals'</em>, <em>style=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/plot.html#build_state_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.plot.build_state_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a bokeh figure based on the representation of the states in
+the <em>counts</em> dataframe, with the associated colors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>counts</strong> – a Pandas dataframe containing the values to plot</li>
+<li><strong>cols</strong> (<em>dict</em>) – dictionary which maps state/variable names to colors</li>
+<li><strong>machine</strong> – the state machine to which the states are related</li>
+<li><strong>model</strong> – the Emulsion model related to this plot</li>
+<li><strong>y</strong> (<em>str</em>) – the name of the field containing y values in the dataframe</li>
+<li><strong>group</strong> (<em>str</em>) – either ‘state’ (default) or ‘variables’, name of
+the field containing each legend items.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A bokeh gridplot (reduced to one figure a the herd level, one
+figure per herd at metapopulation level).</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.plot.plot_outputs">
+<code class="descclassname">emulsion.tools.plot.</code><code class="descname">plot_outputs</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/plot.html#plot_outputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.plot.plot_outputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read outputs from previous runs and plot the corresponding
+figures. In the <em>params</em> dictionary, <cite>output_dir</cite> is expected to
+contain a <cite>counts.csv</cite> file; <cite>figure_dir</cite> is where the plot is
+saved.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.tools.preprocessor">
+<span id="emulsion-tools-preprocessor-module"></span><h2>emulsion.tools.preprocessor module<a class="headerlink" href="#module-emulsion.tools.preprocessor" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.tools.preprocessor"></span><p>Tools for providing generic preprocessor classes.</p>
+<dl class="class">
+<dt id="emulsion.tools.preprocessor.EmulsionPreprocessor">
+<em class="property">class </em><code class="descclassname">emulsion.tools.preprocessor.</code><code class="descname">EmulsionPreprocessor</code><span class="sig-paren">(</span><em>model</em>, <em>simulation</em>, <em>data_based_parameters=[]</em>, <em>input_files=None</em>, <em>output_files=None</em>, <em>parameters=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/preprocessor.html#EmulsionPreprocessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.preprocessor.EmulsionPreprocessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This is the base class for all preprocessing operations.</p>
+<dl class="method">
+<dt id="emulsion.tools.preprocessor.EmulsionPreprocessor.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>model</em>, <em>simulation</em>, <em>data_based_parameters=[]</em>, <em>input_files=None</em>, <em>output_files=None</em>, <em>parameters=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/preprocessor.html#EmulsionPreprocessor.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.preprocessor.EmulsionPreprocessor.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the preprocessor.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.preprocessor.EmulsionPreprocessor.init_preprocessor">
+<code class="descname">init_preprocessor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/preprocessor.html#EmulsionPreprocessor.init_preprocessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.preprocessor.EmulsionPreprocessor.init_preprocessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do basic verifications and initializations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.preprocessor.EmulsionPreprocessor.run_preprocessor">
+<code class="descname">run_preprocessor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/preprocessor.html#EmulsionPreprocessor.run_preprocessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.preprocessor.EmulsionPreprocessor.run_preprocessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do the actual preprocessing operations.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.tools.simulation">
+<span id="emulsion-tools-simulation-module"></span><h2>emulsion.tools.simulation module<a class="headerlink" href="#module-emulsion.tools.simulation" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.tools.simulation"></span><p>Tools for providing generic simulation classes.</p>
+<dl class="class">
+<dt id="emulsion.tools.simulation.AbstractSimulation">
+<em class="property">class </em><code class="descclassname">emulsion.tools.simulation.</code><code class="descname">AbstractSimulation</code><span class="sig-paren">(</span><em>start_id: int = 0</em>, <em>model=None</em>, <em>model_path: str = ''</em>, <em>stock_agent: bool = True</em>, <em>output_dir: str = 'outputs/'</em>, <em>target_agent_class=None</em>, <em>save_results: bool = True</em>, <em>input_dir: str = None</em>, <em>load_from_file: str = None</em>, <em>save_to_file: str = None</em>, <em>shared_data: dict = None</em>, <em>**_</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#AbstractSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.AbstractSimulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract class from which any simulation class inherits.</p>
+<dl class="method">
+<dt id="emulsion.tools.simulation.AbstractSimulation.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>start_id: int = 0</em>, <em>model=None</em>, <em>model_path: str = ''</em>, <em>stock_agent: bool = True</em>, <em>output_dir: str = 'outputs/'</em>, <em>target_agent_class=None</em>, <em>save_results: bool = True</em>, <em>input_dir: str = None</em>, <em>load_from_file: str = None</em>, <em>save_to_file: str = None</em>, <em>shared_data: dict = None</em>, <em>**_</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#AbstractSimulation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.AbstractSimulation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the simulation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>start_id</strong> – ID of the (first) simulation</li>
+<li><strong>model</strong> – instance of the model to run</li>
+<li><strong>model_path</strong> – path to the filename holding the description of the
+model, used if <em>model</em> is None</li>
+<li><strong>stock_agent</strong> – TODO</li>
+<li><strong>output_dir</strong> – name of the directory for simulation outputs</li>
+<li><strong>target_agent_class</strong> – agent class representing the top level in the
+simulation</li>
+<li><strong>save_results</strong> – True if simulation outputs have to be saved,
+False otherwise. TODO: should be removed, and replaced
+by a set of OutputManagers dedicated to the specific
+expected outputs.</li>
+<li><strong>load_from_file</strong> – a filename from which the initial state of
+the simulation (agents corresponding to levels with
+their state) is read (instead of running the
+<cite>initialize_level</cite> method)</li>
+<li><strong>save_to_file</strong> – a filename in which the final state of the
+simulation (agents corresponding to levels with their
+state) is written (after running the <cite>finalize_level</cite>
+method)</li>
+<li><strong>shared_data</strong> – dict containing pre-loaded input data to be shared
+between several simulations (without reloading them)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.AbstractSimulation.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>steps: int = 1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#AbstractSimulation.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.AbstractSimulation.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Operations to perform at each time step. Should be defined in
+subclasses.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>steps</strong> – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.AbstractSimulation.init_input_data">
+<code class="descname">init_input_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#AbstractSimulation.init_input_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.AbstractSimulation.init_input_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize input data. This is composed of two separate operations:
+reading CSV files representing data-based parameters and
+performing preprocessing operations, which can occur either
+before of after loading data-based parameters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.AbstractSimulation.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#AbstractSimulation.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.AbstractSimulation.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Entry point to simulation execution. Should be defined in
+subclasses.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.AbstractSimulation.update_csv_counts">
+<code class="descname">update_csv_counts</code><span class="sig-paren">(</span><em>df</em>, <em>dparams: dict = {}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#AbstractSimulation.update_csv_counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.AbstractSimulation.update_csv_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the CSV recording of populations in each state.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.simulation.MultiSimulation">
+<em class="property">class </em><code class="descclassname">emulsion.tools.simulation.</code><code class="descname">MultiSimulation</code><span class="sig-paren">(</span><em>multi_id: int = 0</em>, <em>nb_simu: int = 100</em>, <em>set_seed: bool = False</em>, <em>silent: bool = False</em>, <em>quiet: bool = False</em>, <em>nocount: bool = False</em>, <em>dparams: dict = {}</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#MultiSimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.MultiSimulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.tools.simulation.AbstractSimulation" title="emulsion.tools.simulation.AbstractSimulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.tools.simulation.AbstractSimulation</span></code></a></p>
+<p>MultiSimulation can handle multiple repetitions of a given model.
+For sensibility study (same model with different values of variables),
+please check out SensitivitySimulation.</p>
+<dl class="method">
+<dt id="emulsion.tools.simulation.MultiSimulation.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>multi_id: int = 0</em>, <em>nb_simu: int = 100</em>, <em>set_seed: bool = False</em>, <em>silent: bool = False</em>, <em>quiet: bool = False</em>, <em>nocount: bool = False</em>, <em>dparams: dict = {}</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#MultiSimulation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.MultiSimulation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a simulation with multiple repetitions of the same
+model.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.tools.simulation.MultiSimulation.counts">
+<code class="descname">counts</code><a class="headerlink" href="#emulsion.tools.simulation.MultiSimulation.counts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.MultiSimulation.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>steps=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#MultiSimulation.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.MultiSimulation.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Operations to perform at each time step. Should be defined in
+subclasses.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>steps</strong> – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.MultiSimulation.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>update=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#MultiSimulation.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.MultiSimulation.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run all repetitions one by one.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.MultiSimulation.write_dot">
+<code class="descname">write_dot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#MultiSimulation.write_dot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.MultiSimulation.write_dot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.simulation.OutputManager">
+<em class="property">class </em><code class="descclassname">emulsion.tools.simulation.</code><code class="descname">OutputManager</code><span class="sig-paren">(</span><em>model=None</em>, <em>output_dir=''</em>, <em>output_file='counts.csv'</em>, <em>log_file='log.txt'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#OutputManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.OutputManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manager to handle different outputs (csv, database,… etc)</p>
+<dl class="method">
+<dt id="emulsion.tools.simulation.OutputManager.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>model=None</em>, <em>output_dir=''</em>, <em>output_file='counts.csv'</em>, <em>log_file='log.txt'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#OutputManager.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.OutputManager.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the output manager, specifying the model and the
+directory where outputs will be stored.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.OutputManager.update_output_information">
+<code class="descname">update_output_information</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#OutputManager.update_output_information"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.OutputManager.update_output_information" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update csv file path or database connection engine</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.OutputManager.update_output_type">
+<code class="descname">update_output_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#OutputManager.update_output_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.OutputManager.update_output_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update output type if specified in model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.OutputManager.update_outputs">
+<code class="descname">update_outputs</code><span class="sig-paren">(</span><em>df=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#OutputManager.update_outputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.OutputManager.update_outputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update outputs: writing in csv file or in database</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.simulation.SensitivitySimulation">
+<em class="property">class </em><code class="descclassname">emulsion.tools.simulation.</code><code class="descname">SensitivitySimulation</code><span class="sig-paren">(</span><em>scenario_path=None</em>, <em>df=None</em>, <em>nb_multi=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#SensitivitySimulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.SensitivitySimulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.tools.simulation.AbstractSimulation" title="emulsion.tools.simulation.AbstractSimulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.tools.simulation.AbstractSimulation</span></code></a></p>
+<p>SensitivitySimulation can handle sensibility study with a given
+pandas DataFrame of parameters or a path linked with file which contains
+scenarios of parameters. Then it will be transformed to a dictionary of
+scenario in the <code class="docutils literal notranslate"><span class="pre">`d_scenario`</span></code> attribute.</p>
+<dl class="docutils">
+<dt>For instance, d_scenario could be the form (QFever model example) :</dt>
+<dd><dl class="first last docutils">
+<dt>{0: {‘m’: 0.7, ‘q’: 0.02 …},</dt>
+<dd>1: {‘m’: 0.5, ‘q’: 0.02 …},
+2: …,
+… }</dd>
+</dl>
+</dd>
+</dl>
+<dl class="method">
+<dt id="emulsion.tools.simulation.SensitivitySimulation.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>scenario_path=None</em>, <em>df=None</em>, <em>nb_multi=None</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#SensitivitySimulation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.SensitivitySimulation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the simulation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>start_id</strong> – ID of the (first) simulation</li>
+<li><strong>model</strong> – instance of the model to run</li>
+<li><strong>model_path</strong> – path to the filename holding the description of the
+model, used if <em>model</em> is None</li>
+<li><strong>stock_agent</strong> – TODO</li>
+<li><strong>output_dir</strong> – name of the directory for simulation outputs</li>
+<li><strong>target_agent_class</strong> – agent class representing the top level in the
+simulation</li>
+<li><strong>save_results</strong> – True if simulation outputs have to be saved,
+False otherwise. TODO: should be removed, and replaced
+by a set of OutputManagers dedicated to the specific
+expected outputs.</li>
+<li><strong>load_from_file</strong> – a filename from which the initial state of
+the simulation (agents corresponding to levels with
+their state) is read (instead of running the
+<cite>initialize_level</cite> method)</li>
+<li><strong>save_to_file</strong> – a filename in which the final state of the
+simulation (agents corresponding to levels with their
+state) is written (after running the <cite>finalize_level</cite>
+method)</li>
+<li><strong>shared_data</strong> – dict containing pre-loaded input data to be shared
+between several simulations (without reloading them)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.tools.simulation.SensitivitySimulation.counts">
+<code class="descname">counts</code><a class="headerlink" href="#emulsion.tools.simulation.SensitivitySimulation.counts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.SensitivitySimulation.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#SensitivitySimulation.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.SensitivitySimulation.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make the simulation advance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.SensitivitySimulation.write_dot">
+<code class="descname">write_dot</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#SensitivitySimulation.write_dot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.SensitivitySimulation.write_dot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.simulation.Simulation">
+<em class="property">class </em><code class="descclassname">emulsion.tools.simulation.</code><code class="descname">Simulation</code><span class="sig-paren">(</span><em>steps: int = 100</em>, <em>simu_id: int = 0</em>, <em>silent: bool = False</em>, <em>quiet: bool = False</em>, <em>nocount: bool = False</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#Simulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.Simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#emulsion.tools.simulation.AbstractSimulation" title="emulsion.tools.simulation.AbstractSimulation"><code class="xref py py-class docutils literal notranslate"><span class="pre">emulsion.tools.simulation.AbstractSimulation</span></code></a></p>
+<p>Simulation class is aimed at running one repetition of a given
+model (for several repetitions, use <cite>MultiSimulation</cite>).</p>
+<dl class="method">
+<dt id="emulsion.tools.simulation.Simulation.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>steps: int = 100</em>, <em>simu_id: int = 0</em>, <em>silent: bool = False</em>, <em>quiet: bool = False</em>, <em>nocount: bool = False</em>, <em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#Simulation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.Simulation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an instance of simulation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>steps</strong> – number of time steps to run</li>
+<li><strong>simu_id</strong> – ID of the simulation</li>
+<li><strong>silent</strong> – if False, show a progress bar during simulation execution</li>
+<li><strong>quiet</strong> – if True, show no progressbar at all</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a href="#id3"><span class="problematic" id="id4">`emulsion.tools.simulation.AbstractSimulation`_</span></a></p>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="emulsion.tools.simulation.Simulation.counts">
+<code class="descname">counts</code><a class="headerlink" href="#emulsion.tools.simulation.Simulation.counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a pandas DataFrame contains counts of each process if existing.
+TODO: column steps need to be with one of process
+and NO column steps for inter herd</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.Simulation.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>steps: int = 1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#Simulation.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.Simulation.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make the target agent evolve.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>steps</strong> – the number of time steps to run</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.Simulation.init_agent">
+<code class="descname">init_agent</code><span class="sig-paren">(</span><em>**others</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#Simulation.init_agent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.Simulation.init_agent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an agent from the target class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.Simulation.log_path">
+<code class="descname">log_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#Simulation.log_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.Simulation.log_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the log path used by current simulation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="emulsion.tools.simulation.Simulation.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>dparams: dict = {}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/simulation.html#Simulation.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.simulation.Simulation.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make the simulation progress.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.tools.state">
+<span id="emulsion-tools-state-module"></span><h2>emulsion.tools.state module<a class="headerlink" href="#module-emulsion.tools.state" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-emulsion.tools.state"></span><p>This module defines:</p>
+<ul class="simple">
+<li>a class <code class="docutils literal notranslate"><span class="pre">StateVarDict</span></code> which is a special auto-referential
+dictionary to handle state variables</li>
+<li>a class <code class="docutils literal notranslate"><span class="pre">EmulsionEnum</span></code> which is a special kind of enumeration
+intended to handle states from state machines</li>
+</ul>
+<dl class="class">
+<dt id="emulsion.tools.state.EmulsionEnum">
+<em class="property">class </em><code class="descclassname">emulsion.tools.state.</code><code class="descname">EmulsionEnum</code><a class="reference internal" href="_modules/emulsion/tools/state.html#EmulsionEnum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.state.EmulsionEnum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>This class represents enumerations for states of state machines in
+EMULSION. They are endowed with some special features:</p>
+<ol class="arabic simple">
+<li>They provide total ordering between items (based on <code class="docutils literal notranslate"><span class="pre">__lt__</span></code>
+and <code class="docutils literal notranslate"><span class="pre">__eq__</span></code> methods).</li>
+<li>A comparison with <code class="docutils literal notranslate"><span class="pre">None</span></code> is provided (any state is always
+greater than <code class="docutils literal notranslate"><span class="pre">None</span></code>).</li>
+<li>Other features will be developed soon.</li>
+</ol>
+</dd></dl>
+
+<dl class="class">
+<dt id="emulsion.tools.state.StateVarDict">
+<em class="property">class </em><code class="descclassname">emulsion.tools.state.</code><code class="descname">StateVarDict</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/state.html#StateVarDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.state.StateVarDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>A special dictionary aimed at handling the state variables of
+agents in EMULSION models. In addition to the classical dict
+key-based access, it provides an attribute-like access syntax.</p>
+<p>This class is used in EMULSION to store agent properties. Such
+properties include those defined automatically and used by the
+EMULSION engine, such as the values of the states for each state
+machine, the current time step, or “hidden” values such as the
+time spent in the current state for each state machine. They are
+also used to include user-defined attributes (e.g. age,
+weight…).</p>
+<p>When searching for a model <code class="docutils literal notranslate"><span class="pre">statevar</span></code>, the engine tries first to
+find a classical instance variable (which can be mimicked by a
+Python <code class="docutils literal notranslate"><span class="pre">&#64;property</span></code>-decored function), then looks inside the
+agent’s <code class="docutils literal notranslate"><span class="pre">statevar</span></code> attribute; finally, the search continues in
+the agent’s host (if any).</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<div class="last highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">StateVarDict</span><span class="p">(</span><span class="n">age</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">sick</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">s</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="n">s</span><span class="o">.</span><span class="n">sick</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">s</span><span class="o">.</span><span class="n">new_property</span> <span class="o">=</span> <span class="s1">&#39;Wow !&#39;</span>
+</pre></div>
+</div>
+</div>
+<dl class="method">
+<dt id="emulsion.tools.state.StateVarDict.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/state.html#StateVarDict.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.state.StateVarDict.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.tools.timing">
+<span id="emulsion-tools-timing-module"></span><h2>emulsion.tools.timing module<a class="headerlink" href="#module-emulsion.tools.timing" title="Permalink to this headline">¶</a></h2>
+<p>A Python implementation of the EMuLSion framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>Tools for performance assessment.</p>
+<dl class="function">
+<dt id="emulsion.tools.timing.timethis">
+<code class="descclassname">emulsion.tools.timing.</code><code class="descname">timethis</code><span class="sig-paren">(</span><em>times=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/timing.html#timethis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.timing.timethis" title="Permalink to this definition">¶</a></dt>
+<dd><p>A decorator function for printing execution time.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-emulsion.tools.view">
+<span id="emulsion-tools-view-module"></span><h2>emulsion.tools.view module<a class="headerlink" href="#module-emulsion.tools.view" title="Permalink to this headline">¶</a></h2>
+<p>A Python implementation of the EMuLSion framework (Epidemiologic
+MUlti-Level SImulatiONs).</p>
+<p>Tools for data / map visualization.</p>
+<dl class="function">
+<dt id="emulsion.tools.view.build_animation">
+<code class="descclassname">emulsion.tools.view.</code><code class="descname">build_animation</code><span class="sig-paren">(</span><em>values</em>, <em>title</em>, <em>unit=None</em>, <em>filename=None</em>, <em>cmap='coolwarm'</em>, <em>framerate=10</em>, <em>resolution=100</em>, <em>writer='imagemagick'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/view.html#build_animation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.view.build_animation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an animation based on the <code class="docutils literal notranslate"><span class="pre">values</span></code> list, with the
+specified title. A special color map name can be specified, as
+well as the presence of a colorbar and additional keyword
+arguments passed to <code class="docutils literal notranslate"><span class="pre">imshow</span></code>. If a specified unit is given, each
+frame is marked with its number and the corresponding unit. If a
+filename is provided in the <code class="docutils literal notranslate"><span class="pre">save</span></code> parameter, the animation is
+stored in that file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.view.show_contour">
+<code class="descclassname">emulsion.tools.view.</code><code class="descname">show_contour</code><span class="sig-paren">(</span><em>value</em>, <em>cmap='hot'</em>, <em>save=None</em>, <em>colbar=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/view.html#show_contour"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.view.show_contour" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the specified value as a contour map with values. A
+special color map name can be specified, as well as the presence
+of a colorbar and additional keyword arguments passed to
+<code class="docutils literal notranslate"><span class="pre">contourf</span></code>. If a filename is provided in the <code class="docutils literal notranslate"><span class="pre">save</span></code> parameter, the
+image is stored in that file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.view.show_histo">
+<code class="descclassname">emulsion.tools.view.</code><code class="descname">show_histo</code><span class="sig-paren">(</span><em>value</em>, <em>xlabel</em>, <em>facecol='green'</em>, <em>save=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/view.html#show_histo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.view.show_histo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the distribution of the specified <code class="docutils literal notranslate"><span class="pre">value</span></code> array using
+<code class="docutils literal notranslate"><span class="pre">xlabel</span></code> for the legend. A specific face color can be used. If a
+filename is provided in the <code class="docutils literal notranslate"><span class="pre">save</span></code> parameter, the image is
+stored in that file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="emulsion.tools.view.show_img">
+<code class="descclassname">emulsion.tools.view.</code><code class="descname">show_img</code><span class="sig-paren">(</span><em>value</em>, <em>cmap='hot'</em>, <em>save=None</em>, <em>colbar=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulsion/tools/view.html#show_img"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulsion.tools.view.show_img" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the specified value as an image. A special color map
+name can be specified, as well as the presence of a colorbar and
+additional keyword arguments passed to <code class="docutils literal notranslate"><span class="pre">imshow</span></code>. If a filename is
+provided in the <code class="docutils literal notranslate"><span class="pre">save</span></code> parameter, the image is stored in that
+file.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">EMULSION</a></h1>
+
+
+
+<p class="blurb">Epidemiological Multi-Level Simulation Framework</p>
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="pages/Information.html">1. Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Install.html">2. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Getting_started.html">3. Getting started with EMULSION</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Modelling_principles.html">4. Modelling principles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Modelling_language_basics.html">5. Modelling language (basics)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Feature_examples.html">7. Feature examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/Release_notes.html">8. Release notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pages/License.html">9. License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emulsion_for_modellers.html">10. High-level functions for model designers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="emulsion.html">11. emulsion package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="emulsion.html#subpackages">11.1. Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="emulsion.agent.html">emulsion.agent package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="emulsion.model.html">emulsion.model package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">emulsion.tools package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.html#submodules">11.2. Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="emulsion.html#module-emulsion.init_emulsion">11.3. emulsion.init_emulsion module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="emulsion.html">11. emulsion package</a><ul>
+      <li>Previous: <a href="emulsion.model.html" title="previous chapter">emulsion.model package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, INRAE and Univ. Lille.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/emulsion.tools.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
