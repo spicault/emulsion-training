@@ -12,7 +12,7 @@ This training (see details [here](https://sourcesup.renater.fr/www/emulsion-publ
         <td style="padding: 25px; border: none;"><img alt="bloc marque Etat" src="img/Republique_Francaise.jpg" width="300px"></td>
         <td style="padding: 25px; border: none;"><img alt="logo INRAE" src="img/Logo-INRAE.jpg" width="400px"></td>
         <td style="padding: 25px; border: none;"><img alt="logo Oniris" src="img/Logo_Oniris.png" width="350px"></td>
-        <td style="padding: 25px; border: none;"><img alt="logo Pays de la Loire" src="img/PDL.jpg" width="500px"></td>
+        <td style="padding: 25px; border: none;"><img alt="logo Pays de la Loire" src="img/Logo-EGAAL.png" width="500px"></td>
     </tr>
 </table>
 </span>
