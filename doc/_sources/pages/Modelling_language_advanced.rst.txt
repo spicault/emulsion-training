@@ -103,7 +103,7 @@ A state can define three main properties:
 
 .. _duration:
 
-``duration`` (valid for **IBM**/**hybrid** models)
+``duration``
     This keyword allows to assign a specific duration to a
     state. Durations can be constant values or arbitrary expressions,
     including a random distribution. When an individual enters the
@@ -206,8 +206,7 @@ Produce new individuals
   similar to transitions in their syntax, except that:
 
   - ``escape`` conditions and ``amount-all-but`` quantifier are not allowed
-  - in IBM/hybrid models, a ``prototype`` must be specified for the new
-    individuals
+  - a ``prototype`` must be specified for the new individuals
 
   Besides, the computation of actual flows uses sampling in Poisson
   distribution rather than binomial/multinomial sampling.
@@ -241,12 +240,16 @@ state machine does not require any transition at all.
 Design prototypes for typical individuals or populations
 ********************************************************
 
-In EMULSION hybrid and IBM models, prototypes are meant to represent
-typical individuals (within populations) or populations (within
-metapopulations), characterized by their state variables, either
-regarding the state of a state machine (e.g. health state, age
-group...), or specific features (e.g. age, temperature... of an
-individual; initial health status, location, carrying capacity... of a
+In EMULSION, prototypes are meant to represent typical individuals
+(within populations) or populations (within metapopulations),
+characterized by their state variables, either regarding the state of
+a state machine (e.g. health state, age group...), or specific
+features (e.g. age, temperature... of an individual; initial health
+status, location, carrying capacity... of a population).
+
+In compartment-based models, the only variables allowed in individual
+prototypes are those corresponding to state machines (because
+individuals are not simulated as entities but only as an aggregate
 population).
 
 Define prototypes
@@ -534,7 +537,7 @@ Regulate time
    specific ``date``. Each event (here ``pasture_period`` and
    ``open_days``) can be used in conditions, especially in the
    ``when`` clause of transition or productions. A transition with
-   e.g. ``Not(pasture_period)`` will not be considered at all when the
+   e.g. ``NOT(pasture_period)`` will not be considered at all when the
    condition is not fulfilled.
 
    Besides, events with a begin and an end date automatically generate
@@ -674,9 +677,15 @@ The following functions are also available:
     Logical disjunction: return true (1) if ``cond1`` is true or
     ``cond2`` is true, false (0) otherwise
 
-``Not(cond)``
+``NOT(cond)``
     Logical negation: return true (1) if ``cond1`` and ``cond2`` are
     both true, false (0) otherwise
+
+``DIV(a, b)``
+    Test-first division: return 0 if ``a`` is 0, otherwise return
+    ``a/b`` (useful when computing proportions where ``a`` is supposed
+    to be a subset of ``b``, which means that when ``b`` is 0, ``a``
+    is also 0)
 
 ``IfThenElse(condition, val_if_true, val_if_false)``
     Ternary conditional function: return either ``val_if_true`` or

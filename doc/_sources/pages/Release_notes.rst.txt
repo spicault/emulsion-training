@@ -2,6 +2,55 @@
 Release notes
 *************
 
+Notes on EMULSION 1.2
+*********************
+
+Release date: TBA
+
+
+Modelling language
+==================
+
+- revised syntax to make compartment-based, hybrid and IBM models more
+  homogeneous
+
+  .. seealso::
+
+     Transition guide (TODO)
+
+- enabled non-exponential distribution of durations in
+  compartment-based models (keyword ``duration`` in state definition)
+- introduced function ``DIV(a,b)`` which returns 0 if a=0, otherwise a/b
+
+
+Simulation engine
+=================
+
+- revised architecture of compartment-based models and hybrid models
+  to build appropriate groupings without duplicates
+
+
+
+Documentation
+=============
+
+- introduced example models for new features of the modelling language
+
+
+Bugfixes
+========
+
+- revised architecture of compartment-based models to enable correct
+  interactions between all state machines
+
+
+
+
+
+
+
+
+
 Notes on EMULSION 1.1
 *********************
 

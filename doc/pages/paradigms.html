@@ -37,20 +37,21 @@
             
   <table border="1" class="docutils">
 <colgroup>
-<col width="26%" />
-<col width="24%" />
-<col width="18%" />
-<col width="13%" />
 <col width="19%" />
+<col width="30%" />
+<col width="18%" />
+<col width="23%" />
+<col width="0%" />
+<col width="10%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" rowspan="2">EMULSION section</th>
 <th class="head" rowspan="2">section keyword</th>
-<th class="head" colspan="3">Modelling paradigm</th>
+<th class="head" colspan="4">Modelling paradigm</th>
 </tr>
 <tr class="row-even"><th class="head">compartment</th>
 <th class="head">hybrid</th>
-<th class="head">IBM</th>
+<th class="head" colspan="2">IBM</th>
 </tr>
 </thead>
 <tbody valign="top">
@@ -58,43 +59,25 @@
 <td><code class="docutils literal notranslate"><span class="pre">aggregation_type</span></code></td>
 <td><code class="docutils literal notranslate"><span class="pre">compartment</span></code></td>
 <td><code class="docutils literal notranslate"><span class="pre">hybrid</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">IBM</span></code></td>
+<td colspan="2"><code class="docutils literal notranslate"><span class="pre">IBM</span></code></td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">contains</span></code></td>
-<td><em>not used</em></td>
-<td colspan="2"><em>sublevels</em></td>
+<td colspan="4"><em>individuals</em></td>
 </tr>
-<tr class="row-odd"><td rowspan="2"><code class="docutils literal notranslate"><span class="pre">grouping</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">key_variables</span></code></td>
-<td colspan="2"><em>list of variables</em></td>
-<td rowspan="2"><em>not used</em></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">grouping</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">[vars]</span></code></td>
+<td>optional</td>
+<td><strong>mandatory</strong></td>
+<td colspan="2">optional</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">state_machine</span></code></td>
-<td colspan="2"><em>machine name</em> (optional)</td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><code class="docutils literal notranslate"><span class="pre">processes</span></code></td>
+<tr class="row-even"><td rowspan="2"><code class="docutils literal notranslate"><span class="pre">processes</span></code></td>
 <td><em>level</em></td>
-<td colspan="2"><em>population</em></td>
-<td><em>individuals</em></td>
+<td colspan="4"><em>individuals</em></td>
 </tr>
-<tr class="row-even"><td><em>list of processes</em></td>
-<td colspan="2"><em>names of groupings</em></td>
-<td><em>machine name</em></td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">state_machines</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">productions</span></code></td>
-<td>&#160;</td>
-<td colspan="2"><em>based on prototypes</em></td>
-</tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">prototypes</span></code></td>
-<td>&#160;</td>
-<td><em>not used</em></td>
-<td colspan="2"><em>for individuals/populations</em></td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">initial_conditions</span></code></td>
-<td>&#160;</td>
-<td><em>per state</em></td>
-<td colspan="2"><em>based on prototypes</em></td>
+<tr class="row-odd"><td><em>list of state machines</em></td>
+<td><em>name</em></td>
+<td colspan="2"><em>name: grouping name</em></td>
+<td><em>name</em></td>
 </tr>
 </tbody>
 </table>

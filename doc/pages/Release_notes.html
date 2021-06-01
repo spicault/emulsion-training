@@ -39,11 +39,52 @@
             
   <div class="section" id="release-notes">
 <h1>8. Release notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="notes-on-emulsion-1-1">
-<h2>8.1. Notes on EMULSION 1.1<a class="headerlink" href="#notes-on-emulsion-1-1" title="Permalink to this headline">¶</a></h2>
-<p>Release date: October 19, 2020</p>
+<div class="section" id="notes-on-emulsion-1-2">
+<h2>8.1. Notes on EMULSION 1.2<a class="headerlink" href="#notes-on-emulsion-1-2" title="Permalink to this headline">¶</a></h2>
+<p>Release date: TBA</p>
+<div class="section" id="modelling-language">
+<h3>Modelling language<a class="headerlink" href="#modelling-language" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">revised syntax to make compartment-based, hybrid and IBM models more
+homogeneous</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">Transition guide (TODO)</p>
+</div>
+</li>
+<li><p class="first">enabled non-exponential distribution of durations in
+compartment-based models (keyword <code class="docutils literal notranslate"><span class="pre">duration</span></code> in state definition)</p>
+</li>
+<li><p class="first">introduced function <code class="docutils literal notranslate"><span class="pre">DIV(a,b)</span></code> which returns 0 if a=0, otherwise a/b</p>
+</li>
+</ul>
+</div>
+<div class="section" id="simulation-engine">
+<h3>Simulation engine<a class="headerlink" href="#simulation-engine" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>revised architecture of compartment-based models and hybrid models
+to build appropriate groupings without duplicates</li>
+</ul>
+</div>
 <div class="section" id="documentation">
 <h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>introduced example models for new features of the modelling language</li>
+</ul>
+</div>
+<div class="section" id="bugfixes">
+<h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>revised architecture of compartment-based models to enable correct
+interactions between all state machines</li>
+</ul>
+</div>
+</div>
+<div class="section" id="notes-on-emulsion-1-1">
+<h2>8.2. Notes on EMULSION 1.1<a class="headerlink" href="#notes-on-emulsion-1-1" title="Permalink to this headline">¶</a></h2>
+<p>Release date: October 19, 2020</p>
+<div class="section" id="id1">
+<h3>Documentation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>fixed minor errors in installation instructions or code examples</li>
 <li>introduced example models for new features of the modelling language</li>
@@ -61,8 +102,8 @@ outputs must be handled explicitly with actions such as
 <code class="docutils literal notranslate"><span class="pre">log_vars</span></code>)</li>
 </ul>
 </div>
-<div class="section" id="modelling-language">
-<h3>Modelling language<a class="headerlink" href="#modelling-language" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Modelling language<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <ul>
 <li><p class="first">introduced wrapper function <code class="docutils literal notranslate"><span class="pre">MIN</span></code> and <code class="docutils literal notranslate"><span class="pre">MAX</span></code> to be used with any number of arguments in models, instead of <code class="docutils literal notranslate"><span class="pre">min</span></code> and <code class="docutils literal notranslate"><span class="pre">max</span></code></p>
 </li>
@@ -123,8 +164,8 @@ complete syntax and additional options (experimental feature)</p>
 </li>
 </ul>
 </div>
-<div class="section" id="bugfixes">
-<h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Bugfixes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Fixed YAML unsafe loading</li>
 <li>set explicit encoding to utf8 when writing graphviz/dot file (to overcome problems in Windows version)</li>
@@ -142,7 +183,7 @@ complete syntax and additional options (experimental feature)</p>
 </div>
 </div>
 <div class="section" id="notes-on-emulsion-1-0">
-<h2>8.2. Notes on EMULSION 1.0<a class="headerlink" href="#notes-on-emulsion-1-0" title="Permalink to this headline">¶</a></h2>
+<h2>8.3. Notes on EMULSION 1.0<a class="headerlink" href="#notes-on-emulsion-1-0" title="Permalink to this headline">¶</a></h2>
 <p>Release date: February 20, 2019</p>
 <p>First public release of EMULSION (support Python 3.6+)</p>
 <p>Last stable version: 1.0.12 (August 17, 2020)</p>
@@ -177,14 +218,21 @@ complete syntax and additional options (experimental feature)</p>
 <li class="toctree-l1"><a class="reference internal" href="Modelling_language_advanced.html">6. Modelling language (advanced)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Feature_examples.html">7. Feature examples</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">8. Release notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#notes-on-emulsion-1-1">8.1. Notes on EMULSION 1.1</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#documentation">Documentation</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#command-line">Command-line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#notes-on-emulsion-1-2">8.1. Notes on EMULSION 1.2</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#modelling-language">Modelling language</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#simulation-engine">Simulation engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#documentation">Documentation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#bugfixes">Bugfixes</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#notes-on-emulsion-1-0">8.2. Notes on EMULSION 1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#notes-on-emulsion-1-1">8.2. Notes on EMULSION 1.1</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#command-line">Command-line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Modelling language</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Bugfixes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#notes-on-emulsion-1-0">8.3. Notes on EMULSION 1.0</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">9. License</a></li>

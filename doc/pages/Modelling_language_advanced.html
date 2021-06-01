@@ -58,20 +58,21 @@ models, regarding the sections and keywords to modify in an EMULSION
 model file.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="26%" />
-<col width="24%" />
-<col width="18%" />
-<col width="13%" />
 <col width="19%" />
+<col width="30%" />
+<col width="18%" />
+<col width="23%" />
+<col width="0%" />
+<col width="10%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" rowspan="2">EMULSION section</th>
 <th class="head" rowspan="2">section keyword</th>
-<th class="head" colspan="3">Modelling paradigm</th>
+<th class="head" colspan="4">Modelling paradigm</th>
 </tr>
 <tr class="row-even"><th class="head">compartment</th>
 <th class="head">hybrid</th>
-<th class="head">IBM</th>
+<th class="head" colspan="2">IBM</th>
 </tr>
 </thead>
 <tbody valign="top">
@@ -79,43 +80,25 @@ model file.</p>
 <td><code class="docutils literal notranslate"><span class="pre">aggregation_type</span></code></td>
 <td><code class="docutils literal notranslate"><span class="pre">compartment</span></code></td>
 <td><code class="docutils literal notranslate"><span class="pre">hybrid</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">IBM</span></code></td>
+<td colspan="2"><code class="docutils literal notranslate"><span class="pre">IBM</span></code></td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">contains</span></code></td>
-<td><em>not used</em></td>
-<td colspan="2"><em>sublevels</em></td>
+<td colspan="4"><em>individuals</em></td>
 </tr>
-<tr class="row-odd"><td rowspan="2"><code class="docutils literal notranslate"><span class="pre">grouping</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">key_variables</span></code></td>
-<td colspan="2"><em>list of variables</em></td>
-<td rowspan="2"><em>not used</em></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">grouping</span></code></td>
+<td><code class="docutils literal notranslate"><span class="pre">name:</span> <span class="pre">[vars]</span></code></td>
+<td>optional</td>
+<td><strong>mandatory</strong></td>
+<td colspan="2">optional</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">state_machine</span></code></td>
-<td colspan="2"><em>machine name</em> (optional)</td>
-</tr>
-<tr class="row-odd"><td rowspan="2"><code class="docutils literal notranslate"><span class="pre">processes</span></code></td>
+<tr class="row-even"><td rowspan="2"><code class="docutils literal notranslate"><span class="pre">processes</span></code></td>
 <td><em>level</em></td>
-<td colspan="2"><em>population</em></td>
-<td><em>individuals</em></td>
+<td colspan="4"><em>individuals</em></td>
 </tr>
-<tr class="row-even"><td><em>list of processes</em></td>
-<td colspan="2"><em>names of groupings</em></td>
-<td><em>machine name</em></td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">state_machines</span></code></td>
-<td><code class="docutils literal notranslate"><span class="pre">productions</span></code></td>
-<td>&#160;</td>
-<td colspan="2"><em>based on prototypes</em></td>
-</tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">prototypes</span></code></td>
-<td>&#160;</td>
-<td><em>not used</em></td>
-<td colspan="2"><em>for individuals/populations</em></td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">initial_conditions</span></code></td>
-<td>&#160;</td>
-<td><em>per state</em></td>
-<td colspan="2"><em>based on prototypes</em></td>
+<tr class="row-odd"><td><em>list of state machines</em></td>
+<td><em>name</em></td>
+<td colspan="2"><em>name: grouping name</em></td>
+<td><em>name</em></td>
 </tr>
 </tbody>
 </table>
@@ -191,7 +174,7 @@ the <code class="docutils literal notranslate"><span class="pre">next_state</spa
 </dd>
 </dl>
 <dl class="docutils" id="duration">
-<dt><code class="docutils literal notranslate"><span class="pre">duration</span></code> (valid for <strong>IBM</strong>/<strong>hybrid</strong> models)</dt>
+<dt><code class="docutils literal notranslate"><span class="pre">duration</span></code></dt>
 <dd><p class="first">This keyword allows to assign a specific duration to a
 state. Durations can be constant values or arbitrary expressions,
 including a random distribution. When an individual enters the
@@ -276,8 +259,7 @@ states can produce new individuals. Production links are very
 similar to transitions in their syntax, except that:</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">escape</span></code> conditions and <code class="docutils literal notranslate"><span class="pre">amount-all-but</span></code> quantifier are not allowed</li>
-<li>in IBM/hybrid models, a <code class="docutils literal notranslate"><span class="pre">prototype</span></code> must be specified for the new
-individuals</li>
+<li>a <code class="docutils literal notranslate"><span class="pre">prototype</span></code> must be specified for the new individuals</li>
 </ul>
 <p>Besides, the computation of actual flows uses sampling in Poisson
 distribution rather than binomial/multinomial sampling.</p>
@@ -310,12 +292,15 @@ state machine does not require any transition at all.</p>
 </div>
 <div class="section" id="design-prototypes-for-typical-individuals-or-populations">
 <h2>6.3. Design prototypes for typical individuals or populations<a class="headerlink" href="#design-prototypes-for-typical-individuals-or-populations" title="Permalink to this headline">¶</a></h2>
-<p>In EMULSION hybrid and IBM models, prototypes are meant to represent
-typical individuals (within populations) or populations (within
-metapopulations), characterized by their state variables, either
-regarding the state of a state machine (e.g. health state, age
-group…), or specific features (e.g. age, temperature… of an
-individual; initial health status, location, carrying capacity… of a
+<p>In EMULSION, prototypes are meant to represent typical individuals
+(within populations) or populations (within metapopulations),
+characterized by their state variables, either regarding the state of
+a state machine (e.g. health state, age group…), or specific
+features (e.g. age, temperature… of an individual; initial health
+status, location, carrying capacity… of a population).</p>
+<p>In compartment-based models, the only variables allowed in individual
+prototypes are those corresponding to state machines (because
+individuals are not simulated as entities but only as an aggregate
 population).</p>
 <div class="section" id="define-prototypes">
 <h3>Define prototypes<a class="headerlink" href="#define-prototypes" title="Permalink to this headline">¶</a></h3>
@@ -588,7 +573,7 @@ a <code class="docutils literal notranslate"><span class="pre">begin</span></cod
 specific <code class="docutils literal notranslate"><span class="pre">date</span></code>. Each event (here <code class="docutils literal notranslate"><span class="pre">pasture_period</span></code> and
 <code class="docutils literal notranslate"><span class="pre">open_days</span></code>) can be used in conditions, especially in the
 <code class="docutils literal notranslate"><span class="pre">when</span></code> clause of transition or productions. A transition with
-e.g. <code class="docutils literal notranslate"><span class="pre">Not(pasture_period)</span></code> will not be considered at all when the
+e.g. <code class="docutils literal notranslate"><span class="pre">NOT(pasture_period)</span></code> will not be considered at all when the
 condition is not fulfilled.</p>
 <p>Besides, events with a begin and an end date automatically generate
 two other events, here for instance <code class="docutils literal notranslate"><span class="pre">begin_pasture_period</span></code> and
@@ -720,9 +705,14 @@ both true, false (0) otherwise</dd>
 <dt><code class="docutils literal notranslate"><span class="pre">OR(cond1,</span> <span class="pre">cond2)</span></code></dt>
 <dd>Logical disjunction: return true (1) if <code class="docutils literal notranslate"><span class="pre">cond1</span></code> is true or
 <code class="docutils literal notranslate"><span class="pre">cond2</span></code> is true, false (0) otherwise</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">Not(cond)</span></code></dt>
+<dt><code class="docutils literal notranslate"><span class="pre">NOT(cond)</span></code></dt>
 <dd>Logical negation: return true (1) if <code class="docutils literal notranslate"><span class="pre">cond1</span></code> and <code class="docutils literal notranslate"><span class="pre">cond2</span></code> are
 both true, false (0) otherwise</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">DIV(a,</span> <span class="pre">b)</span></code></dt>
+<dd>Test-first division: return 0 if <code class="docutils literal notranslate"><span class="pre">a</span></code> is 0, otherwise return
+<code class="docutils literal notranslate"><span class="pre">a/b</span></code> (useful when computing proportions where <code class="docutils literal notranslate"><span class="pre">a</span></code> is supposed
+to be a subset of <code class="docutils literal notranslate"><span class="pre">b</span></code>, which means that when <code class="docutils literal notranslate"><span class="pre">b</span></code> is 0, <code class="docutils literal notranslate"><span class="pre">a</span></code>
+is also 0)</dd>
 <dt><code class="docutils literal notranslate"><span class="pre">IfThenElse(condition,</span> <span class="pre">val_if_true,</span> <span class="pre">val_if_false)</span></code></dt>
 <dd>Ternary conditional function: return either <code class="docutils literal notranslate"><span class="pre">val_if_true</span></code> or
 <code class="docutils literal notranslate"><span class="pre">val_if_false</span></code> depending on <code class="docutils literal notranslate"><span class="pre">condition</span></code>.</dd>
