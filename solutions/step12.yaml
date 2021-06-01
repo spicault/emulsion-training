@@ -15,7 +15,7 @@
 
 
 # NAME OF THE MODEL
-model_name: stoch_hybrid_SEIR_JA_dur_var_test_quar_metapop_data
+model_name: stoch_hybrid_SEIR_JA_dur_var_test_quar_metapop_data_treatment
 
 
 # DESCRIPTION OF THE MODEL
@@ -23,7 +23,7 @@ model_info:
   abstract: 'This model is a simple discrete-time, stochastic,
   hybrid SIR model with demography and age structure,
   and a contact structure between age group. It is organized as
-  a metapopulation'
+  a metapopulation. A treatment can be used to cure animals instead of culling them.'
   author: 'Sebastien Picault (sebastien.picault@inrae.fr)'
 
 
@@ -164,6 +164,8 @@ state_machines:
           desc: 'individuals removed from the herd'
           autoremove: yes
           fillcolor: 'white'
+          on_enter:
+            - record_change: cumul_culled
     transitions:
       - from: Untested
         to: Negative
@@ -182,7 +184,19 @@ state_machines:
         proba: 1
       - from: Confirmed
         to: Culled
+        proba: 'NOT(use_treatment)'
+        desc: 'confirmed animals are culled only if no treatment available'
+      - from: Confirmed
+        to: Untested
+        escape: 'use_treatment'
         proba: 1
+        on_cross:
+          - set_upper_var: true_positive
+            value: 'true_positive + OR(is_I, is_E)'
+          - set_upper_var: cumul_treatment
+            value: 'cumul_treatment + 1'
+          - become: cured_animal
+        desc: 'when a treatment is available, use it. As a consequence, the animal becomes R based on the built-in action "become"'
 
   isolation:
     desc: 'The state machine which handles quarantine'
@@ -471,6 +485,8 @@ statevars:
   sold:
     desc: 'Total number of animals sold by the herd over
     time. This variable is updated by the exchange process in Python file.'
+  use_treatment:
+    desc: 'boolean, 1 to treat animals instead of culling them, 0 otherwise'
 
 #  _____                   _
 # |_   _|                 | |
@@ -523,9 +539,11 @@ prototypes:
         herd_status: DiseaseFree
         purchased: 0
         sold: 0
+        cumul_treatment: 0
+        true_positive: 0
     - data_based_herd:
         desc: 'herd collection with data-driven initial conditions'
-        file: 'herds.csv'
+        file: 'herds2.csv'
         select: 'ordered_cycle'
         herd_status: DiseaseFree
   animals:
@@ -534,6 +552,8 @@ prototypes:
         beta_i_max: 0
         test_status: Untested
         isolation: InGroup
+        nb_treatments: 0
+        treated_while_infected: 0
     - healthy:
         desc: 'healthy animals'
         health_state: S
@@ -554,6 +574,9 @@ prototypes:
         desc: 'animal from outside the metapopulation, assuming no external risk'
         health_state: S
         age_group: default
+    - cured_animal:
+        desc: 'animal that received a treatment and became resistant'
+        health_state: R
 
 
 #  _____       _ _   _       _
@@ -617,4 +640,7 @@ outputs:
       - total_beta_Isolated
       - is_Infected
       - is_Alert
+      - cumul_culled
+      - cumul_treatment
+      - true_positive
 ...
