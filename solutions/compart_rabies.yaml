@@ -314,16 +314,16 @@ parameters:
     value: '0.2'
   prop_vaccinated:
     desc: 'actual proportion of vaccinated cattle'
-    value: 'total_Z / total_Cattle'
+    value: 'DIV(total_Z, total_Cattle)'
   bat_latent_prevalence:
     desc: 'prevalence of latent state in bat population'
-    value: 'total_H_Bat / total_Bat'
+    value: 'DIV(total_H_Bat, total_Bat)'
   bat_rabid_prevalence:
     desc: 'prevalence of rabid state in bat population'
-    value: 'total_Y_Bat / total_Bat'
+    value: 'DIV(total_Y_Bat, total_Bat)'
   cattle_rabid_prevalence:
     desc: 'prevalence of rabid state in cattle population'
-    value: 'total_Y_Cattle / total_Cattle'
+    value: 'DIV(total_Y_Cattle, total_Cattle)'
   disease_impact:
     desc: 'relative losses in cattle due to rabies compared to carrying capacity'
     value: 'rabies_losses / K_c'
