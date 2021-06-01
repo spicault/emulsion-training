@@ -178,7 +178,7 @@ state_machines:
       # infectious process
       - from: X
         to: H
-        rate: 'is_Bat * bat_force_of_infection'
+        rate: 'bat_force_of_infection'
         desc: 'infection experienced by bats, leading to latent state'
       - from: H
         to: Y
@@ -186,7 +186,7 @@ state_machines:
         desc: 'transference from latent to rabid bats'
       - from: X
         to: Y
-        rate: 'is_Cattle * cattle_force_of_infection'
+        rate: 'cattle_force_of_infection'
         desc: 'infection experienced by cattle, leading directly to clinically ill state'
       - from: X
         to: Z
@@ -222,10 +222,11 @@ parameters:
   ## INFECTION
   bat_force_of_infection:
     desc: 'force of infection experienced by bats, resulting from 1) infection by latent bats, 2) infection by rabid bats, and 3) a small fraction of infection by bitten rabid cattle'
-    value: 'beta_1 * total_H_Bat / total_Bat + beta_2 * total_Y_Bat / total_Bat + delta * a_X * total_Y_Cattle / total_Cattle'
+    value: 'is_Bat * (DIV(beta_1 * total_H_Bat + beta_2 * total_Y_Bat, total_Bat)
+                    + DIV(delta * a_X * total_Y_Cattle, total_Cattle))'
   cattle_force_of_infection:
     desc: 'force of infection experienced by cattle, resulting from bites by latend and rabid bats'
-    value: 'kappa_1 * a_Y * total_Y_Bat / total_Cattle + kappa_2 * a_H * total_H_Bat / total_Cattle'
+    value: 'DIV(is_Cattle * (kappa_1 * a_Y * total_Y_Bat + kappa_2 * a_H * total_H_Bat), total_Cattle)'
   tau:
     desc: 'rate of transference from latent to rabid bats (per day)'
     value: '1 / 21'

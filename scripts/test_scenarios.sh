@@ -21,7 +21,7 @@ FILENAME="$OUTPUT_NAME.csv"
 NB_REPETITIONS="$3"
 DEFAULT_REPET=10
 ADDITIONAL_OPTIONS="$4"
-PYTHON3="python3" 		# adapt to your config (Python 3 executable with emulsion module installed)
+PYTHON3="python" 		# adapt to your config (Python 3 executable with emulsion module installed)
 
 
 # if number of repetitions not specified, use default
@@ -63,7 +63,8 @@ do
 	    pars="$pars -p ${PARAMS[$i]}=${values[$i]}"
 	done
 	echo "$scenario ==> $pars"
-	$PYTHON3 -m emulsion $OPTIONS --output-dir $outdir $pars
+	# launch runs in parallel
+	$PYTHON3 -m emulsion $OPTIONS --output-dir $outdir $pars &
     fi
 done < "$FILENAME"
 

@@ -38,8 +38,8 @@ ggplot(results, aes(x=step)) +
     facet_grid(cattle_vaccination_rate ~ bat_additional_mortality, labeller="label_both") +
     geom_line(aes(y=bat_rabid_prevalence, group=simu_id, color="Bats", linetype="Stochastic repetition"), alpha=0.4) +
     geom_line(aes(y=cattle_rabid_prevalence, group=simu_id, color="Cattle", linetype="Stochastic repetition"), alpha=0.4) +
-    stat_summary(aes(y=bat_rabid_prevalence, color="Bats", linetype="Average"), geom="line", fun.y="mean") +
-    stat_summary(aes(y=cattle_rabid_prevalence, color="Cattle", linetype="Average"), geom="line", fun.y="mean") +
+    stat_summary(aes(y=bat_rabid_prevalence, color="Bats", linetype="Average"), geom="line", fun="mean") +
+    stat_summary(aes(y=cattle_rabid_prevalence, color="Cattle", linetype="Average"), geom="line", fun="mean") +
     guides(colour=guide_legend(title="Species", override.aes=list(alpha=1)),
            linetype = guide_legend(title=NULL)) +
     ggtitle('Evolution of prevalence function of control measures') +
@@ -50,15 +50,15 @@ ggplot(results, aes(x=step)) +
 
 ggplot(results, aes(x=step)) +
     facet_grid(cattle_vaccination_rate ~ bat_additional_mortality, labeller="label_both") +
-    stat_summary(aes(y=persists), geom="line", fun.y="sum") +
+    stat_summary(aes(y=persists), geom="line", fun="sum") +
     ggtitle('Evolution of persistence function of control measures') +
     xlab("Time (days)") + ylab("Persistence") +
     theme_bw()
 
 ggplot(results, aes(x=step)) +
     facet_grid(cattle_vaccination_rate ~ bat_additional_mortality, labeller="label_both") +
-    stat_summary(aes(y=disease_impact), geom="line", fun.y="sum") +
-    ggtitle('Evolution of persistence function of control measures') +
+    stat_summary(aes(y=disease_impact), geom="line", fun="sum") +
+    ggtitle('Evolution of disease impact function of control measures') +
     xlab("Time (days)") + ylab("Persistence") +
     theme_bw()
 

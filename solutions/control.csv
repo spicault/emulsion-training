@@ -1,0 +1,5 @@
+scenario_id	cattle_vaccination_rate	bat_additional_mortality
+reference	0	0
+vaccination_high	0.02	0
+mortality_high	0	0.2
+both_high	0.02	0.2
