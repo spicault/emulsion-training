@@ -84,7 +84,7 @@ levels:
         collect: 'beta_i'
         operator: 'sum'
   animals:
-    desc: 'level of individuals (not simulated in compartment-based models)'
+    desc: 'level of individuals'
     default_prototype: default_animal
 
 #   _____                       _
@@ -381,12 +381,6 @@ parameters:
   mortality:
     desc: 'mortality rate, assumed density-dependent'
     value: 'mu * total_herd / K'
-  # mu:
-  #   desc: 'base mortality rate'
-  #   value: 0.05
-  # K:
-  #   desc: 'carrying capacity of the environment'
-  #   value: 150
   b:
     desc: 'birth rate'
     value: '2 * mu'

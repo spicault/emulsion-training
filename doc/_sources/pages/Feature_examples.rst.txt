@@ -644,9 +644,9 @@ SIR model with structured population
 
 .. admonition:: Files
 
-   - `compart_SIR_struct.yaml <../_static/models/features/compart_SIR_struct.yaml>`_
-   - `hybrid_SIR_struct.yaml <../_static/models/features/hybrid_SIR_struct.yaml>`_
-   - `IBM_SIR_struct.yaml <../_static/models/features/IBM_SIR_struct.yaml>`_
+   - `compart_SIR_JA_struct.yaml <../_static/models/features/compart_SIR_JA_struct.yaml>`_
+   - `hybrid_SIR_JA_struct.yaml <../_static/models/features/hybrid_SIR_JA_struct.yaml>`_
+   - `IBM_SIR_JA_struct.yaml <../_static/models/features/IBM_SIR_JA_struct.yaml>`_
 
 .. graphviz:: ../_images/SIR_struct.dot
 

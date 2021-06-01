@@ -67,7 +67,7 @@ levels:
         collect: 'beta_i'
         operator: 'sum'
   animals:
-    desc: 'level of individuals (not simulated in compartment-based models)'
+    desc: 'level of individuals'
     default_prototype: default_animal
 
 #   _____                       _

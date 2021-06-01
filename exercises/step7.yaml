@@ -63,7 +63,7 @@ levels:
     contains:
       - animals
   animals:
-    desc: 'level of individuals (not simulated in compartment-based models)'
+    desc: 'level of individuals'
 
 #   _____                       _
 #  / ____|                     (_)

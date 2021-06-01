@@ -5,17 +5,15 @@ Modelling language (basics)
 YAML Syntax in a nutshell
 *************************
 
-EMULSION models must respect the `YAML
-<https://en.wikipedia.org/wiki/YAML>`_ format, which is based
-on lists and key-value mappings. Data structures are delimited by
-2-space indentation.
+EMULSION models must respect the `YAML <https://en.wikipedia.org/wiki/YAML>`_ format, which is based
+on **lists** and **key-value mappings**. Data structures are delimited by **2-space indentation**.
 
-Comments
+**Comments**
     Whatever is put after ``#`` is not interpreted.
-Values
+**Values**
     Numbers (``3``, ``3.14``), strings (``'some text'``), booleans
     (``yes``/``no``), lists or key-value mappings.
-Lists
+**Lists**
     A succession of values, e.g.
 
     .. code-block:: yaml
@@ -29,7 +27,7 @@ Lists
         - value1
 	- value2
 	- value3
-Key-value mappings
+**Key-value mappings**
     An (unordered) set of associations between unique indentifiers
     (keys) and any value, e.g.
 
@@ -74,7 +72,7 @@ Model structure
 
 An EMULSION model is divided in several "sections", corresponding to
 the main components of a model. Each section corresponds to a
-first-level key (i.e. put directly at the beginning of a line without
+**first-level key** (i.e. put directly at the beginning of a line without
 any indentation).
 
 Below is a short description of their nature. This is just an overview
@@ -110,10 +108,10 @@ license if any, etc.
 
       model_info:
         abstract: 'A very long description of the model'
-	authors:
-	  - First Author
-	  - Another Colleague
-	DOI: my_doi/10.10.10.
+       	authors:
+          - 'First Author'
+          - 'Another Colleague'
+        DOI: 'my_doi/10.10.10.'
 
 This part is only intended to provide information to the reader. All
 subsections can be freely defined according to the modeller's needs.
@@ -130,6 +128,7 @@ step** in the simulation. Optionally, it can specify:
 
 - the date where the simulation starts (``origin_date``)
 - the total duration of the simulation (``total_duration``)
+- a condition to interrupt the simulation before the total duration (``stop_condition``)
 - calendars with events (see :ref:`Regulate time`)
 
 .. admonition:: Example
@@ -137,14 +136,16 @@ step** in the simulation. Optionally, it can specify:
    .. code-block:: yaml
 
       time_info:
-        # all paramter values are expressed in days/per day
+        # all durations (resp. rates) parameter values are expressed in days (resp. per day)
         time_unit: 'days'
-	# the simulation step is 1 day
-            delta_t: 1
-	# simulations start on 01/01 (default: current year)
+        # the simulation step is 1 day
+        delta_t: 1
+        # simulations start on 01/01 (default: current year)
         origin: 'January 1'
-	# simulations run for 100 days
+        # simulations run for 100 days
         total_duration: '100'
+        # each run stops before 100 days if the infection is gone
+        stop_condition: 'infection_terminated'
 
 
 .. _state_machines:
@@ -159,7 +160,8 @@ productions links between states, to specify which states can produce
 new individuals.
 
 An EMULSION model can contain several state machines, the only
-constraint being that all state names must be different.
+constraint being that **all state names must be different**.
+
 
 .. admonition:: Example of a typical state machine
 
@@ -167,26 +169,33 @@ constraint being that all state names must be different.
 
       state_machines:
         health_state:  # the name of the state machine
-	      desc: 'The state machine which defines the evolution of health
-	      states'
-	      # Below, the list of states with their attributes.
-              states:
-                - S:
-                    name: 'Susceptible'
-                    desc: 'suceptible of becoming infected'
-                    fillcolor: 'deepskyblue'
-                - I:
-                    name: 'Infectious'
-                    desc: 'infected and able to transmit the disease'
-                    fillcolor: 'red'
-                - R:
-                    name: 'Resistant'
-                    desc: 'healthy again and resistant to infection'
-                    fillcolor: 'limegreen'
-              # Below, a list of transitions between states
-              transitions:
-                - {from: S, to: I, rate: 'force_of_infection'}
-                - {from: I, to: R, rate: 'recovery'}
+          desc: 'The state machine which defines the evolution of health states'
+          # Below, the list of states with their attributes.
+          states:
+            - S:
+                name: 'Susceptible'
+                desc: 'suceptible of becoming infected'
+                fillcolor: 'deepskyblue'
+            - I:
+                name: 'Infectious'
+                desc: 'infected and able to transmit the disease'
+                fillcolor: 'red'
+            - R:
+                name: 'Resistant'
+                desc: 'healthy again and resistant to infection'
+                fillcolor: 'limegreen'
+          # Below, a list of transitions between states
+          transitions:
+            - {from: S, to: I, rate: 'force_of_infection'}
+            - {from: I, to: R, rate: 'recovery'}
+          # Below, a list of production links: all states produce S individuals
+          productions:
+            - {from: S, to: S, rate: 'birth_rate', prototype: 'newborn'}
+            - {from: I, to: S, rate: 'birth_rate', prototype: 'newborn'}
+            - {from: R, to: S, rate: 'birth_rate', prototype: 'newborn'}
+
+
+State machine diagrams can be produced automatically by EMULSION with command ``emulsion diagrams <model.yaml>``.
 
 
 .. _levels:
@@ -194,7 +203,17 @@ constraint being that all state names must be different.
 ``levels``
 ==========
 
-In EMULSION, a **level** is a name associated with an entity of a given scale. At least two levels are expected in a model (e.g. individuals and the population).  A level can contain other sub-levels, base on a specific aggregation type (``compartment``, ``IBM``, ``hybrid`` or ``metapopulation``). A level is essentially a concept, hence not necessarily simulated explicitly by EMULSION: for instance, the notion of individuals exist in compartmental models, though calculations only involve populations. A level can also define aggregated variables calculated from the values of another variable at the sublevel.
+In EMULSION, a **level** is a name associated with an entity of a
+given scale. At least two levels are expected in a model
+(e.g. individuals and the population).  A level can contain other
+sub-levels, base on a specific aggregation type (``compartment``,
+``IBM``, ``hybrid`` or ``metapopulation``). A level is essentially a
+concept, hence not necessarily simulated explicitly by EMULSION: for
+instance, the notion of individuals exist in compartmental models,
+though calculations only involve populations. A level can also define
+aggregated variables calculated from the values of another variable at
+the sublevel.
+
 Level names can be chosen arbitrarily, to identify entities with the most relevant terms.
 
 .. admonition:: Example
@@ -217,12 +236,25 @@ Level names can be chosen arbitrarily, to identify entities with the most releva
 ``grouping``
 ============
 
-This section is **mandatory in hybrid models**, to describe explicitly how entities from a sublevel are grouped for optimizing the calculations.
+This section is **mandatory in hybrid models**, to describe explicitly
+how entities from a sublevel are grouped for optimizing the
+calculations.
 
-In compartmental models and IBM, a **grouping** section can be introduced to provide automatic variables of the form e.g. ``total_X_Y_Z`` where X, Y, and Z can be any states of three different state machines. The ``grouping`` section specifies upon which state machines a population is partitioned.
+In compartmental models and IBM, a **grouping** section can be
+introduced to provide automatic variables of the form
+e.g. ``total_X_Y_Z`` where X, Y, and Z can be any states of three
+different state machines. The ``grouping`` section specifies upon
+which state machines a population is partitioned.
 
-For instance, in a hybrid model, the operation in the ``health_state`` state machine are likely to depend only on the actual ``health_state`` value in each individual. Thus, individuals must be grouped by health state (all S together, all I together, etc.). Assuming for instance that we also have a state machine for defining several species and one for specifying age groups, grouping individuals by ``age_group`` and ``species`` automatically provides variables of the form ``total_Juvenile_Vector`` or ``total_Adult_Host``.
-Grouping names can be chosen arbitrarily.
+For instance, in a hybrid model, the operation in the ``health_state``
+state machine are likely to depend only on the actual ``health_state``
+value in each individual. Thus, individuals must be grouped by health
+state (all S together, all I together, etc.). Assuming for instance
+that we also have a state machine for defining several species and one
+for specifying age groups, grouping individuals by ``age_group`` and
+``species`` automatically provides variables of the form
+``total_Juvenile_Vector`` or ``total_Adult_Host``.  Grouping names can
+be chosen arbitrarily.
 
 .. admonition:: Example
 
@@ -240,32 +272,46 @@ Grouping names can be chosen arbitrarily.
 =============
 
 This section specifies the list of major processes that take place at
-each level during the simulation. A process name can be:
+each level during the simulation. A process name can be either:
 
-- the name of a grouping in compartment-based or hybrid models (hence
-  taking place at the population level)
-- the name of a state machine in individual-based models (hence taking
-  place at the individual level)
-- the name of a Python method developed specifically in a code add-on
+
+- **The name of a state machine:** then, the corresponding level (even
+  virtual individuals as in the compartment aggregation type) is
+  endowed with a **variable** with the same name as the state machine
+  (e.g. ``health_state``), which contains the current state
+  (e.g. ``S``). The state machines applies on the specified level,
+  making the state evolve over time.
+
+- **The name of a method** in a class implemented in a Python
+  add-on. In that case, the corresponding code is executed on the
+  corresponding level.
+
+In **hybrid models**, the name of the process is expected to be
+associated with the name of the grouping, used by the state machine to
+compute the flows on transitions.
 
 .. admonition:: Examples
 
-   A typical processes specification in a compartment-based/hybrid
+   A typical processes specification in a compartment-based/IBM
    model:
 
    .. code-block:: yaml
 
       processes:
-        population:
-	  - infection
+        individuals:
+          - health_state
 
-   A typical processes specification in an individual-based model:
+   A typical processes specification in a hybrid model:
 
    .. code-block:: yaml
 
       processes:
         individuals:
-	  - health_state
+          - health_state: infection
+      # assuming a grouping named "infection":
+      grouping:
+        population:
+          infection: [health_state]
 
 
 .. _parameters:
@@ -313,19 +359,15 @@ expression) comes from (``source:``).
 ``prototypes``
 ==============
 
-Prototypes are used for IBM/hybrid models and for
-metapopulations. They are intended to specify typical individuals or
-populations which are characterized by specific values of their
-variables.
+Prototypes are intended to specify typical individuals or populations
+which are characterized by specific values of their variables (in
+compartmental models, such variables can only be state machines).
 
-Prototypes are used mainly in two occasions:
+Prototypes are used mainly in:
 
-- in initial conditions (see below), to specify how many individuals
-  of each kind must be created
-- in production links of state machines, to indicate the nature of
-  individuals produced
-- in the built-in action ``become``, to make a state machine induce
-  changes in another state machine
+- initial conditions (see below), to specify how many individuals of each kind must be created
+- in production links of state machines, to indicate the nature of individuals produced
+- in the built-in action ``become``, to make a state machine induce changes in other variables, including another state machine
 
 .. admonition:: Example
 
@@ -337,13 +379,13 @@ Prototypes are used mainly in two occasions:
           - healthy:  # the name of the prototype
               desc: 'healthy individuals'
               health_state: S
-	      # variable age_group is one of the existing states
-	      age_group: random
+              # variable age_group is one of the existing states
+              age_group: random
           - infected:
               desc: 'infected individuals'
               health_state: I
-	      # here we intend to start with infected juveniles
-	      age_group: J
+              # here we intend to start with infected juveniles
+              age_group: J
 
 .. seealso::
 
@@ -355,45 +397,26 @@ Prototypes are used mainly in two occasions:
 ``initial_conditions``
 ======================
 
-Initial conditions specify how to initialize each level.
-
-In compartment-based models, initial conditions give the total
-population and the repartition in each compartment.
-
-In IBM, hybrid models and metapopulations, initial conditions rely on
-prototypes.
+Initial conditions specify how to initialize each level. They rely on
+prototypes, considered as the description of typical sub-levels
+(e.g. typical populations in metapopulations, typical individuals in
+IBM/hybrid models, typical sub-populations in compartment-based
+models).
 
 .. admonition:: Examples
 
-   A typical specification of initial conditions in a
-   compartment-based model:
-
-   .. code-block:: yaml
-
-      initial_conditions:
-        # the level for which the initial conditions are defined
-        population:
-          - population:
-  	      - total: 'initial_population_size'
-	      - vars: [S]  # amount of individuals in state S
-		amount: 'initial_population_size - initial_infected'
-	      - vars: [I] # amount of individuals in state I
-		amount: 'initial_infected'
-	      # the amount of individuals in state R is computed as:
-	      # (total - S - I)
-
-   A typical specification of initial conditions in an IBM:
+   A typical specification of initial conditions in an IBM/hybrid/compartment-based model:
 
    .. code-block:: yaml
 
       initial_conditions:
         population:
-	  # a list of prototypes with the number of individuals
-	  # to create with each prototype
-	  - prototype: healthy
-	    amount: 'initial_population_size - initial_infected'
-	  - prototype: infected
-	    amount: 'initial_infected'
+          # a list of prototypes with the number of individuals
+          # to create with each prototype
+          - prototype: infected
+            amount: 'initial_infected'
+          - prototype: healthy
+            amount: 'initial_population_size - initial_infected'
 
 
 .. _outputs:
@@ -419,10 +442,146 @@ automatically produced, as well as one plot for all extra variables.
         population:      # outputs for level population
           period: 1  # at each time step
           extra_vars:
-	    # add an expression (from 'parameters')
-            - 'prevalence (%)'
-	    # add a population variable
+            # add an expression (from 'parameters')
+            - 'percentage_prevalence'
+            # add a population variable
             - total_population
+
+
+.. _statevars:
+
+``statevars``
+=============
+
+This section appears when a level requires variables which are not
+defined automatically by their state machines, nor defined as
+expressions in the parameters section, nor computed by aggregating
+variables from a sublevel. In that case, the section contains a simple
+description of the meaning of the variable, which has to be handled
+either in prototypes and built-in actions (e.g. ``set_var``), or in a
+Python code add-on.
+
+.. admonition:: Example
+
+   .. code-block:: yaml
+
+      statevars:
+        nb_mothers_of_infected_calf:
+          desc: 'identify and counts cows which gave birth to an infected calf'
+
+
+
+.. _input_data:
+
+``input_data``
+==============
+
+.. warning::
+
+   This feature is experimental and likely to evolve in further versions.
+
+
+This section is used to connect the model description to data (and
+possibly to Python code add-ons). Two main subsections can be specified:
+**preprocessors** and **data-based parameters**.
+
+**Preprocessors** are intended to define treatments which have to be
+done before all stochastic repetitions within the same ``emulsion
+run`` command.
+
+For instance, to load a data file on trade movements between the
+populations of a metapopulation: this has to be done once before all
+repetitions start, then it has to be stored in memory and made
+available for each repetition. Each preprocessor is associated with a
+specific Python class.
+
+The ``preprocessing:`` subsection is composed of a list of
+preprocessor specifications, with the name of the Python file where
+the preprocessor class is defined, the corresponding class name, a
+description of the treatment, and possibly input files, output files
+and a dependance to data-based parameters. The Python class must
+implement two methods: ``init_preprocessor`` and ``run_preprocessor``.
+
+Preprocessors are executed in sequence, before handling data-based
+parameters if they do not depend on them.
+
+.. admonition:: Example
+
+   The specification of a preprocessor in the YAML model file:
+
+   .. code-block:: yaml
+
+      preprocessing:
+        - file: 'hybrid_SIR_JA_metapop_data.py'
+          class_name: TradeMovementsReader
+          desc: 'A preprocessor class for reading the CSV that describes the trade movements and restructuring it as a dictionary, stored in shared information in the simulation.'
+          input_files:
+            trade_file: 'moves.csv'
+
+   The definition of the preprocessor in the Python file:
+
+   .. code-block:: python
+
+       class TradeMovementsReader(EmulsionPreprocessor):
+           """A preprocessor class for reading the CSV... """
+           # The method which checks the validity of the preprocessor definition
+           def init_preprocessor(self):
+               if self.input_files is None or 'trade_file' not in self.input_files:
+                   raise SemanticException("A valid 'trafe_file' must be specified in the input_files section for pre-processing class {}".format(self.__class__.__name__))
+           # The method which performs the actual treatment
+           def run_preprocessor(self):
+               # Note that data shared between runs can be stored in a shared_data
+               # dictionary in the simulation
+               if 'moves' not in self.simulation.shared_data:
+                   debuginfo('Reading {}'.format(self.input_files.trade_file))
+                   self.simulation.shared_data['moves'] = self.restructure_moves()
+               else:
+                   debuginfo('Trade movements already loaded in simulation')
+            # The treatment itself
+            def restructure_moves(self):
+                """Restructure the CSV file as nested dictionaries"""
+		    ...
+
+
+.. seealso::
+
+   :ref:`SIR model with metapopulation, data-driven movements and data pre-processing`,
+
+
+
+**Data-based parameters** allow to force parameter values at a given
+level through a data file. For instance, environmental parameters such
+as the temperature or a carring capacity can be entirely
+data-driven. The principle then is to used a CSV file where some
+columns are used as index (``key_variables``) to identify which
+entities have to update, and other columns are the values of the
+parameters. In practice, those "parameter" values are stored into
+variables defined at the corresponding level.
+
+The ``data_based_parameters`` subsection must specify the level
+concerned by the data-driven parameters, the CSV file to use, the list
+of variables used as index, and the dictionary of parameters to change
+based on data with their description.
+
+.. admonition:: Example
+
+   .. code-block:: yaml
+
+     data_based_parameters:
+       - level: herd
+         file: 'herd_params.csv'
+         key_variables: [population_id, step]
+         parameters:
+           carrying_capacity:
+             desc: 'carrying capacity of the population environment at current time step'
+           precipitation:
+             desc: 'amount of water available in the population environment at current time step'
+
+
+.. seealso::
+
+   TODO
+
 
 
 .. _actions:
@@ -442,27 +601,4 @@ to be defined in a separate Python file.
 
       actions:
         read_mailbox:
-	  desc: 'Check if messages were received from other
-	  individuals and modify contact network accordingly.'
-
-
-.. _statevars:
-
-``statevars``
-=============
-
-This section appears when a level requires variables which are not
-defined automatically by their state machines, nor defined as
-expressions in the parameters section, nor computed by aggregating
-variables from a sublevel. In that case, the section contains a simple
-description of the meaning of the variable, which has to be defined in
-a separate Python file.
-
-.. admonition:: Example
-
-   .. code-block:: yaml
-
-      statevars:
-        nb_mothers_of_infected_calf:
-	  desc: 'identify and counts cows which gave birth to an
-	  infected calf'
+          desc: 'Check if messages were received from other individuals and modify contact network accordingly.'

@@ -115,6 +115,9 @@ features while making them appear explicitly. Especially:
     before the expected duration
   - actions to perform for individuals crossing the transition
 
+- in addition to transitions, **production links** can be used to
+  represent the introdution of new individuals (e.g. births)
+
 .. _state-machine:
 .. figure:: ../_images/state_machine.jpg
    :alt: principles of a state machine
