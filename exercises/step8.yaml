@@ -234,7 +234,7 @@ parameters:
     value: 'is_J * random_gamma(50, max_shedding_low/50) + is_A * random_gamma(100, max_shedding_high/100)'
   beta:
     desc: 'actual shedding rate of individuals, depending on the time elapsed since infection'
-    value: 'is_I * beta_max * exp(-2 * recovery * duration_in_health_state)'
+    value: 'is_I * beta_i_max * exp(-2 * recovery * duration_in_health_state)'
   force_of_infection:
     desc: 'infection function assuming frequency dependence'
     value: 'total_beta / total_herd'
